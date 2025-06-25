@@ -1210,6 +1210,112 @@ export const cardGeniusApiData = {
     "monthly_amazon_spend": 10000,
     "monthly_fuel_spend": 3000
 }'`
+  },
+  'v1-eligibility': {
+    name: 'Eligibility',
+    endpoint: '/v1/cards/eligibility',
+    methods: ['POST'],
+    description: 'Check if a user can apply for one or more cards.',
+    category: 'Card APIs',
+    purpose: 'Show only cards the user can apply for before they start an application.',
+    requestSchema: {
+      type: 'object',
+      properties: {
+        card_slug: { type: 'string', description: 'The slug of the card to check eligibility for.' },
+      }
+    },
+    sampleResponse: { "card_slug": "sbi-cashback-credit-card", "eligible": true, "criteria": { "income": true, "location": true, "employment": true } },
+    curlExample: `curl --location 'https://api.bankkaro.com/v1/cards/eligibility' \\
+--header 'Authorization: Bearer <jwt>' \\
+--header 'Content-Type: application/json' \\
+--data '{"card_slug": "sbi-cashback-credit-card"}'`
+  },
+  'v1-redemption-planner': {
+    name: 'Redemption Planner',
+    endpoint: '/v1/redemptions/calculate',
+    methods: ['POST'],
+    description: 'Calculate the best way to redeem reward points.',
+    category: 'Card APIs',
+    purpose: 'Help users maximize the value of their accumulated reward points.',
+    requestSchema: {
+      type: 'object',
+      properties: {
+        points: { type: 'integer', description: 'The number of points to calculate redemption options for.' },
+        preferred_redemption_types: { type: 'array', items: { type: 'string' }, description: 'An array of preferred redemption types (e.g., "cash").' }
+      }
+    },
+    sampleResponse: {
+      "best_option": {
+        "type": "cash",
+        "conversion_rate": 0.25,
+        "estimated_value_inr": 8750,
+        "redeem_url": "https://example.com/redeem?pts=35000"
+      },
+      "options": [
+        { "type": "cash", "conversion_rate": 0.25, "estimated_value_inr": 8750 },
+        { "type": "amazon_voucher", "conversion_rate": 0.20, "estimated_value_inr": 7000 },
+        { "type": "air_miles", "conversion_rate": 0.30, "estimated_value_inr": 10500 }
+      ]
+    },
+    curlExample: `curl --location 'https://api.bankkaro.com/v1/redemptions/calculate' \\
+--header 'Authorization: Bearer <jwt>' \\
+--header 'Content-Type: application/json' \\
+--data '{"points": 35000}'`
+  },
+  'v1-instant-offers': {
+    name: 'Instant Offers',
+    endpoint: '/v1/cards/{card_slug}/offers',
+    methods: ['GET'],
+    description: 'Get live issuer–brand promotions for a specific card.',
+    category: 'Card APIs',
+    purpose: 'Display relevant, real-time offers and deals associated with a card.',
+    sampleResponse: { "offers": [ { "merchant": "Swiggy", "headline": "15% off Tue", "valid_till": "2025-12-31" } ] },
+    curlExample: `curl --location 'https://api.bankkaro.com/v1/cards/sbi-cashback-credit-card/offers' \\
+--header 'Authorization: Bearer <jwt>'`
+  },
+  'v1-lounge-finder': {
+    name: 'Lounge Finder',
+    endpoint: '/v1/cards/{card_slug}/lounges',
+    methods: ['GET'],
+    description: 'Get airport and railway lounge access details for a specific card.',
+    category: 'Card APIs',
+    purpose: 'Provide users with information about their travel lounge benefits.',
+    sampleResponse: { "domestic_lounges_per_quarter": 4, "international_lounges_per_year": 2, "railway_lounges_per_quarter": 4, "lounge_networks": ["Priority Pass"], "terms": "Primary only" },
+    curlExample: `curl --location 'https://api.bankkaro.com/v1/cards/sbi-cashback-credit-card/lounges' \\
+--header 'Authorization: Bearer <jwt>'`
+  },
+  'v1-omni': {
+    name: 'Omni Endpoint',
+    endpoint: '/v1/cards/omni',
+    methods: ['POST'],
+    description: 'A single endpoint to get nested data from multiple modules.',
+    category: 'Card APIs',
+    purpose: 'Enable low-development integrations by fetching multiple data types in one API call.',
+    sampleResponse: { "banks": [], "categories": [], "cards": [], "recommendations": [], "offers": [], "lounges": [], "redemptions": {} },
+    curlExample: `curl --location 'https://api.bankkaro.com/v1/cards/omni' \\
+--header 'Authorization: Bearer <jwt>' \\
+--header 'Content-Type: application/json' \\
+--data '{}'`
+  },
+  'v1-webhooks': {
+    name: 'Webhooks Subscription',
+    endpoint: '/v1/webhooks',
+    methods: ['POST'],
+    description: 'Subscribe to webhook events for real-time notifications.',
+    category: 'Card APIs',
+    purpose: 'Allow partners to receive real-time updates on events like application status changes.',
+    requestSchema: {
+      type: 'object',
+      properties: {
+        url: { type: 'string', description: 'The URL to send webhook events to.' },
+        events: { type: 'array', items: { type: 'string' }, description: 'An array of event names to subscribe to (e.g., "application.approved").' }
+      }
+    },
+    sampleResponse: { "success": true, "message": "Webhook subscription created successfully.", "webhook_id": "wh_1a2b3c4d5e" },
+    curlExample: `curl --location 'https://api.bankkaro.com/v1/webhooks' \\
+--header 'Authorization: Bearer <jwt>' \\
+--header 'Content-Type: application/json' \\
+--data '{"url": "https://partner.com/hook", "events": ["application.approved", "reward.posted"]}'`
   }
 };
 
