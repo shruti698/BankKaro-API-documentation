@@ -1330,6 +1330,6 @@ export const projects = {
     name: 'CardGenius Suite',
     description: 'REST endpoints for credit card discovery and personalization.',
     apis: cardGeniusApiData,
-    dashboard: false
+    dashboard: true
   }
 };

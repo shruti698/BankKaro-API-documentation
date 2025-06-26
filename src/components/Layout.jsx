@@ -51,7 +51,8 @@ const Layout = ({ children }) => {
   };
 
   const handleDashboardSelect = () => {
-    navigate('/dashboard');
+    const dashboardPath = selectedProject === 'cardGenius' ? '/cardgenius-dashboard' : '/loangenius-dashboard';
+    navigate(dashboardPath);
     if (isMobile) {
       setMobileOpen(false);
     }
@@ -62,9 +63,9 @@ const Layout = ({ children }) => {
     setSelectedProject(newProject);
     
     if (newProject === 'cardGenius') {
-      navigate('/docs/v1-banks');
+      navigate('/cardgenius-dashboard');
     } else {
-      navigate('/dashboard');
+      navigate('/loangenius-dashboard');
     }
     
     if (isMobile) {
@@ -133,7 +134,7 @@ const Layout = ({ children }) => {
           {currentProject.dashboard && (
             <ListItem disablePadding>
               <ListItemButton
-                selected={location.pathname === '/dashboard'}
+                selected={location.pathname.includes('dashboard')}
                 onClick={handleDashboardSelect}
                 sx={{
                   mx: 2,
@@ -153,14 +154,14 @@ const Layout = ({ children }) => {
               >
                 <ListItemIcon>
                   <DashboardIcon 
-                    color={location.pathname === '/dashboard' ? 'inherit' : 'primary'} 
+                    color={location.pathname.includes('dashboard') ? 'inherit' : 'primary'} 
                   />
                 </ListItemIcon>
                 <ListItemText 
                   primary="Dashboard"
                   primaryTypographyProps={{
                     fontSize: '0.95rem',
-                    fontWeight: location.pathname === '/dashboard' ? 'bold' : 500
+                    fontWeight: location.pathname.includes('dashboard') ? 'bold' : 500
                   }}
                 />
               </ListItemButton>

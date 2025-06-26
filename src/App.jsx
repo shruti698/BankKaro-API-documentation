@@ -4,7 +4,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
 import Layout from './components/Layout';
 import ApiDocumentation from './components/ApiDocumentation';
-import Dashboard from './components/Dashboard';
+import LoanGeniusDashboard from './components/LoanGeniusDashboard';
+import CardGeniusDashboard from './components/CardGeniusDashboard';
 import ComingSoon from './components/ComingSoon';
 
 const theme = createTheme({
@@ -159,8 +160,9 @@ function App() {
         <Box sx={{ display: 'flex', height: '100vh' }}>
           <Layout>
             <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/" element={<Navigate to="/loangenius-dashboard" replace />} />
+              <Route path="/loangenius-dashboard" element={<LoanGeniusDashboard />} />
+              <Route path="/cardgenius-dashboard" element={<CardGeniusDashboard />} />
               <Route path="/docs/:endpoint" element={<ApiDocumentation />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
             </Routes>

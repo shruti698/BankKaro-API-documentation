@@ -43,7 +43,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { environments } from '../config/environments';
 
-const Dashboard = () => {
+const LoanGeniusDashboard = () => {
   const navigate = useNavigate();
 
   const [workflowState, setWorkflowState] = useState({
@@ -317,15 +317,12 @@ const Dashboard = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: '100%' }}>
+    <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1200, mx: 'auto' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h3" gutterBottom sx={{ fontWeight: 'bold' }}>
-          BankKaro API Dashboard
-        </Typography>
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
-          Welcome to the BankKaro Partner API documentation. This dashboard provides an overview of available APIs 
-          and guides you through the typical integration workflow.
+        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>LoanGenius Dashboard</Typography>
+        <Typography variant="h6" color="text.secondary">
+          An interactive guide to the BankKaro for Business API suite.
         </Typography>
       </Box>
 
@@ -570,7 +567,7 @@ const Dashboard = () => {
                 {workflowSteps.map((step, index) => (
                   <Step key={step.label} expanded={expandedStep === index}>
                     <StepLabel 
-                      onClick={() => setExpandedStep(expandedStep === index ? -1 : index)}
+                      onClick={() => getStepStatusIcon(index)}
                       sx={{ cursor: 'pointer' }}
                       icon={getStepStatusIcon(index)}
                     >
@@ -640,4 +637,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; 
+export default LoanGeniusDashboard; 

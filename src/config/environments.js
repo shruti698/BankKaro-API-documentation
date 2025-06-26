@@ -3,7 +3,8 @@ export const environments = {
     name: 'Staging',
     url: 'https://bk-api.bankkaro.com',
     description: 'Development and testing environment',
-    color: 'warning'
+    color: 'warning',
+    cardApiUrl: 'https://bk-api.bankkaro.com/card-genius'
   },
   production: {
     name: 'Production',
