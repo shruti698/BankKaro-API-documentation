@@ -7,6 +7,7 @@ import ApiDocumentation from './components/ApiDocumentation';
 import LoanGeniusDashboard from './components/LoanGeniusDashboard';
 import CardGeniusDashboard from './components/CardGeniusDashboard';
 import ComingSoon from './components/ComingSoon';
+import Home from './components/Home';
 
 const theme = createTheme({
   palette: {
@@ -160,9 +161,9 @@ function App() {
         <Box sx={{ display: 'flex', height: '100vh' }}>
           <Layout>
             <Routes>
-              <Route path="/" element={<Navigate to="/loangenius-dashboard" replace />} />
-              <Route path="/loangenius-dashboard" element={<LoanGeniusDashboard />} />
-              <Route path="/cardgenius-dashboard" element={<CardGeniusDashboard />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/loangenius" element={<LoanGeniusDashboard />} />
+              <Route path="/cardgenius" element={<CardGeniusDashboard />} />
               <Route path="/docs/:endpoint" element={<ApiDocumentation />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
             </Routes>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Drawer,
@@ -13,10 +13,8 @@ import {
   Divider,
   useTheme,
   useMediaQuery,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
+  Tabs,
+  Tab,
   Paper
 } from '@mui/material';
 import {
@@ -27,9 +25,24 @@ import {
   Business as BusinessIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { apiData, projects } from '../data/apiData';
+import { apiData, cardGeniusApiData } from '../data/apiData';
 
 const drawerWidth = 320;
+
+const projects = {
+  bankkaro: {
+    name: 'Loan Genius',
+    description: 'APIs for lead generation, and managing financial products like loans & credit cards.',
+    apis: apiData,
+    dashboard: true,
+  },
+  cardGenius: {
+    name: 'CardGenius',
+    description: 'APIs for credit card sourcing and processing.',
+    apis: cardGeniusApiData,
+    dashboard: true,
+  },
+};
 
 const Layout = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -38,6 +51,25 @@ const Layout = ({ children }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const path = location.pathname;
+
+    if (path.startsWith('/cardgenius')) {
+      setSelectedProject('cardGenius');
+    } else if (path.startsWith('/loangenius')) {
+      setSelectedProject('bankkaro');
+    } else if (path.startsWith('/docs/')) {
+      const endpointSlug = path.substring('/docs/'.length);
+      // Check if the endpoint belongs to CardGenius
+      if (projects.cardGenius.apis.hasOwnProperty(endpointSlug)) {
+        setSelectedProject('cardGenius');
+      } else {
+        // Assume it belongs to Loan Genius if not found in CardGenius
+        setSelectedProject('bankkaro');
+      }
+    }
+  }, [location.pathname]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -51,25 +83,19 @@ const Layout = ({ children }) => {
   };
 
   const handleDashboardSelect = () => {
-    const dashboardPath = selectedProject === 'cardGenius' ? '/cardgenius-dashboard' : '/loangenius-dashboard';
+    const dashboardPath = selectedProject === 'cardGenius' ? '/cardgenius' : '/loangenius';
     navigate(dashboardPath);
     if (isMobile) {
       setMobileOpen(false);
     }
   };
 
-  const handleProjectChange = (event) => {
-    const newProject = event.target.value;
+  const handleProjectChange = (event, newProject) => {
     setSelectedProject(newProject);
-    
     if (newProject === 'cardGenius') {
-      navigate('/cardgenius-dashboard');
+      navigate('/cardgenius');
     } else {
-      navigate('/loangenius-dashboard');
-    }
-    
-    if (isMobile) {
-      setMobileOpen(false);
+      navigate('/loangenius');
     }
   };
 
@@ -96,140 +122,131 @@ const Layout = ({ children }) => {
       </Paper>
       
       {/* Project Switcher */}
-      <Box sx={{ p: 3, borderBottom: '1px solid #e2e8f0' }}>
-        <FormControl fullWidth size="small">
-          <InputLabel sx={{ fontWeight: 500 }}>Project</InputLabel>
-          <Select
-            value={selectedProject}
-            label="Project"
-            onChange={handleProjectChange}
-            sx={{ 
-              '& .MuiSelect-select': { 
-                display: 'flex', 
-                alignItems: 'center',
-                fontWeight: 500
-              }
-            }}
-          >
-            <MenuItem value="bankkaro">
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <BusinessIcon fontSize="small" />
-                BankKaro
-              </Box>
-            </MenuItem>
-            <MenuItem value="cardGenius">
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <ApiIcon fontSize="small" />
-                CardGenius
-              </Box>
-            </MenuItem>
-          </Select>
-        </FormControl>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs 
+          value={selectedProject} 
+          onChange={handleProjectChange} 
+          aria-label="project select tabs"
+          variant="fullWidth"
+        >
+          <Tab 
+            value="bankkaro" 
+            label="Loan Genius" 
+            icon={<BusinessIcon />} 
+            iconPosition="start" 
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          />
+          <Tab 
+            value="cardGenius" 
+            label="CardGenius" 
+            icon={<ApiIcon />} 
+            iconPosition="start" 
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          />
+        </Tabs>
       </Box>
       
       {/* Navigation Items */}
       <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-        <List sx={{ py: 0 }}>
-          {/* Dashboard */}
-          {currentProject.dashboard && (
-            <ListItem disablePadding>
-              <ListItemButton
-                selected={location.pathname.includes('dashboard')}
-                onClick={handleDashboardSelect}
-                sx={{
-                  mx: 2,
-                  my: 0.5,
-                  borderRadius: 2,
-                  '&.Mui-selected': {
-                    backgroundColor: theme.palette.primary.light,
-                    color: theme.palette.primary.contrastText,
-                    '&:hover': {
-                      backgroundColor: theme.palette.primary.light,
-                    },
-                  },
+        {/* Dashboard */}
+        {currentProject.dashboard && (
+          <ListItem disablePadding>
+            <ListItemButton
+              selected={location.pathname.startsWith('/loangenius') || location.pathname.startsWith('/cardgenius')}
+              onClick={handleDashboardSelect}
+              sx={{
+                mx: 2,
+                my: 0.5,
+                borderRadius: 2,
+                '&.Mui-selected': {
+                  backgroundColor: theme.palette.primary.light,
+                  color: theme.palette.primary.contrastText,
                   '&:hover': {
-                    backgroundColor: '#f1f5f9',
+                    backgroundColor: theme.palette.primary.light,
                   },
-                }}
-              >
-                <ListItemIcon>
-                  <DashboardIcon 
-                    color={location.pathname.includes('dashboard') ? 'inherit' : 'primary'} 
-                  />
-                </ListItemIcon>
-                <ListItemText 
-                  primary="Dashboard"
-                  primaryTypographyProps={{
-                    fontSize: '0.95rem',
-                    fontWeight: location.pathname.includes('dashboard') ? 'bold' : 500
-                  }}
+                },
+                '&:hover': {
+                  backgroundColor: '#f1f5f9',
+                },
+              }}
+            >
+              <ListItemIcon>
+                <DashboardIcon 
+                  color={location.pathname.startsWith('/loangenius') || location.pathname.startsWith('/cardgenius') ? 'inherit' : 'primary'} 
                 />
-              </ListItemButton>
-            </ListItem>
-          )}
-          
-          {/* API Endpoints */}
-          {Object.keys(currentApis).length > 0 && (
-            <>
-              <Box sx={{ px: 3, py: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 'bold' }}>
-                  {currentProject.name} APIs
-                </Typography>
-              </Box>
-              {Object.entries(currentApis).map(([key, api]) => {
-                const isSelected = location.pathname === `/docs/${key}`;
-                return (
-                  <ListItem key={key} disablePadding>
-                    <ListItemButton
-                      selected={isSelected}
-                      onClick={() => handleApiSelect(key)}
-                      sx={{
-                        mx: 2,
-                        my: 0.5,
-                        borderRadius: 2,
-                        '&.Mui-selected': {
-                          backgroundColor: theme.palette.primary.light,
-                          color: theme.palette.primary.contrastText,
-                          '&:hover': {
-                            backgroundColor: theme.palette.primary.light,
-                          },
-                        },
-                        '&:hover': {
-                          backgroundColor: '#f1f5f9',
-                        },
-                      }}
-                    >
-                      <ListItemIcon>
-                        <CodeIcon color={isSelected ? 'inherit' : 'primary'} />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={api.name}
-                        secondary={api.endpoint}
-                        primaryTypographyProps={{
-                          fontSize: '0.95rem',
-                          fontWeight: isSelected ? 'bold' : 500
-                        }}
-                        secondaryTypographyProps={{
-                          fontSize: '0.75rem',
-                          fontFamily: 'monospace'
-                        }}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                );
-              })}
-            </>
-          )}
-          
-          {/* Coming Soon for CardGenius */}
-          {selectedProject === 'cardGenius' && Object.keys(currentApis).length === 0 && (
-            <Box sx={{ p: 3, textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
-                APIs coming soon...
+              </ListItemIcon>
+              <ListItemText 
+                primary="Dashboard"
+                primaryTypographyProps={{
+                  fontSize: '0.95rem',
+                  fontWeight: location.pathname.startsWith('/loangenius') || location.pathname.startsWith('/cardgenius') ? 'bold' : 500
+                }}
+              />
+            </ListItemButton>
+          </ListItem>
+        )}
+        
+        {/* API Endpoints */}
+        {Object.keys(currentApis).length > 0 && (
+          <>
+            <Box sx={{ px: 3, py: 2 }}>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 'bold' }}>
+                {currentProject.name} APIs
               </Typography>
             </Box>
-          )}
-        </List>
+            {Object.entries(currentApis).map(([key, api]) => {
+              const isSelected = location.pathname === `/docs/${key}`;
+              return (
+                <ListItem key={key} disablePadding>
+                  <ListItemButton
+                    selected={isSelected}
+                    onClick={() => handleApiSelect(key)}
+                    sx={{
+                      mx: 2,
+                      my: 0.5,
+                      borderRadius: 2,
+                      '&.Mui-selected': {
+                        backgroundColor: theme.palette.primary.light,
+                        color: theme.palette.primary.contrastText,
+                        '&:hover': {
+                          backgroundColor: theme.palette.primary.light,
+                        },
+                      },
+                      '&:hover': {
+                        backgroundColor: '#f1f5f9',
+                      },
+                    }}
+                  >
+                    <ListItemIcon>
+                      <CodeIcon color={isSelected ? 'inherit' : 'primary'} />
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary={api.name}
+                      secondary={api.endpoint}
+                      primaryTypographyProps={{
+                        fontSize: '0.95rem',
+                        fontWeight: isSelected ? 'bold' : 500
+                      }}
+                      secondaryTypographyProps={{
+                        fontSize: '0.75rem',
+                        fontFamily: 'monospace'
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
+          </>
+        )}
+        
+        {/* Coming Soon for CardGenius */}
+        {selectedProject === 'cardGenius' && Object.keys(currentApis).length === 0 && (
+          <Box sx={{ p: 3, textAlign: 'center' }}>
+            <Typography variant="body2" color="text.secondary">
+              APIs coming soon...
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   );
@@ -260,24 +277,6 @@ const Layout = ({ children }) => {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
             {currentProject.name} API Documentation
           </Typography>
-          
-          {/* Project Switcher in AppBar for mobile */}
-          {isMobile && (
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <Select
-                value={selectedProject}
-                onChange={handleProjectChange}
-                sx={{ 
-                  color: 'primary.main',
-                  fontWeight: 500,
-                  '& .MuiSelect-icon': { color: 'primary.main' }
-                }}
-              >
-                <MenuItem value="bankkaro">BankKaro</MenuItem>
-                <MenuItem value="cardGenius">CardGenius</MenuItem>
-              </Select>
-            </FormControl>
-          )}
         </Toolbar>
       </AppBar>
       

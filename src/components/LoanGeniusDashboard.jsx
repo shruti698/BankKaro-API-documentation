@@ -320,9 +320,11 @@ const LoanGeniusDashboard = () => {
     <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1200, mx: 'auto' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>LoanGenius Dashboard</Typography>
-        <Typography variant="h6" color="text.secondary">
-          An interactive guide to the BankKaro for Business API suite.
+        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+          LoanGenius Dashboard
+        </Typography>
+        <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 4 }}>
+          An interactive guide to the BankKaro Loans API suite.
         </Typography>
       </Box>
 
