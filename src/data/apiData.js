@@ -1,241 +1,4 @@
 export const apiData = {
-  'initial-data': {
-    name: 'Initialization Bundle',
-    endpoint: '/cardgenius/initial-data',
-    methods: ['GET'],
-    description: 'Returns all static data required to initialize the CardGenius app.',
-    category: 'Card APIs',
-    purpose: 'Provides banks, categories, and other static data needed for app initialization.',
-    responseSchema: {
-      type: 'object',
-      properties: {
-        banks: {
-          type: 'array',
-          description: 'List of all available banks'
-        },
-        categories: {
-          type: 'array', 
-          description: 'List of all card categories'
-        },
-        tags: {
-          type: 'array',
-          description: 'List of all available tags'
-        }
-      }
-    },
-    sampleResponse: {
-      "banks": [
-        {
-          "id": 1,
-          "name": "HDFC Bank",
-          "logo_url": "https://example.com/hdfc-logo.png"
-        },
-        {
-          "id": 2, 
-          "name": "SBI",
-          "logo_url": "https://example.com/sbi-logo.png"
-        }
-      ],
-      "categories": [
-        {
-          "id": 1,
-          "name": "Shopping",
-          "icon": "shopping_cart"
-        },
-        {
-          "id": 2,
-          "name": "Travel",
-          "icon": "flight"
-        }
-      ],
-      "tags": [
-        {
-          "id": 1,
-          "name": "Cashback",
-          "color": "#4CAF50"
-        },
-        {
-          "id": 2,
-          "name": "Rewards",
-          "color": "#2196F3"
-        }
-      ]
-    },
-    curlExample: `curl --location 'https://api.bankkaro.com/cardgenius/initial-data' \\
---header 'Authorization: Bearer <jwt>'`
-  },
-  'banks': {
-    name: 'Banks List',
-    endpoint: '/cardgenius/banks',
-    methods: ['GET'],
-    description: 'Get a list of all available banks.',
-    category: 'Card APIs',
-    purpose: 'Retrieve all banks that offer credit cards through the platform.',
-    responseSchema: {
-      type: 'object',
-      properties: {
-        banks: {
-          type: 'array',
-          description: 'List of banks',
-          items: {
-            type: 'object',
-            properties: {
-              id: { type: 'integer', description: 'Bank ID' },
-              name: { type: 'string', description: 'Bank name' },
-              logo_url: { type: 'string', description: 'Bank logo URL' }
-            }
-          }
-        }
-      }
-    },
-    sampleResponse: {
-      "banks": [
-        {
-          "id": 1,
-          "name": "HDFC Bank",
-          "logo_url": "https://example.com/hdfc-logo.png"
-        },
-        {
-          "id": 2,
-          "name": "SBI",
-          "logo_url": "https://example.com/sbi-logo.png"
-        }
-      ]
-    },
-    curlExample: `curl --location 'https://api.bankkaro.com/cardgenius/banks' \\
---header 'Authorization: Bearer <jwt>'`
-  },
-  'categories': {
-    name: 'Categories List',
-    endpoint: '/cardgenius/categories',
-    methods: ['GET'],
-    description: 'Get a list of all card categories.',
-    category: 'Card APIs',
-    purpose: 'Retrieve all available card categories for filtering and organization.',
-    responseSchema: {
-      type: 'object',
-      properties: {
-        categories: {
-          type: 'array',
-          description: 'List of categories',
-          items: {
-            type: 'object',
-            properties: {
-              id: { type: 'integer', description: 'Category ID' },
-              name: { type: 'string', description: 'Category name' },
-              icon: { type: 'string', description: 'Category icon' }
-            }
-          }
-        }
-      }
-    },
-    sampleResponse: {
-      "categories": [
-        {
-          "id": 1,
-          "name": "Shopping",
-          "icon": "shopping_cart"
-        },
-        {
-          "id": 2,
-          "name": "Travel",
-          "icon": "flight"
-        }
-      ]
-    },
-    curlExample: `curl --location 'https://api.bankkaro.com/cardgenius/categories' \\
---header 'Authorization: Bearer <jwt>'`
-  },
-  'cards': {
-    name: 'Cards Catalog',
-    endpoint: '/cardgenius/cards',
-    methods: ['GET'],
-    description: 'Get a paginated list of all available credit cards.',
-    category: 'Card APIs',
-    purpose: 'Retrieve a comprehensive list of credit cards with filtering and pagination options.',
-    requestSchema: {
-      type: 'object',
-      properties: {
-        page: {
-          type: 'integer',
-          description: 'Page number for pagination',
-          required: false,
-          validation: 'Must be a positive integer'
-        },
-        limit: {
-          type: 'integer',
-          description: 'Number of cards per page',
-          required: false,
-          validation: 'Must be between 1 and 100'
-        },
-        bank_id: {
-          type: 'integer',
-          description: 'Filter by bank ID',
-          required: false
-        },
-        category_id: {
-          type: 'integer',
-          description: 'Filter by category ID',
-          required: false
-        }
-      }
-    },
-    responseSchema: {
-      type: 'object',
-      properties: {
-        cards: {
-          type: 'array',
-          description: 'List of credit cards',
-          items: {
-            type: 'object',
-            properties: {
-              id: { type: 'integer', description: 'Card ID' },
-              name: { type: 'string', description: 'Card name' },
-              bank_name: { type: 'string', description: 'Bank name' },
-              image_url: { type: 'string', description: 'Card image URL' },
-              annual_fee: { type: 'string', description: 'Annual fee' },
-              joining_fee: { type: 'string', description: 'Joining fee' }
-            }
-          }
-        },
-        pagination: {
-          type: 'object',
-          properties: {
-            current_page: { type: 'integer', description: 'Current page number' },
-            total_pages: { type: 'integer', description: 'Total number of pages' },
-            total_cards: { type: 'integer', description: 'Total number of cards' }
-          }
-        }
-      }
-    },
-    sampleResponse: {
-      "cards": [
-        {
-          "id": 1,
-          "name": "HDFC Regalia Credit Card",
-          "bank_name": "HDFC Bank",
-          "image_url": "https://example.com/hdfc-regalia.png",
-          "annual_fee": "₹2,500",
-          "joining_fee": "₹2,500"
-        },
-        {
-          "id": 2,
-          "name": "SBI Cashback Credit Card",
-          "bank_name": "SBI",
-          "image_url": "https://example.com/sbi-cashback.png",
-          "annual_fee": "₹999",
-          "joining_fee": "₹999"
-        }
-      ],
-      "pagination": {
-        "current_page": 1,
-        "total_pages": 10,
-        "total_cards": 100
-      }
-    },
-    curlExample: `curl --location 'https://api.bankkaro.com/cardgenius/cards?page=1&limit=20' \\
---header 'Authorization: Bearer <jwt>'`
-  },
   'partner-auth': {
     name: 'Partner Authentication',
     endpoint: '/sp/api/partner-auth',
@@ -1218,6 +981,243 @@ export const apiData = {
       }
     ]
   },
+  'initial-data': {
+    name: 'Initialization Bundle',
+    endpoint: '/cardgenius/initial-data',
+    methods: ['GET'],
+    description: 'Returns all static data required to initialize the CardGenius app.',
+    category: 'Card APIs',
+    purpose: 'Provides banks, categories, and other static data needed for app initialization.',
+    responseSchema: {
+      type: 'object',
+      properties: {
+        banks: {
+          type: 'array',
+          description: 'List of all available banks'
+        },
+        categories: {
+          type: 'array', 
+          description: 'List of all card categories'
+        },
+        tags: {
+          type: 'array',
+          description: 'List of all available tags'
+        }
+      }
+    },
+    sampleResponse: {
+      "banks": [
+        {
+          "id": 1,
+          "name": "HDFC Bank",
+          "logo_url": "https://example.com/hdfc-logo.png"
+        },
+        {
+          "id": 2, 
+          "name": "SBI",
+          "logo_url": "https://example.com/sbi-logo.png"
+        }
+      ],
+      "categories": [
+        {
+          "id": 1,
+          "name": "Shopping",
+          "icon": "shopping_cart"
+        },
+        {
+          "id": 2,
+          "name": "Travel",
+          "icon": "flight"
+        }
+      ],
+      "tags": [
+        {
+          "id": 1,
+          "name": "Cashback",
+          "color": "#4CAF50"
+        },
+        {
+          "id": 2,
+          "name": "Rewards",
+          "color": "#2196F3"
+        }
+      ]
+    },
+    curlExample: `curl --location 'https://api.bankkaro.com/cardgenius/initial-data' \\
+--header 'Authorization: Bearer <jwt>'`
+  },
+  'banks': {
+    name: 'Banks List',
+    endpoint: '/cardgenius/banks',
+    methods: ['GET'],
+    description: 'Get a list of all available banks.',
+    category: 'Card APIs',
+    purpose: 'Retrieve all banks that offer credit cards through the platform.',
+    responseSchema: {
+      type: 'object',
+      properties: {
+        banks: {
+          type: 'array',
+          description: 'List of banks',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'integer', description: 'Bank ID' },
+              name: { type: 'string', description: 'Bank name' },
+              logo_url: { type: 'string', description: 'Bank logo URL' }
+            }
+          }
+        }
+      }
+    },
+    sampleResponse: {
+      "banks": [
+        {
+          "id": 1,
+          "name": "HDFC Bank",
+          "logo_url": "https://example.com/hdfc-logo.png"
+        },
+        {
+          "id": 2,
+          "name": "SBI",
+          "logo_url": "https://example.com/sbi-logo.png"
+        }
+      ]
+    },
+    curlExample: `curl --location 'https://api.bankkaro.com/cardgenius/banks' \\
+--header 'Authorization: Bearer <jwt>'`
+  },
+  'categories': {
+    name: 'Categories List',
+    endpoint: '/cardgenius/categories',
+    methods: ['GET'],
+    description: 'Get a list of all card categories.',
+    category: 'Card APIs',
+    purpose: 'Retrieve all available card categories for filtering and organization.',
+    responseSchema: {
+      type: 'object',
+      properties: {
+        categories: {
+          type: 'array',
+          description: 'List of categories',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'integer', description: 'Category ID' },
+              name: { type: 'string', description: 'Category name' },
+              icon: { type: 'string', description: 'Category icon' }
+            }
+          }
+        }
+      }
+    },
+    sampleResponse: {
+      "categories": [
+        {
+          "id": 1,
+          "name": "Shopping",
+          "icon": "shopping_cart"
+        },
+        {
+          "id": 2,
+          "name": "Travel",
+          "icon": "flight"
+        }
+      ]
+    },
+    curlExample: `curl --location 'https://api.bankkaro.com/cardgenius/categories' \\
+--header 'Authorization: Bearer <jwt>'`
+  },
+  'cards': {
+    name: 'Cards Catalog',
+    endpoint: '/cardgenius/cards',
+    methods: ['GET'],
+    description: 'Get a paginated list of all available credit cards.',
+    category: 'Card APIs',
+    purpose: 'Retrieve a comprehensive list of credit cards with filtering and pagination options.',
+    requestSchema: {
+      type: 'object',
+      properties: {
+        page: {
+          type: 'integer',
+          description: 'Page number for pagination',
+          required: false,
+          validation: 'Must be a positive integer'
+        },
+        limit: {
+          type: 'integer',
+          description: 'Number of cards per page',
+          required: false,
+          validation: 'Must be between 1 and 100'
+        },
+        bank_id: {
+          type: 'integer',
+          description: 'Filter by bank ID',
+          required: false
+        },
+        category_id: {
+          type: 'integer',
+          description: 'Filter by category ID',
+          required: false
+        }
+      }
+    },
+    responseSchema: {
+      type: 'object',
+      properties: {
+        cards: {
+          type: 'array',
+          description: 'List of credit cards',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'integer', description: 'Card ID' },
+              name: { type: 'string', description: 'Card name' },
+              bank_name: { type: 'string', description: 'Bank name' },
+              image_url: { type: 'string', description: 'Card image URL' },
+              annual_fee: { type: 'string', description: 'Annual fee' },
+              joining_fee: { type: 'string', description: 'Joining fee' }
+            }
+          }
+        },
+        pagination: {
+          type: 'object',
+          properties: {
+            current_page: { type: 'integer', description: 'Current page number' },
+            total_pages: { type: 'integer', description: 'Total number of pages' },
+            total_cards: { type: 'integer', description: 'Total number of cards' }
+          }
+        }
+      }
+    },
+    sampleResponse: {
+      "cards": [
+        {
+          "id": 1,
+          "name": "HDFC Regalia Credit Card",
+          "bank_name": "HDFC Bank",
+          "image_url": "https://example.com/hdfc-regalia.png",
+          "annual_fee": "₹2,500",
+          "joining_fee": "₹2,500"
+        },
+        {
+          "id": 2,
+          "name": "SBI Cashback Credit Card",
+          "bank_name": "SBI",
+          "image_url": "https://example.com/sbi-cashback.png",
+          "annual_fee": "₹999",
+          "joining_fee": "₹999"
+        }
+      ],
+      "pagination": {
+        "current_page": 1,
+        "total_pages": 10,
+        "total_cards": 100
+      }
+    },
+    curlExample: `curl --location 'https://api.bankkaro.com/cardgenius/cards?page=1&limit=20' \\
+--header 'Authorization: Bearer <jwt>'`
+  },
   'card': {
     name: 'Card Detail',
     endpoint: '/cardgenius/cards/{card_slug}',
@@ -1432,7 +1432,7 @@ export const apiData = {
         { "type": "air_miles", "conversion_rate": 0.30, "estimated_value_inr": 10500 }
       ]
     },
-    curlExample: `curl --location 'https://api.bankkaro.com/v1/redemptions/calculate' \\
+    curlExample: `curl --location 'https://api.bankkaro.com/v1/cards/redemptions/calculate' \\
 --header 'Authorization: Bearer <jwt>' \\
 --header 'Content-Type: application/json' \\
 --data '{"points": 35000}'`
