@@ -980,352 +980,32 @@ export const apiData = {
         description: 'Unique key provided by BankKaro (staging/prod specific). Must be kept secret on the backend.'
       }
     ]
-  }
-};
-
-export const cardGeniusApiData = {
-  'initial-data': {
-    name: 'Initialization Bundle',
-    endpoint: '/cardgenius/initial-data',
+  },
+  'card': {
+    name: 'Card Detail',
+    endpoint: '/cardgenius/cards/{card_slug}',
     methods: ['GET'],
-    description: 'Fetch every bank, every category, and a lightweight list of cards belonging to each. Ideal for first-paint/bootstrapping screens or offline caches.',
+    description: 'Fetch the full specification and meta‑data for a single credit card.',
     category: 'Card APIs',
-    purpose: 'Remove three sequential calls (banks, categories, cards) and provide the UI with an immediately usable dataset that preserves the relationships between objects.',
+    purpose: 'Used on product‑detail pages, comparison views, or pre‑filled applications to obtain every field we store for a card.',
     fieldTable: [
-      { field: 'bank_id[]', type: 'integer', required: 'No', description: 'Restrict results to these banks' },
-      { field: 'category_slug', type: 'string', required: 'No', description: 'Restrict to a single category' },
-      { field: 'is_lifetime_free', type: 'boolean', required: 'No', description: 'Return only lifetime-free cards' },
-      { field: 'field_mask', type: 'string', required: 'No', description: 'Comma-sep list of card fields to return' }
+      { field: 'card_slug', type: 'string', required: 'Yes', description: 'The SEO‑friendly slug of the card (e.g. sbi-cashback-credit-card).' }
     ],
-    responseSchema: {
-      type: 'object',
-      properties: {
-        banks: {
-          type: 'array',
-          description: 'Every bank (optionally filtered)',
-          items: {
-            type: 'object',
-            properties: {
-              bank_id: { type: 'integer' },
-              bank_name: { type: 'string' },
-              logo_url: { type: 'string' },
-              status: { type: 'string' },
-              cards: {
-                type: 'array',
-                description: 'Cards issued by this bank (lightweight objects)',
-                items: {
-                  type: 'object',
-                  properties: {
-                    card_id: { type: 'integer' },
-                    card_slug: { type: 'string' },
-                    card_name: { type: 'string' },
-                    category_slugs: { type: 'array', items: { type: 'string' } },
-                    card_network: { type: 'string' },
-                    joining_fee: { type: 'integer' },
-                    annual_fee: { type: 'integer' },
-                    top_usp: { type: 'string' },
-                    card_image_url: { type: 'string' }
-                  }
-                }
-              }
-            }
-          }
-        },
-        categories: {
-          type: 'array',
-          description: 'Every category (optionally filtered)',
-          items: {
-            type: 'object',
-            properties: {
-              category_id: { type: 'integer' },
-              category_slug: { type: 'string' },
-              name: { type: 'string' },
-              description: { type: 'string' },
-              image_url: { type: 'string' },
-              highlight_color: { type: 'string' },
-              cards: {
-                type: 'array',
-                description: 'Cards that belong to this category (lightweight objects)',
-                items: {
-                  type: 'object',
-                  properties: {
-                    card_id: { type: 'integer' },
-                    card_slug: { type: 'string' },
-                    card_name: { type: 'string' },
-                    card_network: { type: 'string' },
-                    annual_fee: { type: 'integer' },
-                    top_usp: { type: 'string' }
-                  }
-                }
-              }
-            }
-          }
-        },
-        cards: {
-          type: 'array',
-          description: 'Flat list of all cards that passed filters (same lightweight shape)',
-          items: { $ref: '#/responseSchema/properties/banks/items/properties/cards/items' }
-        }
-      }
-    },
     sampleResponse: {
-      "banks": [
-        {
-          "bank_id": 1,
-          "bank_name": "Axis Bank",
-          "logo_url": "https://img.cdn/banks/axis.svg",
-          "status": "active",
-          "cards": [
-            {
-              "card_id": 27,
-              "card_slug": "axis-ace-credit-card",
-              "card_name": "Axis ACE Credit Card",
-              "category_slugs": ["cashback", "shopping"],
-              "card_network": "Visa",
-              "joining_fee": 499,
-              "annual_fee": 499,
-              "top_usp": "5 % cashback on GPay",
-              "card_image_url": "https://img.cdn/cards/axis-ace.png"
-            }
-          ]
-        }
-      ],
-      "categories": [
-        {
-          "category_id": 3,
-          "category_slug": "cashback",
-          "name": "Cash-back",
-          "description": "Earn cash rebates on every spend",
-          "image_url": "https://img.cdn/categories/cashback.png",
-          "highlight_color": "#00695c",
-          "cards": [
-            {
-              "card_id": 27,
-              "card_slug": "axis-ace-credit-card",
-              "card_name": "Axis ACE Credit Card",
-              "card_network": "Visa",
-              "annual_fee": 499,
-              "top_usp": "5 % cashback on GPay"
-            }
-          ]
-        }
-      ],
-      "cards": [
-        {
-          "card_id": 27,
-          "card_slug": "axis-ace-credit-card",
-          "card_name": "Axis ACE Credit Card",
-          "category_slugs": ["cashback", "shopping"],
-          "card_network": "Visa",
-          "joining_fee": 499,
-          "annual_fee": 499,
-          "top_usp": "5 % cashback on GPay",
-          "card_image_url": "https://img.cdn/cards/axis-ace.png"
-        }
-      ]
-    },
-    curlExample: `curl --location 'https://bk-api.bankkaro.com/cardgenius/initial-data' \\
---header 'Authorization: Bearer <jwt>'`
-  },
-  'v1-banks': {
-    name: 'Banks',
-    endpoint: '/v1/banks',
-    methods: ['GET'],
-    description: 'Lists all available banks for filtering.',
-    category: 'Card APIs',
-    purpose: 'Retrieve a list of all banks to populate filter options in the user interface.',
-    responseSchema: {
-      type: 'object',
-      properties: {
-        banks: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              bank_id: { type: 'integer', description: 'Unique identifier for the bank.' },
-              bank_name: { type: 'string', description: 'Name of the bank.' },
-              logo_url: { type: 'string', description: 'URL for the bank\'s logo.' },
-              status: { type: 'string', description: 'Status of the bank (e.g., "active").' }
-            }
-          }
-        }
-      }
-    },
-    sampleResponse: {
-      "banks": [
-        {
-          "bank_id": 1,
-          "bank_name": "Axis Bank",
-          "logo_url": "https://example.com/axis.png",
-          "status": "active"
-        }
-      ]
-    },
-    curlExample: `curl --location 'https://api.bankkaro.com/v1/banks' \\
---header 'Authorization: Bearer <jwt>'`
-  },
-  'v1-categories': {
-    name: 'Categories',
-    endpoint: '/v1/categories',
-    methods: ['GET'],
-    description: 'Lists all available card categories for filtering.',
-    category: 'Card APIs',
-    purpose: 'Retrieve a list of all card categories to populate filter options in the user interface.',
-    responseSchema: {
-      type: 'object',
-      properties: {
-        categories: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              category_id: { type: 'integer', description: 'Unique identifier for the category.' },
-              category_slug: { type: 'string', description: 'URL-friendly slug for the category.' },
-              name: { type: 'string', description: 'Name of the category.' },
-              description: { type: 'string', description: 'Description of the category.' },
-              image_url: { type: 'string', description: 'URL for the category image.' },
-              highlight_color: { type: 'string', description: 'Hex color code for UI highlights.' }
-            }
-          }
-        }
-      }
-    },
-    sampleResponse: {
-      "categories": [
-        {
-          "category_id": 1,
-          "category_slug": "fuel",
-          "name": "Fuel",
-          "description": "Cards with fuel surcharge waiver & cashback",
-          "image_url": "https://example.com/fuel.png",
-          "highlight_color": "#274B4D"
-        }
-      ]
-    },
-    curlExample: `curl --location 'https://api.bankkaro.com/v1/categories' \\
---header 'Authorization: Bearer <jwt>'`
-  },
-  'cards': {
-    name: 'Cards Catalog',
-    endpoint: '/cardgenius/cards',
-    methods: ['GET'],
-    description: 'Browse or search credit cards with powerful filtering.',
-    category: 'Card APIs',
-    purpose: 'Paginated list of credit cards. All response fields now mirror production.',
-    fieldTable: [
-      { field: 'bank_id[]', type: 'integer', required: 'No', description: 'Filter by one or more bank IDs.' },
-      { field: 'category_slug', type: 'string', required: 'No', description: 'Filter by category slug.' },
-      { field: 'card_network', type: 'string', required: 'No', description: 'Filter by card network (e.g., Visa).' },
-      { field: 'max_annual_fee', type: 'integer', required: 'No', description: 'Filter by maximum annual fee.' },
-      { field: 'is_lifetime_free', type: 'boolean', required: 'No', description: 'Filter for lifetime-free cards.' },
-      { field: 'sort', type: 'string', required: 'No', description: 'Sort order (recommended, annual_savings, annual_fee).' },
-      { field: 'page_size', type: 'integer', required: 'No', description: 'Number of results per page (default 50).' },
-      { field: 'page_token', type: 'string', required: 'No', description: 'Token for fetching the next page.' },
-      { field: 'field_mask', type: 'string', required: 'No', description: 'Mask for specifying which fields to return.' }
-    ],
-    responseSchema: {
-      type: 'object',
-      properties: {
-        cards: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              card_id: { type: 'integer' },
-              card_name: { type: 'string' },
-              card_nick_name: { type: 'string' },
-              product_type: { type: 'string' },
-              card_networks: { type: 'string' },
-              user_rating_count: { type: 'integer' },
-              rating: { type: 'number' },
-              bank_id: { type: 'integer' },
-              priority: { type: 'integer' },
-              bk_commission: { type: 'string' },
-              new_to_credit: { type: 'boolean' },
-              existing_customer: { type: 'boolean' },
-              commission_type: { type: 'string' },
-              commission: { type: 'string' },
-              commission_percent: { type: 'string' },
-              sub_agent_commission: { type: 'string' },
-              seo_card_alias: { type: 'string' },
-              card_alias: { type: 'string' },
-              card_image_url: { type: 'string' },
-              card_bg_image: { type: 'string' },
-              card_bg_gradient: { type: 'string' },
-              other_images: { type: 'string' },
-              age_criteria: { type: 'string' },
-              age_criteria_comment: { type: 'string' },
-              age_self_emp: { type: 'string' },
-              age_self_emp_comment: { type: 'string' },
-              min_age: { type: 'integer' },
-              max_age: { type: 'integer' },
-              crif_min: { type: 'string' },
-              crif_comment: { type: 'string' },
-              income_min: { type: 'string' },
-              income_comment: { type: 'string' },
-              crif_self_emp_min: { type: 'string' },
-              crif_self_emp_comment: { type: 'string' },
-              income_salaried_lpa: { type: 'string' },
-              income_self_emp_lpa: { type: 'string' },
-              income_self_emp_comment: { type: 'string' },
-              joining_fee_text: { type: 'string' },
-              joining_fee_offset: { type: 'string' },
-              joining_fee_comment: { type: 'string' },
-              annual_fee_text: { type: 'string' },
-              annual_fee_waiver: { type: 'string' },
-              annual_fee_comment: { type: 'string' },
-              annual_saving: { type: 'string' },
-              annual_saving_comment: { type: 'string' },
-              reward_conversion_rate: { type: 'string' },
-              redemption_options: { type: 'string' },
-              redemption_catalogue: { type: 'string' },
-              exclusion_earnings: { type: 'string' },
-              exclusion_spends: { type: 'string' },
-              network_url: { type: 'string' },
-              employment_type: { type: 'string' },
-              tnc: { type: 'string' },
-              status: { type: 'boolean' },
-              redirectionFlag: { type: 'boolean' },
-              createdAt: { type: 'string' },
-              updatedAt: { type: 'string' },
-              meta_title: { type: 'string' },
-              meta_description: { type: 'string' },
-              product_usps: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    header: { type: 'string' },
-                    description: { type: 'string' },
-                    priority: { type: 'integer' },
-                    tag_id: { type: 'integer' }
-                  }
-                }
-              },
-              tags: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    tag_id: { type: 'integer' },
-                    name: { type: 'string' }
-                  }
-                }
-              }
-            }
-          }
-        },
-        next_page_token: { type: 'string' }
-      }
-    },
-    sampleResponse: {
-      "cards": [
-        {
-          "card_id": 27,
-          "card_name": "SBI Cashback Credit Card",
-          "card_nick_name": "SBI Cashback,Credit Card",
+      "status": "success",
+      "message": "",
+      "data": {
+        "cards": [],
+        "filteredCards": [],
+        "tag_slug": false,
+        "card_slug": true,
+        "tag": {},
+        "card_details": {
+          "id": 27,
+          "name": "SBI Cashback Credit Card",
+          "nick_name": "SBI Cashback,Credit Card",
           "product_type": "credit_card",
-          "card_networks": "VISA,Mastercard",
+          "card_type": "VISA,Mastercard",
           "user_rating_count": 413,
           "rating": 4,
           "bank_id": 3,
@@ -1339,7 +1019,7 @@ export const cardGeniusApiData = {
           "sub_agent_commission": "0",
           "seo_card_alias": "sbi-cashback-credit-card",
           "card_alias": "sbi-cashback-credit-card",
-          "card_image_url": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_SBI%20Cashback.png1732257446742",
+          "image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_SBI%20Cashback.png1732257446742",
           "card_bg_image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Mockup-24.webp1736921642945",
           "card_bg_gradient": "radial-gradient(99.6% 170.48% at 50% -70.48%, #B79DE8 0%, #1B1B1B 100%)",
           "other_images": "",
@@ -1349,14 +1029,14 @@ export const cardGeniusApiData = {
           "age_self_emp_comment": "",
           "min_age": 21,
           "max_age": 60,
-          "crif_min": "720",
+          "crif": "720",
           "crif_comment": "",
-          "income_min": "20000",
+          "income": "20000",
           "income_comment": "",
-          "crif_self_emp_min": "720",
+          "crif_self_emp": "720",
           "crif_self_emp_comment": "",
-          "income_salaried_lpa": "4",
-          "income_self_emp_lpa": "4",
+          "income_salaried": "4",
+          "income_self_emp": "4",
           "income_self_emp_comment": "Banks asks for an annual income of Rs 4 LPA for business owners but BankKaro suggests a salary of 4.8 LPA for a better approval rate",
           "joining_fee_text": "999",
           "joining_fee_offset": "No joining fee offset",
@@ -1380,88 +1060,55 @@ export const cardGeniusApiData = {
           "updatedAt": "2025-03-18T12:08:10.000Z",
           "meta_title": "",
           "meta_description": "",
+          "banks": {
+            "id": 3,
+            "name": "SBI"
+          },
           "product_usps": [
-            { "header": "5% Cashback", "description": "on all online spends including Amazon, Flipkart, Myntra, Ajio, Makemytrip", "priority": 1, "tag_id": 0},
-            { "header": "Flat 1%", "description": "cashback on all offline spends", "priority": 2, "tag_id": 0}
+            { "header": "5% Cashback ", "description": "on all online spends including Amazon, Flipkart, Myntra, Ajio, Makemytrip", "priority": 1, "tag_id": 0 },
+            { "header": "Flat 1%", "description": "cashback on all offline spends", "priority": 2, "tag_id": 0 },
+            { "header": "5% Cashback", "description": "on all online spends capped at ₹5,000 per statement cycle", "priority": 1, "tag_id": 2 }
           ],
           "tags": [
-            { "tag_id": 2, "name": "Shopping" },
-            { "tag_id": 5, "name": "Online Food Ordering" }
+            { "id": 2, "name": "Shopping" },
+            { "id": 5, "name": "Online Food Ordering" },
+            { "id": 6, "name": "Dining" },
+            { "id": 7, "name": "Grocery Shopping" }
+          ],
+          "bank_fee_structure": {
+            "id": 24,
+            "product_id": 27,
+            "forex_markup": "3.5%",
+            "forex_markup_comment": "<p>3.5% Forex Markups... (truncated)</p>",
+            "apr_fees": "3.5%",
+            "apr_fees_comment": "<p>3.5% monthly fee... (truncated)</p>",
+            "atm_withdrawal": "2.5%",
+            "atm_withdrawal_comment": "<p>For every withdraw money transaction... (truncated)</p>",
+            "reward_redemption_fees": "₹99",
+            "reward_redemption_fees_comment": "",
+            "link": "https://www.sbicard.com/sbi-card-en/assets/docs/pdf/ekit-tncs/cashback-tnc-ekit.pdf",
+            "railway_surcharge": "1%",
+            "railway_surcharge_comment": "<p>A surcharge of 1% is applied...</p>",
+            "rent_payment_fees": "1%",
+            "rent_payment_fees_comment": "",
+            "check_payment_fees": "₹100",
+            "check_payment_fees_comment": "<p>₹100 will be charged for all payments done via Check</p>",
+            "cash_payment_fees": "₹250",
+            "cash_payment_fees_comment": "<p>₹250 + taxes will be charged for all payments done via Cash</p>",
+            "late_payment_annual": "₹0 - ₹500| ₹501 - ₹1000| ...",
+            "late_payment_fine": "₹0 | ₹400 | ₹ 750 | ...",
+            "late_payment_comment": "<p>An additional Late Payment Charge...</p>",
+            "createdAt": "2024-10-28T12:34:26.000Z",
+            "updatedAt": "2025-01-16T17:34:49.000Z"
+          },
+          "product_benefits": [
+            { "id": 359, "product_id": 27, "benefit_type": "all", "sub_type": "All Benefits", "html_text": "<ul><li>&nbsp;5% Cashback on all online spends and 1% Cashback on offline spends. Max Cashback per statement cycle is Rs 5000</li><li>Get 1% fuel surcharge waiver upto Rs 100 in a statement cycle. You can get waiver upto Rs 10,000 fuel purchases in a statement cycle.&nbsp;</li></ul>" },
+            { "id": 368, "product_id": 27, "benefit_type": "dining", "sub_type": "Dining Benefits", "html_text": "<ul><li>5% Cashback on online dining payments..." }
           ]
         }
-      ],
-      "next_page_token": "eyJpZCI6Mjh9"
-    },
-    curlExample: `curl --location 'https://bk-api.bankkaro.com/cardgenius/cards?category_slug=shopping&page_size=50' \\
---header 'Authorization: Bearer <jwt>'`
-  },
-  'v1-card-detail': {
-    name: 'Card Detail',
-    endpoint: '/v1/cards/{card_slug}',
-    methods: ['GET'],
-    description: 'Get the full specifications of a single credit card.',
-    category: 'Card APIs',
-    purpose: 'Retrieve all details for a specific card, identified by its slug.',
-    responseSchema: {
-      type: 'object',
-      properties: {
-        card: {
-          type: 'object',
-          properties: {
-            card_id: { type: 'integer' },
-            card_slug: { type: 'string' },
-            card_name: { type: 'string' },
-            bank: { type: 'object', properties: { bank_id: { type: 'integer' }, bank_name: { type: 'string' } } },
-            card_image_url: { type: 'string' },
-            card_network: { type: 'string' },
-            joining_fee: { type: 'integer' },
-            annual_fee: { type: 'integer' },
-            fee_summary: { type: 'string' },
-            partner_commission: { type: 'integer' },
-            eligibility: { type: 'object', properties: { /* ... */ } },
-            features: { type: 'object', properties: { /* ... */ } },
-            fees_and_charges: { type: 'object', properties: { /* ... */ } },
-            rating: { type: 'number' },
-            user_rating_count: { type: 'integer' },
-            tags: { type: 'array', items: { type: 'string' } }
-          }
-        }
       }
     },
-    sampleResponse: {
-      "card": {
-        "card_id": 27,
-        "card_slug": "sbi-cashback-credit-card",
-        "card_name": "SBI Cashback Credit Card",
-        "bank": { "bank_id": 11, "bank_name": "SBI Card" },
-        "card_image_url": "https://example.com/sbi.png",
-        "card_network": "Visa",
-        "joining_fee": 999,
-        "annual_fee": 999,
-        "fee_summary": "₹999 annual (waiver on ₹2 L spend)",
-        "partner_commission": 650,
-        "eligibility": {
-          "age_range": "18 70 yrs",
-          "monthly_income_min": 30000,
-          "credit_score_min": 700
-        },
-        "features": {
-          "welcome_benefits": ["₹500 cashback on first ₹5k spend"],
-          "milestone_benefits": ["Annual fee waiver on ₹2 L spend"],
-          "rewards": ["5 % on online, 1 % offline"],
-          "other_benefits": ["4 domestic lounge visits/qtr"]
-        },
-        "fees_and_charges": {
-          "finance_charge_pct_monthly": 3.5,
-          "late_payment_fee": "₹0 ₹1300 slab",
-          "forex_markup_pct": 1
-        },
-        "rating": 4.0,
-        "user_rating_count": 413,
-        "tags": ["shopping", "dining", "utility"]
-      }
-    },
-    curlExample: `curl --location 'https://api.bankkaro.com/v1/cards/sbi-cashback-credit-card' \\
+    curlExample: `curl --location 'https://bk-api.bankkaro.com/cardgenius/cards/sbi-cashback-credit-card' \\
 --header 'Authorization: Bearer <jwt>'`
   },
   'v1-card-genius-calculator': {
