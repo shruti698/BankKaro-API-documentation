@@ -31,8 +31,10 @@ import {
   Home as HomeIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { getApiBaseUrl } from '../config/environments';
+import { apiData } from '../data/apiData';
 
-const API_BASE_URL = 'http://localhost:4000';
+const API_BASE_URL = getApiBaseUrl();
 const drawerWidth = 280;
 
 const Layout = ({ children }) => {
@@ -59,7 +61,19 @@ const Layout = ({ children }) => {
         const data = await response.json();
         setEndpoints(data);
       } catch (err) {
-        setError(err.message);
+        console.warn('API not available, falling back to static data:', err.message);
+        // Fallback to static data if API is not available
+        const staticEndpoints = Object.entries(apiData).map(([id, data]) => ({
+          id,
+          name: data.name,
+          endpoint: data.endpoint,
+          description: data.description,
+          category: data.category,
+          product: data.category === 'Partner APIs' ? 'Loan Genius' : 'Card Genius',
+          methods: data.methods,
+          purpose: data.purpose
+        }));
+        setEndpoints(staticEndpoints);
       } finally {
         setLoading(false);
       }

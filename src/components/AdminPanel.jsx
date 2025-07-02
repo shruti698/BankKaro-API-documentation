@@ -37,8 +37,9 @@ import {
   Description as DescriptionIcon,
   Settings as SettingsIcon
 } from '@mui/icons-material';
+import { getApiBaseUrl } from '../config/environments';
 
-const API_BASE_URL = 'http://localhost:4000';
+const API_BASE_URL = getApiBaseUrl();
 
 const AdminPanel = () => {
   const [endpoints, setEndpoints] = useState([]);

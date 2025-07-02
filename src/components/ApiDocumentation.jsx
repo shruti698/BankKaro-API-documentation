@@ -40,9 +40,10 @@ import {
   TableChart as TableChartIcon,
   Cloud as CloudIcon
 } from '@mui/icons-material';
-import { environments, getEnvironmentUrl } from '../config/environments';
+import { environments, getEnvironmentUrl, getApiBaseUrl } from '../config/environments';
+import { apiData } from '../data/apiData';
 
-const API_BASE_URL = 'http://localhost:4000';
+const API_BASE_URL = getApiBaseUrl();
 
 const ApiDocumentation = () => {
   const { endpoint } = useParams();
@@ -70,7 +71,15 @@ const ApiDocumentation = () => {
           setError('API endpoint not found');
         }
       } catch (err) {
-        setError(err.message);
+        console.warn('API not available, falling back to static data:', err.message);
+        // Fallback to static data if API is not available
+        const foundApi = apiData[endpoint];
+        if (foundApi) {
+          setApi(foundApi);
+          setSelectedMethod(foundApi.methods[0] || 'POST');
+        } else {
+          setError('API endpoint not found');
+        }
       } finally {
         setLoading(false);
       }
