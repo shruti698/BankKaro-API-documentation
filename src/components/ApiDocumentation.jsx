@@ -38,10 +38,12 @@ import {
   Security as SecurityIcon,
   Warning as WarningIcon,
   TableChart as TableChartIcon,
-  Cloud as CloudIcon
+  Cloud as CloudIcon,
+  PlayArrow as PlayArrowIcon
 } from '@mui/icons-material';
 import { environments, getEnvironmentUrl, getApiBaseUrl } from '../config/environments';
 import { apiData } from '../data/apiData';
+import ApiSandbox from './ApiSandbox';
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -52,6 +54,7 @@ const ApiDocumentation = () => {
   const [error, setError] = useState(null);
   const [selectedMethod, setSelectedMethod] = useState('POST');
   const [selectedEnvironment, setSelectedEnvironment] = useState('staging');
+  const [showSandbox, setShowSandbox] = useState(false);
 
   useEffect(() => {
     const fetchApiData = async () => {
@@ -337,6 +340,32 @@ const ApiDocumentation = () => {
           </Box>
         )}
       </Box>
+
+      {/* Sandbox Toggle Button */}
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+        <Button
+          variant={showSandbox ? "contained" : "outlined"}
+          startIcon={<PlayArrowIcon />}
+          onClick={() => setShowSandbox(!showSandbox)}
+          size="large"
+          sx={{ 
+            px: 4, 
+            py: 1.5, 
+            borderRadius: 3,
+            fontWeight: 'bold',
+            fontSize: '1.1rem'
+          }}
+        >
+          {showSandbox ? 'Hide Sandbox' : 'Try API in Sandbox'}
+        </Button>
+      </Box>
+
+      {/* Sandbox Section */}
+      {showSandbox && (
+        <Box sx={{ mb: 4 }}>
+          <ApiSandbox api={api} />
+        </Box>
+      )}
 
       {/* Important Notes Alert */}
       {api.importantNotes && Array.isArray(api.importantNotes) && (
