@@ -28,7 +28,8 @@ import {
   Dashboard as DashboardIcon,
   Business as BusinessIcon,
   School as SchoolIcon,
-  Home as HomeIcon
+  Home as HomeIcon,
+  AdminPanelSettings as AdminIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getApiBaseUrl } from '../config/environments';
@@ -376,6 +377,22 @@ const Layout = ({ children }) => {
               'BankKaro API Docs'
             )}
           </Typography>
+
+          {/* Admin Link */}
+          <Button
+            onClick={() => navigate('/admin')}
+            startIcon={<AdminIcon />}
+            sx={{ 
+              textTransform: 'none', 
+              fontWeight: 600,
+              color: 'text.secondary',
+              '&:hover': {
+                color: 'primary.main'
+              }
+            }}
+          >
+            Admin
+          </Button>
 
           {/* Product Switcher for Mobile */}
           {isMobile && (

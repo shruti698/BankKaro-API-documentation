@@ -12,6 +12,8 @@ A modern, responsive API documentation website built with React, Vite, and Mater
   - Sample request and response JSON
   - Validation notes and requirements
   - Additional information about authentication, rate limiting, and error handling
+- **API Sandbox**: Interactive testing environment with predefined test data
+- **Admin Panel**: Password-protected admin interface for managing API documentation
 - **Modern UI**: Built with Material UI components for a professional look
 - **Modular Structure**: Easy to add new APIs and endpoints
 
@@ -143,6 +145,36 @@ To add new API categories (like CardGenius APIs), you can:
 1. Modify the sidebar structure in `Layout.jsx`
 2. Add category grouping in the API data structure
 3. Update the navigation logic to handle multiple categories
+
+## Admin Access
+
+### Production Admin Panel
+
+The admin panel is accessible in production at `/admin` with password protection:
+
+1. **Access URL**: `https://your-domain.com/admin`
+2. **Default Password**: `bankkaro2024`
+3. **Session Duration**: 24 hours
+4. **Features**:
+   - Add/Edit/Delete API endpoints
+   - Manage API documentation
+   - Update sample data and schemas
+   - Real-time preview of changes
+
+### Changing Admin Password
+
+To change the admin password, edit the `ADMIN_PASSWORD` constant in `src/components/AdminLogin.jsx`:
+
+```javascript
+const ADMIN_PASSWORD = 'your-new-password';
+```
+
+### Security Notes
+
+- The admin panel uses client-side authentication (localStorage)
+- For production use, consider implementing server-side authentication
+- The password is stored in plain text in the frontend code
+- Session expires after 24 hours of inactivity
 
 ## Browser Support
 

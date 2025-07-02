@@ -9,7 +9,7 @@ import CardGeniusDashboard from './components/CardGeniusDashboard';
 import EducationGeniusDashboard from './components/EducationGeniusDashboard';
 import ComingSoon from './components/ComingSoon';
 import Home from './components/Home';
-import AdminPanel from './components/AdminPanel';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
 const theme = createTheme({
   palette: {
@@ -162,7 +162,7 @@ function App() {
       <Router>
         <Box sx={{ display: 'flex', height: '100vh' }}>
           <Routes>
-            <Route path="/admin/*" element={<AdminPanel />} />
+            <Route path="/admin/*" element={<ProtectedAdminRoute />} />
             <Route path="/*" element={
               <Layout>
                 <Routes>
