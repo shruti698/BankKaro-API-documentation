@@ -6,15 +6,20 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "api": "json-server --watch db.json --port 4000 --host 0.0.0.0",
+    "serve": "concurrently -k -n \"API,WEB\" -c \"green,blue\" \"npm run api\" \"npm run dev -- --port 5173 --strictPort\""
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.1.2",
     "@mui/material": "^7.1.2",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "cookie": "^1.0.2",
+    "ra-data-json-server": "^4.11.1",
+    "react": "18.2.0",
+    "react-admin": "^4.11.1",
+    "react-dom": "18.2.0",
     "react-is": "^19.1.0",
     "react-router-dom": "^7.6.2",
     "react-transition-group": "^4.4.5"
@@ -23,6 +28,8 @@
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",
+    "concurrently": "^7.6.0",
+    "json-server": "^0.17.4",
     "vite": "^6.3.5"
   }
 }

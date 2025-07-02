@@ -6,8 +6,10 @@ import Layout from './components/Layout';
 import ApiDocumentation from './components/ApiDocumentation';
 import LoanGeniusDashboard from './components/LoanGeniusDashboard';
 import CardGeniusDashboard from './components/CardGeniusDashboard';
+import EducationGeniusDashboard from './components/EducationGeniusDashboard';
 import ComingSoon from './components/ComingSoon';
 import Home from './components/Home';
+import AdminPanel from './components/AdminPanel';
 
 const theme = createTheme({
   palette: {
@@ -159,15 +161,21 @@ function App() {
       <CssBaseline />
       <Router>
         <Box sx={{ display: 'flex', height: '100vh' }}>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/loangenius" element={<LoanGeniusDashboard />} />
-              <Route path="/cardgenius" element={<CardGeniusDashboard />} />
-              <Route path="/docs/:endpoint" element={<ApiDocumentation />} />
-              <Route path="/coming-soon" element={<ComingSoon />} />
-            </Routes>
-          </Layout>
+          <Routes>
+            <Route path="/admin/*" element={<AdminPanel />} />
+            <Route path="/*" element={
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/loangenius" element={<Navigate to="/docs/partner-auth" replace />} />
+                  <Route path="/cardgenius" element={<Navigate to="/docs/initial-data" replace />} />
+                  <Route path="/educationgenius" element={<EducationGeniusDashboard />} />
+                  <Route path="/docs/:endpoint" element={<ApiDocumentation />} />
+                  <Route path="/coming-soon" element={<ComingSoon />} />
+                </Routes>
+              </Layout>
+            } />
+          </Routes>
         </Box>
       </Router>
     </ThemeProvider>

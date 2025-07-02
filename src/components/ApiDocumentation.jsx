@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Box,
@@ -25,7 +25,8 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
+  CircularProgress
 } from '@mui/material';
 import {
   Http as HttpIcon,
@@ -39,22 +40,58 @@ import {
   TableChart as TableChartIcon,
   Cloud as CloudIcon
 } from '@mui/icons-material';
-import { apiData, cardGeniusApiData } from '../data/apiData';
 import { environments, getEnvironmentUrl } from '../config/environments';
 
-const allApis = { ...apiData, ...cardGeniusApiData };
+const API_BASE_URL = 'http://localhost:4000';
 
 const ApiDocumentation = () => {
   const { endpoint } = useParams();
-  const api = allApis[endpoint];
-  const [selectedMethod, setSelectedMethod] = useState(api?.methods[0] || 'POST');
+  const [api, setApi] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedMethod, setSelectedMethod] = useState('POST');
   const [selectedEnvironment, setSelectedEnvironment] = useState('staging');
 
-  if (!api) {
+  useEffect(() => {
+    const fetchApiData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/endpoints`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch API data');
+        }
+        const endpoints = await response.json();
+        const foundApi = endpoints.find(ep => ep.id === endpoint);
+        
+        if (foundApi) {
+          setApi(foundApi);
+          setSelectedMethod(foundApi.methods[0] || 'POST');
+        } else {
+          setError('API endpoint not found');
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApiData();
+  }, [endpoint]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error || !api) {
     return (
       <Box sx={{ p: 3 }}>
         <Alert severity="error">
-          API endpoint not found. Please select a valid endpoint from the sidebar.
+          {error || 'API endpoint not found. Please select a valid endpoint from the sidebar.'}
         </Alert>
       </Box>
     );
@@ -64,6 +101,10 @@ const ApiDocumentation = () => {
   const currentApiData = hasMultipleMethods ? api[selectedMethod.toLowerCase()] : api;
 
   const renderSchemaProperties = (properties) => {
+    if (!properties || typeof properties !== 'object') {
+      return null;
+    }
+    
     return Object.entries(properties).map(([key, prop]) => (
       <Box key={key} sx={{ mb: 2, p: 2, border: '1px solid #e2e8f0', borderRadius: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -107,6 +148,10 @@ const ApiDocumentation = () => {
   };
 
   const renderJson = (data) => {
+    if (!data) {
+      return null;
+    }
+    
     return (
       <Box
         component="pre"
@@ -157,6 +202,10 @@ const ApiDocumentation = () => {
   };
 
   const renderFieldTable = (fieldTable) => {
+    if (!fieldTable || !Array.isArray(fieldTable)) {
+      return null;
+    }
+    
     return (
       <TableContainer component={Paper} sx={{ mt: 2 }}>
         <Table>
@@ -268,7 +317,7 @@ const ApiDocumentation = () => {
       </Box>
 
       {/* Important Notes Alert */}
-      {api.importantNotes && (
+      {api.importantNotes && Array.isArray(api.importantNotes) && (
         <Alert 
           severity="warning" 
           icon={<SecurityIcon />}
@@ -347,7 +396,7 @@ const ApiDocumentation = () => {
         )}
 
         {/* Headers Table */}
-        {currentApiData.headers && (
+        {currentApiData.headers && Array.isArray(currentApiData.headers) && (
           <Grid item xs={12}>
             <Card sx={{ borderRadius: 2 }}>
               <CardContent sx={{ p: 3 }}>
@@ -393,7 +442,7 @@ const ApiDocumentation = () => {
         )}
 
         {/* Additional Examples */}
-        {currentApiData.additionalExamples && (
+        {currentApiData.additionalExamples && Array.isArray(currentApiData.additionalExamples) && (
           <Grid item xs={12}>
             <Card sx={{ borderRadius: 2 }}>
               <CardContent sx={{ p: 3 }}>
@@ -431,7 +480,7 @@ const ApiDocumentation = () => {
         )}
 
         {/* Request Schema */}
-        {currentApiData.requestSchema && (
+        {currentApiData.requestSchema && currentApiData.requestSchema.properties && (
           <Grid item xs={12} md={6}>
             <Card sx={{ borderRadius: 2, height: 'fit-content' }}>
               <CardContent sx={{ p: 3 }}>
@@ -455,7 +504,7 @@ const ApiDocumentation = () => {
                 Response Schema
               </Typography>
               <Divider sx={{ mb: 3 }} />
-              {currentApiData.responseSchema && renderSchemaProperties(currentApiData.responseSchema.properties)}
+              {currentApiData.responseSchema && currentApiData.responseSchema.properties && renderSchemaProperties(currentApiData.responseSchema.properties)}
             </CardContent>
           </Card>
         </Grid>
@@ -477,21 +526,23 @@ const ApiDocumentation = () => {
         )}
 
         {/* Success Response */}
-        <Grid item xs={12} md={6}>
-          <Card sx={{ borderRadius: 2 }}>
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <CheckCircleIcon sx={{ mr: 1, color: 'success.main' }} />
-                Success Response
-              </Typography>
-              <Divider sx={{ mb: 3 }} />
-              {renderJson(currentApiData.sampleResponse)}
-            </CardContent>
-          </Card>
-        </Grid>
+        {currentApiData.sampleResponse && (
+          <Grid item xs={12} md={6}>
+            <Card sx={{ borderRadius: 2 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <CheckCircleIcon sx={{ mr: 1, color: 'success.main' }} />
+                  Success Response
+                </Typography>
+                <Divider sx={{ mb: 3 }} />
+                {renderJson(currentApiData.sampleResponse)}
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
 
         {/* Error Responses - Specific for partner-token API */}
-        {currentApiData.errorResponses && (
+        {currentApiData.errorResponses && Array.isArray(currentApiData.errorResponses) && (
           <Grid item xs={12}>
             <Card sx={{ borderRadius: 2 }}>
               <CardContent sx={{ p: 3 }}>
@@ -551,7 +602,7 @@ const ApiDocumentation = () => {
         )}
 
         {/* Validation Notes */}
-        {currentApiData.validationNotes && (
+        {currentApiData.validationNotes && Array.isArray(currentApiData.validationNotes) && (
           <Grid item xs={12} md={6}>
             <Card sx={{ borderRadius: 2 }}>
               <CardContent sx={{ p: 3 }}>

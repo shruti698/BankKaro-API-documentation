@@ -13,66 +13,132 @@ import {
   Divider,
   useTheme,
   useMediaQuery,
-  Tabs,
-  Tab,
-  Paper
+  IconButton,
+  Button,
+  Menu,
+  MenuItem,
+  Paper,
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import {
   Api as ApiIcon,
   Menu as MenuIcon,
   Code as CodeIcon,
   Dashboard as DashboardIcon,
-  Business as BusinessIcon
+  Business as BusinessIcon,
+  School as SchoolIcon,
+  Home as HomeIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { apiData, cardGeniusApiData } from '../data/apiData';
 
-const drawerWidth = 320;
-
-const projects = {
-  bankkaro: {
-    name: 'Loan Genius',
-    description: 'APIs for lead generation, and managing financial products like loans & credit cards.',
-    apis: apiData,
-    dashboard: true,
-  },
-  cardGenius: {
-    name: 'CardGenius',
-    description: 'APIs for credit card sourcing and processing.',
-    apis: cardGeniusApiData,
-    dashboard: true,
-  },
-};
+const API_BASE_URL = 'http://localhost:4000';
+const drawerWidth = 280;
 
 const Layout = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState('bankkaro');
+  const [selectedProject, setSelectedProject] = useState('cardGenius');
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [endpoints, setEndpoints] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Fetch endpoints from admin API
+  useEffect(() => {
+    const fetchEndpoints = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/endpoints`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch endpoints');
+        }
+        const data = await response.json();
+        setEndpoints(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEndpoints();
+  }, []);
+
+  // Organize endpoints by product
+  const organizeEndpointsByProduct = () => {
+    const organized = {
+      'Loan Genius': [],
+      'Card Genius': [],
+      'Education Genius': []
+    };
+
+    endpoints.forEach(endpoint => {
+      if (organized[endpoint.product]) {
+        organized[endpoint.product].push(endpoint);
+      }
+    });
+
+    return organized;
+  };
+
+  const organizedApis = organizeEndpointsByProduct();
+
   useEffect(() => {
     const path = location.pathname;
-
+    
     if (path.startsWith('/cardgenius')) {
       setSelectedProject('cardGenius');
     } else if (path.startsWith('/loangenius')) {
       setSelectedProject('bankkaro');
+    } else if (path.startsWith('/educationgenius')) {
+      setSelectedProject('educationGenius');
     } else if (path.startsWith('/docs/')) {
       const endpointSlug = path.substring('/docs/'.length);
-      // Check if the endpoint belongs to CardGenius
-      if (projects.cardGenius.apis.hasOwnProperty(endpointSlug)) {
-        setSelectedProject('cardGenius');
-      } else {
-        // Assume it belongs to Loan Genius if not found in CardGenius
-        setSelectedProject('bankkaro');
+      const endpoint = endpoints.find(ep => ep.id === endpointSlug);
+      if (endpoint) {
+        if (endpoint.product === 'Card Genius') {
+          setSelectedProject('cardGenius');
+        } else if (endpoint.product === 'Loan Genius') {
+          setSelectedProject('bankkaro');
+        } else if (endpoint.product === 'Education Genius') {
+          setSelectedProject('educationGenius');
+        }
       }
+    } else if (path === '/') {
+      // Default to Card Genius when on home page
+      setSelectedProject('cardGenius');
     }
-  }, [location.pathname]);
+  }, [location.pathname, endpoints]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleProjectMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProjectMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleProjectSelect = (projectKey) => {
+    setSelectedProject(projectKey);
+    if (projectKey === 'cardGenius') {
+      navigate('/docs/initial-data');
+    } else if (projectKey === 'bankkaro') {
+      navigate('/docs/partner-auth');
+    } else if (projectKey === 'educationGenius') {
+      navigate('/educationgenius');
+    }
+    setAnchorEl(null);
+    if (isMobile) {
+      setMobileOpen(false);
+    }
   };
 
   const handleApiSelect = (endpoint) => {
@@ -82,25 +148,23 @@ const Layout = ({ children }) => {
     }
   };
 
-  const handleDashboardSelect = () => {
-    const dashboardPath = selectedProject === 'cardGenius' ? '/cardgenius' : '/loangenius';
-    navigate(dashboardPath);
+  const handleHomeClick = () => {
+    navigate('/');
     if (isMobile) {
       setMobileOpen(false);
     }
   };
 
-  const handleProjectChange = (event, newProject) => {
-    setSelectedProject(newProject);
-    if (newProject === 'cardGenius') {
-      navigate('/cardgenius');
-    } else {
-      navigate('/loangenius');
-    }
+  const getCurrentProductApis = () => {
+    const productMap = {
+      'bankkaro': 'Loan Genius',
+      'cardGenius': 'Card Genius',
+      'educationGenius': 'Education Genius'
+    };
+    return organizedApis[productMap[selectedProject]] || [];
   };
 
-  const currentProject = projects[selectedProject];
-  const currentApis = currentProject.apis;
+  const currentApis = getCurrentProductApis();
 
   const drawer = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -114,138 +178,137 @@ const Layout = ({ children }) => {
         }}
       >
         <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-          {currentProject.name} API Docs
+          BankKaro API Docs
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {currentProject.description}
+          Financial API Documentation Hub
         </Typography>
+        {/* Only show product name if on a product/API page and not on home */}
+        {location.pathname !== '/' &&
+          (/^\/(docs|loangenius|cardgenius|educationgenius)/.test(location.pathname)) && (
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>
+              {selectedProject === 'bankkaro' ? 'Loan Genius' : selectedProject === 'cardGenius' ? 'Card Genius' : 'Education Genius'}
+            </Typography>
+        )}
       </Paper>
-      
-      {/* Project Switcher */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs 
-          value={selectedProject} 
-          onChange={handleProjectChange} 
-          aria-label="project select tabs"
-          variant="fullWidth"
-        >
-          <Tab 
-            value="bankkaro" 
-            label="Loan Genius" 
-            icon={<BusinessIcon />} 
-            iconPosition="start" 
-            sx={{ textTransform: 'none', fontWeight: 600 }}
-          />
-          <Tab 
-            value="cardGenius" 
-            label="CardGenius" 
-            icon={<ApiIcon />} 
-            iconPosition="start" 
-            sx={{ textTransform: 'none', fontWeight: 600 }}
-          />
-        </Tabs>
-      </Box>
       
       {/* Navigation Items */}
       <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-        {/* Dashboard */}
-        {currentProject.dashboard && (
-          <ListItem disablePadding>
-            <ListItemButton
-              selected={location.pathname.startsWith('/loangenius') || location.pathname.startsWith('/cardgenius')}
-              onClick={handleDashboardSelect}
-              sx={{
-                mx: 2,
-                my: 0.5,
-                borderRadius: 2,
-                '&.Mui-selected': {
-                  backgroundColor: theme.palette.primary.light,
-                  color: theme.palette.primary.contrastText,
-                  '&:hover': {
-                    backgroundColor: theme.palette.primary.light,
-                  },
-                },
+        {/* Home */}
+        <ListItem disablePadding>
+          <ListItemButton
+            selected={location.pathname === '/'}
+            onClick={handleHomeClick}
+            sx={{
+              mx: 2,
+              my: 0.5,
+              borderRadius: 2,
+              '&.Mui-selected': {
+                backgroundColor: theme.palette.primary.light,
+                color: theme.palette.primary.contrastText,
                 '&:hover': {
-                  backgroundColor: '#f1f5f9',
+                  backgroundColor: theme.palette.primary.light,
                 },
-              }}
-            >
-              <ListItemIcon>
-                <DashboardIcon 
-                  color={location.pathname.startsWith('/loangenius') || location.pathname.startsWith('/cardgenius') ? 'inherit' : 'primary'} 
-                />
-              </ListItemIcon>
-              <ListItemText 
-                primary="Dashboard"
-                primaryTypographyProps={{
-                  fontSize: '0.95rem',
-                  fontWeight: location.pathname.startsWith('/loangenius') || location.pathname.startsWith('/cardgenius') ? 'bold' : 500
-                }}
+              },
+              '&:hover': {
+                backgroundColor: '#f1f5f9',
+              },
+            }}
+          >
+            <ListItemIcon>
+              <HomeIcon 
+                color={location.pathname === '/' ? 'inherit' : 'primary'} 
               />
-            </ListItemButton>
-          </ListItem>
-        )}
-        
-        {/* API Endpoints */}
-        {Object.keys(currentApis).length > 0 && (
-          <>
-            <Box sx={{ px: 3, py: 2 }}>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 'bold' }}>
-                {currentProject.name} APIs
-              </Typography>
-            </Box>
-            {Object.entries(currentApis).map(([key, api]) => {
-              const isSelected = location.pathname === `/docs/${key}`;
-              return (
-                <ListItem key={key} disablePadding>
-                  <ListItemButton
-                    selected={isSelected}
-                    onClick={() => handleApiSelect(key)}
-                    sx={{
-                      mx: 2,
-                      my: 0.5,
-                      borderRadius: 2,
-                      '&.Mui-selected': {
-                        backgroundColor: theme.palette.primary.light,
-                        color: theme.palette.primary.contrastText,
-                        '&:hover': {
-                          backgroundColor: theme.palette.primary.light,
-                        },
-                      },
-                      '&:hover': {
-                        backgroundColor: '#f1f5f9',
-                      },
-                    }}
-                  >
-                    <ListItemIcon>
-                      <CodeIcon color={isSelected ? 'inherit' : 'primary'} />
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary={api.name}
-                      secondary={api.endpoint}
-                      primaryTypographyProps={{
-                        fontSize: '0.95rem',
-                        fontWeight: isSelected ? 'bold' : 500
-                      }}
-                      secondaryTypographyProps={{
-                        fontSize: '0.75rem',
-                        fontFamily: 'monospace'
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              );
-            })}
-          </>
-        )}
-        
-        {/* Coming Soon for CardGenius */}
-        {selectedProject === 'cardGenius' && Object.keys(currentApis).length === 0 && (
-          <Box sx={{ p: 3, textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary">
-              APIs coming soon...
+            </ListItemIcon>
+            <ListItemText 
+              primary="Home"
+              primaryTypographyProps={{
+                fontSize: '0.95rem',
+                fontWeight: location.pathname === '/' ? 'bold' : 500
+              }}
+            />
+          </ListItemButton>
+        </ListItem>
+
+        <Divider sx={{ my: 1 }} />
+
+        {/* Product Selection - Only show when not on home page */}
+        {location.pathname !== '/' && (
+          <Box sx={{ px: 3, py: 2 }}>
+            <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 'bold', mb: 2 }}>
+              APIs
             </Typography>
           </Box>
+        )}
+
+        {/* API Endpoints - Only show when not on home page */}
+        {location.pathname !== '/' && (
+          <>
+            {loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                <CircularProgress size={24} />
+              </Box>
+            ) : error ? (
+              <Box sx={{ p: 3 }}>
+                <Alert severity="error" sx={{ fontSize: '0.875rem' }}>
+                  {error}
+                </Alert>
+              </Box>
+            ) : selectedProject === 'educationGenius' ? (
+              <Box sx={{ p: 4, textAlign: 'center' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+                  Education Genius APIs
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Coming Soon: Our education loan API suite is launching soon. Stay tuned!
+                </Typography>
+              </Box>
+            ) : currentApis.length > 0 ? (
+              <>
+                {currentApis.map((api) => {
+                  const isSelected = location.pathname === `/docs/${api.id}`;
+                  return (
+                    <ListItem key={api.id} disablePadding>
+                      <ListItemButton
+                        selected={isSelected}
+                        onClick={() => handleApiSelect(api.id)}
+                        sx={{
+                          mx: 2,
+                          my: 0.25,
+                          borderRadius: 1,
+                          pl: 4,
+                          '&.Mui-selected': {
+                            backgroundColor: theme.palette.primary.light,
+                            color: theme.palette.primary.contrastText,
+                            '&:hover': {
+                              backgroundColor: theme.palette.primary.light,
+                            },
+                          },
+                          '&:hover': {
+                            backgroundColor: '#f1f5f9',
+                          },
+                        }}
+                      >
+                        <ListItemText 
+                          primary={api.name || api.id}
+                          primaryTypographyProps={{
+                            fontSize: '0.9rem',
+                            fontWeight: isSelected ? 'bold' : 400
+                          }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  );
+                })}
+              </>
+            ) : (
+              <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  No APIs found for this product.
+                </Typography>
+              </Box>
+            )}
+          </>
         )}
       </Box>
     </Box>
@@ -253,84 +316,118 @@ const Layout = ({ children }) => {
 
   return (
     <Box sx={{ display: 'flex' }}>
+      {/* App Bar */}
       <AppBar
         position="fixed"
         sx={{
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: `${drawerWidth}px` },
-          backgroundColor: '#ffffff',
-          color: '#1e293b',
-          boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-          borderBottom: '1px solid #e2e8f0'
+          backgroundColor: 'white',
+          color: 'text.primary',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
         }}
       >
-        <Toolbar sx={{ minHeight: 70 }}>
-          {isMobile && (
-            <Box sx={{ mr: 2 }}>
-              <MenuIcon 
-                onClick={handleDrawerToggle} 
-                sx={{ cursor: 'pointer', fontSize: 28 }} 
-              />
-            </Box>
-          )}
-          <ApiIcon sx={{ mr: 2, fontSize: 28, color: 'primary.main' }} />
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2, display: { md: 'none' } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-            {currentProject.name} API Documentation
+            {location.pathname !== '/' ? (
+              selectedProject === 'bankkaro' ? 'Loan Genius' : selectedProject === 'cardGenius' ? 'Card Genius' : 'Education Genius'
+            ) : (
+              'BankKaro API Docs'
+            )}
           </Typography>
+
+          {/* Product Switcher for Mobile */}
+          {isMobile && (
+            <Button
+              onClick={handleProjectMenuOpen}
+              endIcon={<CodeIcon />}
+              sx={{ textTransform: 'none', fontWeight: 600 }}
+            >
+              Switch Product
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
-      
+
+      {/* Mobile Product Menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleProjectMenuClose}
+        PaperProps={{
+          sx: { minWidth: 200 }
+        }}
+      >
+        {[
+          { key: 'bankkaro', name: 'Loan Genius', icon: <BusinessIcon /> },
+          { key: 'cardGenius', name: 'Card Genius', icon: <ApiIcon /> },
+          { key: 'educationGenius', name: 'Education Genius', icon: <SchoolIcon />, comingSoon: true }
+        ].map((project) => (
+          <MenuItem 
+            key={project.key} 
+            onClick={() => handleProjectSelect(project.key)}
+            selected={selectedProject === project.key}
+          >
+            <ListItemIcon>
+              {project.icon}
+            </ListItemIcon>
+            <ListItemText 
+              primary={project.name}
+              secondary={project.comingSoon ? 'Coming Soon' : ''}
+            />
+          </MenuItem>
+        ))}
+      </Menu>
+
+      {/* Drawer */}
       <Box
         component="nav"
         sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
       >
-        {isMobile ? (
-          <Drawer
-            variant="temporary"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            ModalProps={{
-              keepMounted: true,
-            }}
-            sx={{
-              display: { xs: 'block', md: 'none' },
-              '& .MuiDrawer-paper': { 
-                boxSizing: 'border-box', 
-                width: drawerWidth,
-                border: 'none'
-              },
-            }}
-          >
-            {drawer}
-          </Drawer>
-        ) : (
-          <Drawer
-            variant="permanent"
-            sx={{
-              display: { xs: 'none', md: 'block' },
-              '& .MuiDrawer-paper': { 
-                boxSizing: 'border-box', 
-                width: drawerWidth,
-                border: 'none',
-                backgroundColor: '#ffffff'
-              },
-            }}
-            open
-          >
-            {drawer}
-          </Drawer>
-        )}
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true,
+          }}
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+        >
+          {drawer}
+        </Drawer>
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: 'none', md: 'block' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
       </Box>
-      
+
+      {/* Main Content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: 4,
+          p: 3,
           width: { md: `calc(100% - ${drawerWidth}px)` },
-          mt: '70px',
-          backgroundColor: '#f8fafc',
-          minHeight: 'calc(100vh - 70px)'
+          mt: { xs: 7, md: 8 }
         }}
       >
         {children}

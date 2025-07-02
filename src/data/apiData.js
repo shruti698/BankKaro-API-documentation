@@ -1350,60 +1350,298 @@ export const apiData = {
   },
   'v1-card-genius-calculator': {
     name: 'Card Genius Calculator',
-    endpoint: '/v1/cards/calculate',
+    endpoint: '/cardgenius/cards/calculate',
     methods: ['POST'],
-    description: 'Recommends the best cards based on a user\'s spending profile.',
+    description: 'Given a detailed spend profile, ranks cards by potential annual savings.',
     category: 'Card APIs',
-    purpose: 'Calculate and rank credit cards by potential monetary savings for the user.',
+    purpose: 'Drive personalised recommendations on the "Card Genius" results page.',
+
     requestSchema: {
       type: 'object',
-      description: 'A full spend profile. See Appendix A in the main documentation for all keys. Missing keys default to 0.',
+      description: 'Complete spending profile – all keys optional & default to 0.  Keys ending _annual take annual values; others are monthly.',
+      additionalProperties: { type: 'number' }
+    },
+
+    fieldTable: [
+      { field: 'amazon_spends',                     type: 'integer', required: 'No', description: '₹ / month on Amazon' },
+      { field: 'flipkart_spends',                   type: 'integer', required: 'No', description: '₹ / month on Flipkart' },
+      { field: 'grocery_spends_online',             type: 'integer', required: 'No', description: '₹ / month – online groceries' },
+      { field: 'grocery_spends_offline',            type: 'integer', required: 'No', description: '₹ / month – supermarket' },
+      { field: 'mobile_phone_bills',                type: 'integer', required: 'No', description: '₹ / month – mobile post‑paid' },
+      { field: 'electricity_bills',                 type: 'integer', required: 'No', description: '₹ / month – electricity' },
+      { field: 'water_bills',                       type: 'integer', required: 'No', description: '₹ / month – water' },
+      { field: 'ott_channels',                      type: 'integer', required: 'No', description: '₹ / month – OTT subscriptions' },
+      { field: 'hotels_annual',                     type: 'integer', required: 'No', description: '₹ / year – hotel bookings' },
+      { field: 'flights_annual',                    type: 'integer', required: 'No', description: '₹ / year – flight tickets' }
+    ],
+
+    responseSchema: {
+      type: 'object',
       properties: {
-        monthly_amazon_spend: { type: 'integer', description: 'Monthly spend on Amazon.' },
-        monthly_fuel_spend: { type: 'integer', description: 'Monthly spend on fuel.' },
+        success: { type: 'boolean', description: 'Indicates if the calculation was successful' },
+        message: { type: 'string', description: 'Response message' },
+        savings: { 
+          type: 'array', 
+          items: { 
+            type: 'object',
+            properties: {
+              card_name: { type: 'string', description: 'Display name of the credit card' },
+              seo_card_alias: { type: 'string', description: 'SEO-friendly card identifier' },
+              cg_network_url: { type: 'string', description: 'CardGenius network URL', nullable: true },
+              ck_store_url: { type: 'string', description: 'CashKaro store URL for card offers' },
+              ck_store_url_2: { type: 'string', description: 'Secondary CashKaro store URL' },
+              id: { type: 'integer', description: 'Internal card ID' },
+              joining_fees: { type: 'string', description: 'Card joining fees in INR' },
+              total_savings: { type: 'integer', description: 'Total savings amount in INR' },
+              total_savings_yearly: { type: 'integer', description: 'Annual savings amount in INR' },
+              total_extra_benefits: { type: 'integer', description: 'Additional benefits value in INR' },
+              max_potential_savings: { type: 'integer', description: 'Maximum potential savings in INR' },
+              redemption_options: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'integer', description: 'Redemption option ID' },
+                    card_id: { type: 'integer', description: 'Associated card ID' },
+                    method: { type: 'string', description: 'Redemption method (e.g., Airmiles, Hotels)' },
+                    brand: { type: 'string', description: 'Brand name for the redemption option' },
+                    min_points: { type: 'integer', description: 'Minimum points required' },
+                    max_points: { type: 'integer', description: 'Maximum points allowed (0 for unlimited)' },
+                    conversion_rate: { type: 'number', description: 'Points to value conversion rate' },
+                    note: { type: 'string', description: 'Additional notes', nullable: true },
+                    createdAt: { type: 'string', description: 'Creation timestamp' },
+                    updatedAt: { type: 'string', description: 'Last update timestamp' }
+                  }
+                }
+              }
+            }
+          } 
+        }
       }
     },
+
     sampleResponse: {
-      "recommendations": [
+      "success": true,
+      "message": "Savings calculated successfully",
+      "savings": [
         {
-          "card_slug": "sbi-cashback-credit-card",
-          "card_name": "SBI Cashback Credit Card",
-          "card_image_url": "https://example.com/sbi.png",
-          "total_savings_yearly": 19668,
-          "net_savings_after_fees": 18669,
-          "spend_breakdown": {
-            "monthly_amazon_spend": { "spend": 10000, "savings": 500, "rate_pct": 5 },
-            "monthly_fuel_spend": { "spend": 3000, "savings": 0, "note": "surcharge waiver" }
-          }
+          "card_name": "HDFC Diners Club Black Metal Edition",
+          "seo_card_alias": "hdfc-diners-club-black-metal-credit-card",
+          "cg_network_url": null,
+          "ck_store_url": "cashkaro://stores/hdfc-credit-card-offers",
+          "ck_store_url_2": "cashkaro://stores/hdfc-credit-card-offers",
+          "id": 114,
+          "joining_fees": "10000",
+          "total_savings": 6253,
+          "total_savings_yearly": 75036,
+          "total_extra_benefits": 0,
+          "max_potential_savings": 1884000,
+          "redemption_options": [
+            {"id":422,"card_id":114,"method":"Airmiles","brand":"Air Canada Aeroplan","min_points":2000,"max_points":0,"conversion_rate":0.65,"note":"","createdAt":"2025-06-26T11:21:42.000Z","updatedAt":"2025-06-26T11:21:42.000Z"},
+            {"id":423,"card_id":114,"method":"Airmiles","brand":"Air Asia","min_points":2000,"max_points":0,"conversion_rate":0.7,"note":"","createdAt":"2025-06-26T11:23:09.000Z","updatedAt":"2025-06-26T11:23:09.000Z"},
+            {"id":424,"card_id":114,"method":"Airmiles","brand":"Avianca LifeMiles","min_points":2000,"max_points":0,"conversion_rate":0.65,"note":"","createdAt":"2025-06-26T11:23:55.000Z","updatedAt":"2025-06-26T11:23:55.000Z"},
+            {"id":425,"card_id":114,"method":"Airmiles","brand":"British Airways (Avios)","min_points":2000,"max_points":0,"conversion_rate":0.65,"note":"","createdAt":"2025-06-26T11:24:24.000Z","updatedAt":"2025-06-26T11:24:24.000Z"},
+            {"id":426,"card_id":114,"method":"Airmiles","brand":"Club Vistara","min_points":2000,"max_points":0,"conversion_rate":1,"note":"","createdAt":"2025-06-26T11:25:22.000Z","updatedAt":"2025-06-26T11:25:22.000Z"},
+            {"id":427,"card_id":114,"method":"Airmiles","brand":"Etihad Guest","min_points":2000,"max_points":0,"conversion_rate":0.5,"note":"","createdAt":"2025-06-26T11:26:06.000Z","updatedAt":"2025-06-26T11:26:06.000Z"},
+            {"id":428,"card_id":114,"method":"Airmiles","brand":"Finnair Plus","min_points":2000,"max_points":0,"conversion_rate":1,"note":"","createdAt":"2025-06-26T11:26:32.000Z","updatedAt":"2025-06-26T11:26:32.000Z"},
+            {"id":429,"card_id":114,"method":"Airmiles","brand":"Flying Blue (Air France/KLM)","min_points":2000,"max_points":0,"conversion_rate":1,"note":"","createdAt":"2025-06-26T11:26:58.000Z","updatedAt":"2025-06-26T11:26:58.000Z"},
+            {"id":430,"card_id":114,"method":"Airmiles","brand":"Hainan Airlines Fortune Wings Club","min_points":0,"max_points":0,"conversion_rate":0.8,"note":"","createdAt":"2025-06-26T11:27:45.000Z","updatedAt":"2025-06-26T11:27:45.000Z"},
+            {"id":431,"card_id":114,"method":"Airmiles","brand":"InterMiles","min_points":2000,"max_points":0,"conversion_rate":0.8,"note":"","createdAt":"2025-06-26T11:28:12.000Z","updatedAt":"2025-06-26T11:28:12.000Z"},
+            {"id":432,"card_id":114,"method":"Airmiles","brand":"Singapore Airlines KrisFlyer","min_points":2000,"max_points":0,"conversion_rate":1,"note":"","createdAt":"2025-06-26T11:28:35.000Z","updatedAt":"2025-06-26T11:28:35.000Z"},
+            {"id":433,"card_id":114,"method":"Airmiles","brand":"Turkish Airlines Miles&Smiles","min_points":2000,"max_points":0,"conversion_rate":0.65,"note":"","createdAt":"2025-06-26T11:30:59.000Z","updatedAt":"2025-06-26T11:30:59.000Z"},
+            {"id":434,"card_id":114,"method":"Airmiles","brand":"United MileagePlus","min_points":2000,"max_points":0,"conversion_rate":0.65,"note":"","createdAt":"2025-06-26T11:31:33.000Z","updatedAt":"2025-06-26T11:31:33.000Z"},
+            {"id":435,"card_id":114,"method":"Airmiles","brand":"Vietnam Airlines Lotusmiles","min_points":2000,"max_points":0,"conversion_rate":0.8,"note":"","createdAt":"2025-06-26T11:33:06.000Z","updatedAt":"2025-06-26T11:33:06.000Z"},
+            {"id":437,"card_id":114,"method":"Hotels","brand":"Accor","min_points":2000,"max_points":0,"conversion_rate":0.5,"note":"","createdAt":"2025-06-26T11:36:12.000Z","updatedAt":"2025-06-26T11:36:12.000Z"},
+            {"id":439,"card_id":114,"method":"Hotels","brand":"Club ITC","min_points":2000,"max_points":0,"conversion_rate":0.25,"note":"","createdAt":"2025-06-26T11:39:07.000Z","updatedAt":"2025-06-26T11:39:07.000Z"},
+            {"id":440,"card_id":114,"method":"Hotels","brand":"IHG One Rewards","min_points":2000,"max_points":0,"conversion_rate":0.4,"note":"","createdAt":"2025-06-26T11:40:21.000Z","updatedAt":"2025-06-26T11:40:21.000Z"},
+            {"id":441,"card_id":114,"method":"Hotels","brand":"Wyndham Hotels","min_points":0,"max_points":0,"conversion_rate":0.4,"note":"","createdAt":"2025-06-26T11:41:12.000Z","updatedAt":"2025-06-26T11:41:12.000Z"}
+          ]
         }
       ]
     },
-    curlExample: `curl --location 'https://api.bankkaro.com/v1/cards/calculate' \\
---header 'Authorization: Bearer <jwt>' \\
+
+    // ▸ **Full production sample – no truncation**
+    sampleResponseProd: {
+      "success": true,
+      "message": "Savings calculated successfully",
+      "savings": [
+        {
+          "card_name": "HDFC Diners Club Black Metal Edition",
+          "seo_card_alias": "hdfc-diners-club-black-metal-credit-card",
+          "cg_network_url": null,
+          "ck_store_url": "cashkaro://stores/hdfc-credit-card-offers",
+          "ck_store_url_2": "cashkaro://stores/hdfc-credit-card-offers",
+          "id": 114,
+          "joining_fees": "10000",
+          "total_savings": 6253,
+          "total_savings_yearly": 75036,
+          "total_extra_benefits": 0,
+          "max_potential_savings": 1884000,
+          "redemption_options": [
+            {"id":422,"card_id":114,"method":"Airmiles","brand":"Air Canada Aeroplan","min_points":2000,"max_points":0,"conversion_rate":0.65,"note":"","createdAt":"2025-06-26T11:21:42.000Z","updatedAt":"2025-06-26T11:21:42.000Z"},
+            {"id":423,"card_id":114,"method":"Airmiles","brand":"Air Asia","min_points":2000,"max_points":0,"conversion_rate":0.7,"note":"","createdAt":"2025-06-26T11:23:09.000Z","updatedAt":"2025-06-26T11:23:09.000Z"},
+            {"id":424,"card_id":114,"method":"Airmiles","brand":"Avianca LifeMiles","min_points":2000,"max_points":0,"conversion_rate":0.65,"note":"","createdAt":"2025-06-26T11:23:55.000Z","updatedAt":"2025-06-26T11:23:55.000Z"},
+            {"id":425,"card_id":114,"method":"Airmiles","brand":"British Airways (Avios)","min_points":2000,"max_points":0,"conversion_rate":0.65,"note":"","createdAt":"2025-06-26T11:24:24.000Z","updatedAt":"2025-06-26T11:24:24.000Z"},
+            {"id":426,"card_id":114,"method":"Airmiles","brand":"Club Vistara","min_points":2000,"max_points":0,"conversion_rate":1,"note":"","createdAt":"2025-06-26T11:25:22.000Z","updatedAt":"2025-06-26T11:25:22.000Z"},
+            {"id":427,"card_id":114,"method":"Airmiles","brand":"Etihad Guest","min_points":2000,"max_points":0,"conversion_rate":0.5,"note":"","createdAt":"2025-06-26T11:26:06.000Z","updatedAt":"2025-06-26T11:26:06.000Z"},
+            {"id":428,"card_id":114,"method":"Airmiles","brand":"Finnair Plus","min_points":2000,"max_points":0,"conversion_rate":1,"note":"","createdAt":"2025-06-26T11:26:32.000Z","updatedAt":"2025-06-26T11:26:32.000Z"},
+            {"id":429,"card_id":114,"method":"Airmiles","brand":"Flying Blue (Air France/KLM)","min_points":2000,"max_points":0,"conversion_rate":1,"note":"","createdAt":"2025-06-26T11:26:58.000Z","updatedAt":"2025-06-26T11:26:58.000Z"},
+            {"id":430,"card_id":114,"method":"Airmiles","brand":"Hainan Airlines Fortune Wings Club","min_points":0,"max_points":0,"conversion_rate":0.8,"note":"","createdAt":"2025-06-26T11:27:45.000Z","updatedAt":"2025-06-26T11:27:45.000Z"},
+            {"id":431,"card_id":114,"method":"Airmiles","brand":"InterMiles","min_points":2000,"max_points":0,"conversion_rate":0.8,"note":"","createdAt":"2025-06-26T11:28:12.000Z","updatedAt":"2025-06-26T11:28:12.000Z"},
+            {"id":432,"card_id":114,"method":"Airmiles","brand":"Singapore Airlines KrisFlyer","min_points":2000,"max_points":0,"conversion_rate":1,"note":"","createdAt":"2025-06-26T11:28:35.000Z","updatedAt":"2025-06-26T11:28:35.000Z"},
+            {"id":433,"card_id":114,"method":"Airmiles","brand":"Turkish Airlines Miles&Smiles","min_points":2000,"max_points":0,"conversion_rate":0.65,"note":"","createdAt":"2025-06-26T11:30:59.000Z","updatedAt":"2025-06-26T11:30:59.000Z"},
+            {"id":434,"card_id":114,"method":"Airmiles","brand":"United MileagePlus","min_points":2000,"max_points":0,"conversion_rate":0.65,"note":"","createdAt":"2025-06-26T11:31:33.000Z","updatedAt":"2025-06-26T11:31:33.000Z"},
+            {"id":435,"card_id":114,"method":"Airmiles","brand":"Vietnam Airlines Lotusmiles","min_points":2000,"max_points":0,"conversion_rate":0.8,"note":"","createdAt":"2025-06-26T11:33:06.000Z","updatedAt":"2025-06-26T11:33:06.000Z"},
+            {"id":437,"card_id":114,"method":"Hotels","brand":"Accor","min_points":2000,"max_points":0,"conversion_rate":0.5,"note":"","createdAt":"2025-06-26T11:36:12.000Z","updatedAt":"2025-06-26T11:36:12.000Z"},
+            {"id":439,"card_id":114,"method":"Hotels","brand":"Club ITC","min_points":2000,"max_points":0,"conversion_rate":0.25,"note":"","createdAt":"2025-06-26T11:39:07.000Z","updatedAt":"2025-06-26T11:39:07.000Z"},
+            {"id":440,"card_id":114,"method":"Hotels","brand":"IHG One Rewards","min_points":2000,"max_points":0,"conversion_rate":0.4,"note":"","createdAt":"2025-06-26T11:40:21.000Z","updatedAt":"2025-06-26T11:40:21.000Z"},
+            {"id":441,"card_id":114,"method":"Hotels","brand":"Wyndham Hotels","min_points":0,"max_points":0,"conversion_rate":0.4,"note":"","createdAt":"2025-06-26T11:41:12.000Z","updatedAt":"2025-06-26T11:41:12.000Z"}
+          ]
+        }
+      ]
+    },
+
+    curlExample: `curl --location 'https://bk-api.bankkaro.com/cardgenius/cards/calculate' \\
 --header 'Content-Type: application/json' \\
 --data '{
-    "monthly_amazon_spend": 10000,
-    "monthly_fuel_spend": 3000
+  "amazon_spends": 5000,
+  "flipkart_spends": 3000,
+  "grocery_spends_online": 2000,
+  "grocery_spends_offline": 4000,
+  "mobile_phone_bills": 500,
+  "electricity_bills": 800,
+  "water_bills": 200,
+  "ott_channels": 300,
+  "hotels_annual": 50000,
+  "flights_annual": 80000
 }'`
   },
   'v1-eligibility': {
     name: 'Eligibility',
-    endpoint: '/v1/cards/eligibility',
+    endpoint: '/cardgenius/eligibility',
     methods: ['POST'],
-    description: 'Check if a user can apply for one or more cards.',
+    description: 'Check if a user qualifies for one or more cards based on pincode, in‑hand salary and employment type.',
     category: 'Card APIs',
-    purpose: 'Show only cards the user can apply for before they start an application.',
+    purpose: 'Surface only cards the user is eligible for before they start the application flow.',
+
     requestSchema: {
       type: 'object',
+      required: ['pincode', 'inhandIncome', 'empStatus'],
       properties: {
-        card_slug: { type: 'string', description: 'The slug of the card to check eligibility for.' },
+        alias: {
+          type: 'string',
+          description: 'Optional – slug of a single card to check. Omit to get results for ALL cards.'
+        },
+        pincode: {
+          type: 'string',
+          description: '6‑digit Indian postal code of the applicant.'
+        },
+        inhandIncome: {
+          type: 'integer',
+          description: 'Monthly in‑hand income (salary or business profits) in INR.'
+        },
+        empStatus: {
+          type: 'string',
+          description: 'Employment status. Allowed values: "salaried" | "self_employed" | "business".'
+        }
       }
     },
-    sampleResponse: { "card_slug": "sbi-cashback-credit-card", "eligible": true, "criteria": { "income": true, "location": true, "employment": true } },
-    curlExample: `curl --location 'https://api.bankkaro.com/v1/cards/eligibility' \\
---header 'Authorization: Bearer <jwt>' \\
+
+    fieldTable: [
+      { field: 'alias',         type: 'string',  required: 'No',  description: 'Card slug to evaluate. If omitted, API returns eligibility for all cards.' },
+      { field: 'pincode',       type: 'string',  required: 'Yes', description: '6‑digit pincode.' },
+      { field: 'inhandIncome',  type: 'integer', required: 'Yes', description: 'Monthly in‑hand income (₹).' },
+      { field: 'empStatus',     type: 'string',  required: 'Yes', description: 'Employment status: salaried | self_employed | business.' }
+    ],
+
+    responseSchema: {
+      type: 'object',
+      properties: {
+        status: { type: 'string', description: 'success | error' },
+        message: { type: 'string' },
+        data: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id:              { type: 'integer', description: 'Internal product ID.' },
+              card_alias:       { type: 'string',  description: 'Slug/alias for the card.' },
+              seo_card_alias:   { type: 'string',  description: 'SEO version of alias' },
+              eligible:         { type: 'boolean', description: 'Eligibility flag.' },
+              rejectionReason:  { type: 'string',  description: 'If ineligible, primary reason (e.g., "income", "location").', nullable: true },
+              bank_id:          { type: 'integer', description: 'Bank ID (present only when not eligible).', nullable: true },
+              product_id:       { type: 'integer', description: 'Product ID (present only when not eligible).', nullable: true },
+              redirectionFlag:  { type: 'boolean', description: 'If true, redirect to bank site immediately.', nullable: true }
+            }
+          }
+        }
+      }
+    },
+
+    sampleRequest: {
+      pincode: "110001",
+      inhandIncome: 50000,
+      empStatus: "salaried"
+    },
+
+    sampleResponse: {
+      "status": "success",
+      "message": "",
+      "data": [
+        { "card_alias": "icici-platinum-chip-credit-card",   "id": 54, "seo_card_alias": "icici-platinum-chip-credit-card",   "eligible": true },
+        { "card_alias": "icici-mmt-platinum-credit-card",    "id": 55, "seo_card_alias": "icici-mmt-platinum-credit-card",    "eligible": true },
+        { "card_alias": "icici-hpcl-super-saver-credit-card", "id": 51, "seo_card_alias": "icici-hpcl-super-saver-credit-card", "eligible": true },
+        { "card_alias": "au-zenith-plus-credit-card",        "bank_id": 7, "product_id": 49, "redirectionFlag": true, "seo_card_alias": "au-zenith-plus-credit-card", "rejectionReason": "income", "eligible": false }
+      ]
+    },
+
+    errorResponse: {
+      status: 'error',
+      message: 'Invalid pincode or employment status.',
+      data: null
+    },
+
+    // ▸ Example #1 – bulk eligibility (no alias)
+    sampleResponseBulk: {
+      "status": "success",
+      "message": "",
+      "data": [
+        { "card_alias": "icici-platinum-chip-credit-card",   "id": 54, "seo_card_alias": "icici-platinum-chip-credit-card",   "eligible": true },
+        { "card_alias": "icici-mmt-platinum-credit-card",    "id": 55, "seo_card_alias": "icici-mmt-platinum-credit-card",    "eligible": true },
+        { "card_alias": "icici-hpcl-super-saver-credit-card", "id": 51, "seo_card_alias": "icici-hpcl-super-saver-credit-card", "eligible": true },
+        { "card_alias": "au-zenith-plus-credit-card",        "bank_id": 7, "product_id": 49, "redirectionFlag": true, "seo_card_alias": "au-zenith-plus-credit-card", "rejectionReason": "income", "eligible": false }
+      ]
+    },
+
+    // ▸ Example #2 – single card eligibility (with alias)
+    sampleResponseSingle: {
+      "status": "success",
+      "message": "",
+      "data": [
+        { "card_alias": "sbi-cashback-credit-card", "id": 27, "seo_card_alias": "sbi-cashback-credit-card", "eligible": true }
+      ]
+    },
+
+    validationNotes: [
+      'pincode must be a valid 6-digit Indian postal code',
+      'inhandIncome must be a positive integer in INR',
+      'empStatus must be one of: "salaried", "self_employed", "business"',
+      'alias is optional - if provided, checks eligibility for specific card only',
+      'Response includes eligibility status and rejection reasons if applicable'
+    ],
+
+    curlExample: `curl --location 'https://bk-api.bankkaro.com/sp/api/cg-eligiblity' \\
 --header 'Content-Type: application/json' \\
---data '{"card_slug": "sbi-cashback-credit-card"}'`
+--data '{
+  "pincode": "110001",
+  "inhandIncome": 50000,
+  "empStatus": "salaried"
+}'`,
+
+    // Dual cURL examples -----------------------------------------------
+    curlExampleProd: `curl --location 'https://bk-api.bankkaro.com/sp/api/cg-eligiblity' \\\n--header 'Content-Type: application/json' \\\n--data '{"pincode":"110001","inhandIncome":"50000","empStatus":"salaried"}'`,
+
+    curlExampleStaging: `curl --location 'https://stg-api.bankkaro.com/sp/api/cg-eligiblity' \\\n--header 'Content-Type: application/json' \\\n--data '{"alias":"sbi-cashback-credit-card","pincode":"560001","inhandIncome":"35000","empStatus":"salaried"}'`
   },
   'v1-redemption-planner': {
     name: 'Redemption Planner',
