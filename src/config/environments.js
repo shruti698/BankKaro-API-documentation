@@ -27,9 +27,9 @@ export const getApiBaseUrl = () => {
     return 'http://localhost:4000';
   }
   
-  // For production deployment, try the staging API first
-  // If that fails, the app will fall back to static data
-  return 'https://bk-api.bankkaro.com';
+  // For production deployment, return null to use static data
+  // This avoids CORS issues and 404 errors from the staging API
+  return null;
   
   // TODO: Replace with your actual production API URL when available
   // return 'https://your-production-api-url.com';

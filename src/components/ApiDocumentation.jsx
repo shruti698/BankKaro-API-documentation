@@ -57,6 +57,19 @@ const ApiDocumentation = () => {
     const fetchApiData = async () => {
       try {
         setLoading(true);
+        
+        // If no API URL is configured, use static data directly
+        if (!API_BASE_URL) {
+          const foundApi = apiData[endpoint];
+          if (foundApi) {
+            setApi(foundApi);
+            setSelectedMethod(foundApi.methods[0] || 'POST');
+          } else {
+            setError('API endpoint not found');
+          }
+          return;
+        }
+        
         const response = await fetch(`${API_BASE_URL}/endpoints`);
         if (!response.ok) {
           throw new Error('Failed to fetch API data');

@@ -54,6 +54,23 @@ const Layout = ({ children }) => {
     const fetchEndpoints = async () => {
       try {
         setLoading(true);
+        
+        // If no API URL is configured, use static data directly
+        if (!API_BASE_URL) {
+          const staticEndpoints = Object.entries(apiData).map(([id, data]) => ({
+            id,
+            name: data.name,
+            endpoint: data.endpoint,
+            description: data.description,
+            category: data.category,
+            product: data.category === 'Partner APIs' ? 'Loan Genius' : 'Card Genius',
+            methods: data.methods,
+            purpose: data.purpose
+          }));
+          setEndpoints(staticEndpoints);
+          return;
+        }
+        
         const response = await fetch(`${API_BASE_URL}/endpoints`);
         if (!response.ok) {
           throw new Error('Failed to fetch endpoints');
