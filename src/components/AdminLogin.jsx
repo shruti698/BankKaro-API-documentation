@@ -25,7 +25,7 @@ const AdminLogin = ({ onLogin }) => {
   const theme = useTheme();
 
   // Simple password - you can change this to any password you want
-  const ADMIN_PASSWORD = 'bankkaro2024';
+  const ADMIN_PASSWORD = 'BankKaro@151085';
 
   const handleSubmit = async (e) => {
     e.preventDefault();

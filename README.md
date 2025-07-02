@@ -153,7 +153,7 @@ To add new API categories (like CardGenius APIs), you can:
 The admin panel is accessible in production at `/admin` with password protection:
 
 1. **Access URL**: `https://your-domain.com/admin`
-2. **Default Password**: `bankkaro2024`
+2. **Default Password**: `BankKaro@151085`
 3. **Session Duration**: 24 hours
 4. **Features**:
    - Add/Edit/Delete API endpoints

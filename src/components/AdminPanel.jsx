@@ -38,6 +38,7 @@ import {
   Settings as SettingsIcon
 } from '@mui/icons-material';
 import { getApiBaseUrl } from '../config/environments';
+import { apiData } from '../data/apiData';
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -72,12 +73,61 @@ const AdminPanel = () => {
 
   const fetchEndpoints = async () => {
     try {
+      // If no API URL is configured, use static data
+      if (!API_BASE_URL) {
+        const staticEndpoints = Object.entries(apiData).map(([id, data]) => ({
+          id,
+          name: data.name,
+          endpoint: data.endpoint,
+          description: data.description || '',
+          category: data.category || '',
+          product: data.category === 'Partner APIs' ? 'Loan Genius' : 'Card Genius',
+          purpose: data.purpose || '',
+          methods: data.methods || [],
+          requestSchema: data.requestSchema || {},
+          responseSchema: data.responseSchema || {},
+          sampleRequest: data.sampleRequest || {},
+          sampleResponse: data.sampleResponse || {},
+          sampleResponses: data.sampleResponses || [],
+          errorResponse: data.errorResponse || {},
+          errorResponses: data.errorResponses || [],
+          curlExample: data.curlExample || '',
+          validationNotes: data.validationNotes || [],
+          fieldTable: data.fieldTable || []
+        }));
+        setEndpoints(staticEndpoints);
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/endpoints`);
       const data = await response.json();
       setEndpoints(data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching endpoints:', error);
+      // Fallback to static data if API fails
+      const staticEndpoints = Object.entries(apiData).map(([id, data]) => ({
+        id,
+        name: data.name,
+        endpoint: data.endpoint,
+        description: data.description || '',
+        category: data.category || '',
+        product: data.category === 'Partner APIs' ? 'Loan Genius' : 'Card Genius',
+        purpose: data.purpose || '',
+        methods: data.methods || [],
+        requestSchema: data.requestSchema || {},
+        responseSchema: data.responseSchema || {},
+        sampleRequest: data.sampleRequest || {},
+        sampleResponse: data.sampleResponse || {},
+        sampleResponses: data.sampleResponses || [],
+        errorResponse: data.errorResponse || {},
+        errorResponses: data.errorResponses || [],
+        curlExample: data.curlExample || '',
+        validationNotes: data.validationNotes || [],
+        fieldTable: data.fieldTable || []
+      }));
+      setEndpoints(staticEndpoints);
       setLoading(false);
     }
   };
@@ -135,6 +185,13 @@ const AdminPanel = () => {
 
   const handleSubmit = async () => {
     try {
+      if (!API_BASE_URL) {
+        // In production (no API), show demo message
+        alert('Demo Mode: Changes would be saved to the database in a real environment.\n\nIn this demo, changes are simulated for demonstration purposes.');
+        handleCloseDialog();
+        return;
+      }
+
       if (editingEndpoint) {
         await fetch(`${API_BASE_URL}/endpoints/${editingEndpoint.id}`, {
           method: 'PUT',
@@ -158,6 +215,12 @@ const AdminPanel = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this endpoint?')) {
       try {
+        if (!API_BASE_URL) {
+          // In production (no API), show demo message
+          alert('Demo Mode: Endpoint deletion would be processed in a real environment.\n\nIn this demo, deletion is simulated for demonstration purposes.');
+          return;
+        }
+
         await fetch(`${API_BASE_URL}/endpoints/${id}`, {
           method: 'DELETE'
         });
