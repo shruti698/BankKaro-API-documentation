@@ -15,16 +15,33 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: [],
+      external: ['react-transition-group', 'set-cookie-parser', '@mui/icons-material'],
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'cookie'],
-          mui: ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled']
+          vendor: ['react', 'react-dom'],
+          mui: ['@mui/material', '@emotion/react', '@emotion/styled']
         }
       }
-    }
+    },
+    chunkSizeWarningLimit: 1000,
+    sourcemap: false,
+    minify: 'esbuild'
   },
   optimizeDeps: {
-    include: ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled', 'cookie']
+    include: [
+      '@mui/material', 
+      '@emotion/react', 
+      '@emotion/styled',
+      'react-is',
+      'react-transition-group',
+      'set-cookie-parser'
+    ],
+    exclude: ['@mui/icons-material']
+  },
+  resolve: {
+    alias: {
+      cookie: 'cookie',
+      'react-is': 'react-is'
+    }
   }
 })

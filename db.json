@@ -3,7 +3,7 @@
     {
       "id": "partner-auth",
       "name": "Partner Authentication",
-      "endpoint": "/sp/api/partner-auth",
+      "endpoint": "/partner/api/partner-auth",
       "methods": [
         "POST"
       ],
@@ -83,7 +83,7 @@
         "message": "Invalid OTP or mobile number.",
         "data": null
       },
-      "curlExample": "curl --location 'https://yourdomain.com/sp/api/partner-auth' \\\n--header 'Authorization: Bearer <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"mobile\": \"9999999999\",\n  \"otp\": \"123456\"\n}'",
+      "curlExample": "curl --location 'https://yourdomain.com/partner/api/partner-auth' \\\n--header 'Authorization: Bearer <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"mobile\": \"9999999999\",\n  \"otp\": \"123456\"\n}'",
       "validationNotes": [
         "mobile must be a valid 10-digit number",
         "otp must be exactly 6 digits",
@@ -108,7 +108,7 @@
     {
       "id": "lead-details",
       "name": "Lead Details",
-      "endpoint": "/sp/api/lead-details",
+      "endpoint": "/partner/api/lead-details",
       "methods": [
         "GET",
         "POST"
@@ -215,7 +215,7 @@
           "message": "Lead not found or access denied.",
           "data": null
         },
-        "curlExample": "curl --location 'https://yourdomain.com/sp/api/lead-details?leadId=550e8400-e29b-41d4-a716-446655440001' \\\n--header 'Authorization: Bearer <auth_token>'",
+        "curlExample": "curl --location 'https://yourdomain.com/partner/api/lead-details?leadId=550e8400-e29b-41d4-a716-446655440001' \\\n--header 'Authorization: Bearer <auth_token>'",
         "validationNotes": [
           "leadId must be a valid UUID format",
           "leadId must exist in the system",
@@ -361,7 +361,7 @@
           "message": "Invalid customer data provided.",
           "data": null
         },
-        "curlExample": "curl --location 'https://yourdomain.com/sp/api/lead-details' \\\n--header 'Authorization: Bearer <auth_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"customerName\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"9876543210\",\n  \"loanAmount\": 500000,\n  \"purpose\": \"personal\"\n}'",
+        "curlExample": "curl --location 'https://yourdomain.com/partner/api/lead-details' \\\n--header 'Authorization: Bearer <auth_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"customerName\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"9876543210\",\n  \"loanAmount\": 500000,\n  \"purpose\": \"personal\"\n}'",
         "validationNotes": [
           "customerName must be 2-100 characters",
           "email must be a valid email format",
@@ -406,7 +406,7 @@
     {
       "id": "application",
       "name": "Loan Application",
-      "endpoint": "/sp/api/application",
+      "endpoint": "/partner/api/application",
       "methods": [
         "POST"
       ],
@@ -561,7 +561,7 @@
         "message": "Invalid application data or missing required documents.",
         "data": null
       },
-      "curlExample": "curl --location 'https://yourdomain.com/sp/api/application' \\\n--header 'Authorization: Bearer <auth_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"leadId\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"personalInfo\": {\n    \"dateOfBirth\": \"1990-05-15\",\n    \"panNumber\": \"ABCDE1234F\",\n    \"aadharNumber\": \"123456789012\"\n  },\n  \"employmentInfo\": {\n    \"employmentType\": \"salaried\",\n    \"monthlyIncome\": 75000,\n    \"companyName\": \"Tech Solutions Ltd\"\n  },\n  \"documents\": [\n    \"https://example.com/pan-card.pdf\",\n    \"https://example.com/aadhar-card.pdf\",\n    \"https://example.com/salary-slip.pdf\"\n  ]\n}'",
+      "curlExample": "curl --location 'https://yourdomain.com/partner/api/application' \\\n--header 'Authorization: Bearer <auth_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"leadId\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"personalInfo\": {\n    \"dateOfBirth\": \"1990-05-15\",\n    \"panNumber\": \"ABCDE1234F\",\n    \"aadharNumber\": \"123456789012\"\n  },\n  \"employmentInfo\": {\n    \"employmentType\": \"salaried\",\n    \"monthlyIncome\": 75000,\n    \"companyName\": \"Tech Solutions Ltd\"\n  },\n  \"documents\": [\n    \"https://example.com/pan-card.pdf\",\n    \"https://example.com/aadhar-card.pdf\",\n    \"https://example.com/salary-slip.pdf\"\n  ]\n}'",
       "validationNotes": [
         "leadId must be a valid UUID and must exist",
         "dateOfBirth must be in YYYY-MM-DD format",
@@ -629,7 +629,7 @@
     {
       "id": "partner-autoAuth",
       "name": "Partner Auto Authentication",
-      "endpoint": "/sp/api/partner-autoAuth",
+      "endpoint": "/partner/api/partner-autoAuth",
       "methods": [
         "POST"
       ],
@@ -730,7 +730,7 @@
         }
       },
       "errorResponse": {},
-      "curlExample": "curl --location 'https://bk-api.bankkaro.com/sp/api/partner-autoAuth' \\\n--header 'Host: abc.example-partner.com' \\\n--header 'origin: abc.example-partner.com' \\\n--header 'partner-token: <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"mobile\": \"7011048697\"\n}'",
+      "curlExample": "curl --location 'https://bk-api.bankkaro.com/partner/api/partner-autoAuth' \\\n--header 'Host: abc.example-partner.com' \\\n--header 'origin: abc.example-partner.com' \\\n--header 'partner-token: <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"mobile\": \"7011048697\"\n}'",
       "validationNotes": [
         "One of mobile or exit_id + vendor must be provided",
         "mobile must be a valid 10-digit number if provided",
@@ -766,7 +766,7 @@
     {
       "id": "partner-token",
       "name": "Partner Token Generation",
-      "endpoint": "/sp/api/partner-token",
+      "endpoint": "/partner/api/partner-token",
       "methods": [
         "POST"
       ],
@@ -827,7 +827,7 @@
         "message": "Invalid API key provided.",
         "data": null
       },
-      "curlExample": "curl --location 'http://localhost:8000/sp/api/partner-token' \\\n--header 'Host: abc.example-partner.com' \\\n--header 'origin: abc.example-partner.com' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"x-api-key\": \"test\"\n}'",
+      "curlExample": "curl --location 'http://localhost:8000/partner/api/partner-token' \\\n--header 'Host: abc.example-partner.com' \\\n--header 'origin: abc.example-partner.com' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"x-api-key\": \"test\"\n}'",
       "validationNotes": [
         "x-api-key must be a valid API key provided by BankKaro",
         "This API must only be called from the server-side to prevent leaking the x-api-key",
@@ -1939,7 +1939,7 @@
         "message": "Invalid pincode or employment status.",
         "data": null
       },
-      "curlExample": "curl --location 'https://bk-api.bankkaro.com/sp/api/cg-eligiblity' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"pincode\": \"110001\",\n  \"inhandIncome\": 50000,\n  \"empStatus\": \"salaried\"\n}'",
+      "curlExample": "curl --location 'https://bk-api.bankkaro.com/partner/api/cg-eligiblity' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"pincode\": \"110001\",\n  \"inhandIncome\": 50000,\n  \"empStatus\": \"salaried\"\n}'",
       "validationNotes": [
         "pincode must be a valid 6-digit Indian postal code",
         "inhandIncome must be a positive integer in INR",

@@ -1,7 +1,7 @@
 export const apiData = {
   'partner-auth': {
     name: 'Partner Authentication',
-    endpoint: '/sp/api/partner-auth',
+    endpoint: '/partner/api/partner-auth',
     methods: ['POST'],
     description: 'Authenticate a partner and get access token',
     category: 'Partner APIs',
@@ -78,7 +78,7 @@ export const apiData = {
       message: 'Invalid OTP or mobile number.',
       data: null
     },
-    curlExample: `curl --location 'https://yourdomain.com/sp/api/partner-auth' \\
+    curlExample: `curl --location 'https://yourdomain.com/partner/api/partner-auth' \\
 --header 'Authorization: Bearer <partner_token>' \\
 --header 'Content-Type: application/json' \\
 --data '{
@@ -106,9 +106,124 @@ export const apiData = {
       }
     ]
   },
+  'partner-auth-test': {
+    name: 'Partner Authentication Test',
+    endpoint: '/partner/api/partner-auth',
+    methods: ['POST'],
+    description: 'Authenticate a partner and get access token',
+    category: 'Partner APIs',
+    purpose: 'Authenticate a partner using mobile number and OTP to obtain access token for API operations',
+    requestSchema: {
+      type: 'object',
+      properties: {
+        mobile: {
+          type: 'string',
+          description: 'Mobile number for authentication',
+          required: true,
+          validation: 'Must be a valid 10-digit mobile number'
+        },
+        otp: {
+          type: 'string',
+          description: 'One-time password for verification',
+          required: true,
+          validation: 'Must be a 6-digit OTP'
+        }
+      }
+    },
+    responseSchema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          description: 'Response status (success/error)'
+        },
+        message: {
+          type: 'string',
+          description: 'Response message'
+        },
+        data: {
+          type: 'object',
+          properties: {
+            auth_token: {
+              type: 'string',
+              description: 'JWT authentication token'
+            },
+            user_data: {
+              type: 'object',
+              properties: {
+                mobile: {
+                  type: 'string',
+                  description: 'User mobile number'
+                },
+                name: {
+                  type: 'string',
+                  description: 'User name'
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    sampleRequest: {
+      mobile: "9999999999",
+      otp: "123456"
+    },
+    sampleResponse: {
+      status: 'success',
+      message: '',
+      data: {
+        auth_token: 'eyJhbGciOiJIUzI1NiIs...',
+        user_data: {
+          mobile: '9999999999',
+          name: 'John Doe'
+        }
+      }
+    },
+    errorResponse: {
+      errorResponse1: {
+        status: 'error',
+        message: 'Invalid OTP or mobile number.',
+        data: null
+      },
+      errorResponse2: {
+        status: 'error',
+        message: 'Invalid OTP or mobile number.',
+        data: null
+      },
+    },
+    curlExample: `curl --location 'https://yourdomain.com/partner/api/partner-auth' \\
+--header 'Authorization: Bearer <partner_token>' \\
+--header 'Content-T
+ype: application/json' \\
+--data '{
+  "mobile": "9999999999",
+  "otp": "123456"
+}'`,
+    validationNotes: [
+      'mobile must be a valid 10-digit number',
+      'otp must be exactly 6 digits',
+      'Authorization header with partner token is required',
+      'OTP expires after 5 minutes'
+    ],
+    fieldTable: [
+      {
+        field: 'mobile',
+        type: 'string',
+        required: 'Yes',
+        description: 'Mobile number for authentication (10 digits)'
+      },
+      {
+        field: 'otp',
+        type: 'string',
+        required: 'Yes',
+        description: 'One-time password for verification (6 digits)'
+      }
+    ]
+  },
   'lead-details': {
     name: 'Lead Details',
-    endpoint: '/sp/api/lead-details',
+    endpoint: '/partner/api/lead-details',
     methods: ['GET', 'POST'],
     description: 'Retrieve or create lead information',
     category: 'Partner APIs',
@@ -211,7 +326,7 @@ export const apiData = {
         message: 'Lead not found or access denied.',
         data: null
       },
-      curlExample: `curl --location 'https://yourdomain.com/sp/api/lead-details?leadId=550e8400-e29b-41d4-a716-446655440001' \\
+      curlExample: `curl --location 'https://yourdomain.com/partner/api/lead-details?leadId=550e8400-e29b-41d4-a716-446655440001' \\
 --header 'Authorization: Bearer <auth_token>'`,
       validationNotes: [
         "leadId must be a valid UUID format",
@@ -358,7 +473,7 @@ export const apiData = {
         message: 'Invalid customer data provided.',
         data: null
       },
-      curlExample: `curl --location 'https://yourdomain.com/sp/api/lead-details' \\
+      curlExample: `curl --location 'https://yourdomain.com/partner/api/lead-details' \\
 --header 'Authorization: Bearer <auth_token>' \\
 --header 'Content-Type: application/json' \\
 --data '{
@@ -411,7 +526,7 @@ export const apiData = {
   },
   'application': {
     name: 'Loan Application',
-    endpoint: '/sp/api/application',
+    endpoint: '/partner/api/application',
     methods: ['POST'],
     description: 'Submit a complete loan application',
     category: 'Partner APIs',
@@ -563,7 +678,7 @@ export const apiData = {
       message: 'Invalid application data or missing required documents.',
       data: null
     },
-    curlExample: `curl --location 'https://yourdomain.com/sp/api/application' \\
+    curlExample: `curl --location 'https://yourdomain.com/partner/api/application' \\
 --header 'Authorization: Bearer <auth_token>' \\
 --header 'Content-Type: application/json' \\
 --data '{
@@ -646,7 +761,7 @@ export const apiData = {
   },
   'partner-autoAuth': {
     name: 'Partner Auto Authentication',
-    endpoint: '/sp/api/partner-autoAuth',
+    endpoint: '/partner/api/partner-autoAuth',
     methods: ['POST'],
     description: 'Auto-authenticate partners using mobile number or exit_id without UI',
     category: 'Partner APIs',
@@ -787,7 +902,7 @@ export const apiData = {
         }
       }
     ],
-    curlExample: `curl --location 'https://bk-api.bankkaro.com/sp/api/partner-autoAuth' \\
+    curlExample: `curl --location 'https://bk-api.bankkaro.com/partner/api/partner-autoAuth' \\
 --header 'Host: abc.example-partner.com' \\
 --header 'origin: abc.example-partner.com' \\
 --header 'partner-token: <partner_token>' \\
@@ -854,7 +969,7 @@ export const apiData = {
       {
         title: 'Auto Auth using Exit ID (CashKaro)',
         description: 'Authenticate using CashKaro exit_id',
-        curl: `curl --location 'https://bk-api.bankkaro.com/sp/api/partner-autoAuth' \\
+        curl: `curl --location 'https://bk-api.bankkaro.com/partner/api/partner-autoAuth' \\
 --header 'partner-token: <partner_token>' \\
 --header 'Content-Type: application/json' \\
 --data '{
@@ -865,7 +980,7 @@ export const apiData = {
       {
         title: 'Auto Auth using Exit ID (ProfitShare)',
         description: 'Authenticate using ProfitShare exit_id',
-        curl: `curl --location 'https://bk-api.bankkaro.com/sp/api/partner-autoAuth' \\
+        curl: `curl --location 'https://bk-api.bankkaro.com/partner/api/partner-autoAuth' \\
 --header 'partner-token: <partner_token>' \\
 --header 'Content-Type: application/json' \\
 --data '{
@@ -877,7 +992,7 @@ export const apiData = {
   },
   'partner-token': {
     name: 'Partner Token Generation',
-    endpoint: '/sp/api/partner-token',
+    endpoint: '/partner/api/partner-token',
     methods: ['POST'],
     description: 'Generate a partner-token (JWT) that is required for authorization in subsequent API calls',
     category: 'Partner APIs',
@@ -953,7 +1068,7 @@ export const apiData = {
         }
       }
     ],
-    curlExample: `curl --location 'http://localhost:8000/sp/api/partner-token' \\
+    curlExample: `curl --location 'http://localhost:8000/partner/api/partner-token' \\
 --header 'Host: abc.example-partner.com' \\
 --header 'origin: abc.example-partner.com' \\
 --header 'Content-Type: application/json' \\
@@ -1630,7 +1745,7 @@ export const apiData = {
       'Response includes eligibility status and rejection reasons if applicable'
     ],
 
-    curlExample: `curl --location 'https://bk-api.bankkaro.com/sp/api/cg-eligiblity' \\
+    curlExample: `curl --location 'https://bk-api.bankkaro.com/partner/api/cg-eligiblity' \\
 --header 'Content-Type: application/json' \\
 --data '{
   "pincode": "110001",
@@ -1639,9 +1754,9 @@ export const apiData = {
 }'`,
 
     // Dual cURL examples -----------------------------------------------
-    curlExampleProd: `curl --location 'https://bk-api.bankkaro.com/sp/api/cg-eligiblity' \\\n--header 'Content-Type: application/json' \\\n--data '{"pincode":"110001","inhandIncome":"50000","empStatus":"salaried"}'`,
+    curlExampleProd: `curl --location 'https://bk-api.bankkaro.com/partner/api/cg-eligiblity' \\\n--header 'Content-Type: application/json' \\\n--data '{"pincode":"110001","inhandIncome":"50000","empStatus":"salaried"}'`,
 
-    curlExampleStaging: `curl --location 'https://stg-api.bankkaro.com/sp/api/cg-eligiblity' \\\n--header 'Content-Type: application/json' \\\n--data '{"alias":"sbi-cashback-credit-card","pincode":"560001","inhandIncome":"35000","empStatus":"salaried"}'`
+    curlExampleStaging: `curl --location 'https://stg-api.bankkaro.com/partner/api/cg-eligiblity' \\\n--header 'Content-Type: application/json' \\\n--data '{"alias":"sbi-cashback-credit-card","pincode":"560001","inhandIncome":"35000","empStatus":"salaried"}'`
   },
   'v1-redemption-planner': {
     name: 'Redemption Planner',

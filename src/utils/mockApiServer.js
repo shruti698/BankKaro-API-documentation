@@ -3,7 +3,7 @@
 
 const mockResponses = {
   // Partner Authentication
-  '/sp/api/partner-auth': {
+  '/partner/api/partner-auth': {
     POST: {
       success: {
         status: 'success',
@@ -27,7 +27,7 @@ const mockResponses = {
   },
 
   // Lead Details
-  '/sp/api/lead-details': {
+  '/partner/api/lead-details': {
     GET: {
       success: {
         status: 'success',
@@ -254,7 +254,7 @@ class MockApiServer {
     // In a real implementation, you might want to add more sophisticated logic
     
     // Check for specific error conditions
-    if (endpoint === '/sp/api/partner-auth') {
+    if (endpoint === '/partner/api/partner-auth') {
       const { mobile, otp } = requestData;
       if (mobile === '9999999999' && otp === '000000') {
         return {
@@ -264,7 +264,7 @@ class MockApiServer {
       }
     }
 
-    if (endpoint === '/sp/api/lead-details' && method === 'GET') {
+    if (endpoint === '/partner/api/lead-details' && method === 'GET') {
       const { leadId } = requestData;
       if (leadId === 'invalid-lead-id') {
         return {
