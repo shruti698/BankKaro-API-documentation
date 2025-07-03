@@ -54,7 +54,7 @@ const ApiDocumentation = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedMethod, setSelectedMethod] = useState('POST');
-  const [selectedEnvironment, setSelectedEnvironment] = useState('staging');
+  const [selectedEnvironment, setSelectedEnvironment] = useState('uat');
   const [showSandbox, setShowSandbox] = useState(false);
 
   useEffect(() => {
@@ -408,10 +408,10 @@ const ApiDocumentation = () => {
                       label={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <CloudIcon fontSize="small" />
-                          Staging
+                          UAT
                         </Box>
                       }
-                      value="staging"
+                      value="uat"
                     />
                     <Tab 
                       label={

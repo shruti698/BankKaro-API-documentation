@@ -1,17 +1,17 @@
 export const environments = {
-  staging: {
-    name: 'Staging',
-    url: 'https://bk-api.bankkaro.com',
-    description: 'Development and testing environment',
+  uat: {
+    name: 'UAT',
+    url: 'https://uat-platform.bankkaro.com',
+    description: 'User Acceptance Testing environment',
     color: 'warning',
-    cardApiUrl: 'https://bk-api.bankkaro.com/card-genius'
+    cardApiUrl: 'https://uat-platform.bankkaro.com/card-genius'
   },
   production: {
     name: 'Production',
-    url: 'https://prod-api.bankkaro.com',
+    url: 'https://prod-platform.bankkaro.com',
     description: 'Production environment for live transactions.',
     color: 'error',
-    cardApiUrl: 'https://api.bankkaro.com'
+    cardApiUrl: 'https://prod-platform.bankkaro.com/card-genius'
   }
 };
 
@@ -27,10 +27,10 @@ export const getApiBaseUrl = () => {
     return 'http://localhost:4000';
   }
   
-  // For production deployment, return null to use static data
-  // This avoids CORS issues and 404 errors from the staging API
-  return null;
+  // For production deployment, use UAT API by default
+  // This allows real API testing in the sandbox
+  return 'https://uat-platform.bankkaro.com';
   
-  // TODO: Replace with your actual production API URL when available
-  // return 'https://your-production-api-url.com';
+  // TODO: You can switch to production API when ready
+  // return 'https://prod-platform.bankkaro.com';
 };

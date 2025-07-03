@@ -38,7 +38,7 @@ import mockApiServer from '../utils/mockApiServer';
 
 const ApiSandbox = ({ api }) => {
   const [selectedMethod, setSelectedMethod] = useState('POST');
-  const [selectedEnvironment, setSelectedEnvironment] = useState('staging');
+  const [selectedEnvironment, setSelectedEnvironment] = useState('uat');
   const [requestData, setRequestData] = useState({});
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -286,24 +286,46 @@ const ApiSandbox = ({ api }) => {
     setResponse(null);
 
     try {
-      // Use mock API server for sandbox testing
       const baseUrl = getEnvironmentUrl(selectedEnvironment, api.endpoint?.startsWith('v1-'));
       const url = `${baseUrl}${api.endpoint}`;
       
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sandbox_token_12345'
+      };
+
       const options = {
         method: selectedMethod,
+        headers,
         ...(selectedMethod !== 'GET' && { body: JSON.stringify(requestData) })
       };
 
-      const response = await mockApiServer.makeRequest(url, options);
-      const data = await response.json();
+      // Try real API first, fallback to mock if it fails
+      let response;
+      try {
+        response = await fetch(url, options);
+        const data = await response.json();
 
-      setResponse({
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries()),
-        data
-      });
+        setResponse({
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+          data
+        });
+      } catch (apiError) {
+        console.warn('Real API failed, falling back to mock server:', apiError.message);
+        
+        // Fallback to mock server
+        const mockResponse = await mockApiServer.makeRequest(url, options);
+        const mockData = await mockResponse.json();
+
+        setResponse({
+          status: mockResponse.status,
+          statusText: mockResponse.statusText,
+          headers: Object.fromEntries(mockResponse.headers.entries()),
+          data: mockData
+        });
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -475,7 +497,7 @@ const ApiSandbox = ({ api }) => {
                 onChange={(e) => setSelectedEnvironment(e.target.value)}
                 label="Environment"
               >
-                <MenuItem value="staging">Staging</MenuItem>
+                <MenuItem value="uat">UAT</MenuItem>
                 <MenuItem value="production">Production</MenuItem>
               </Select>
             </FormControl>

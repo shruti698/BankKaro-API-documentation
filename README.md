@@ -163,13 +163,24 @@ The admin panel is accessible in production at `/admin` with password protection
 
 ### Changing Admin Password
 
+### **API Environments**
+
+The application supports multiple API environments:
+
+- **UAT**: `https://uat-platform.bankkaro.com`
+- **Production**: `https://prod-platform.bankkaro.com`
+
+The sandbox environment will attempt to call real APIs first, then fall back to mock data if the API is unavailable.
+
+### **Changing Admin Password**
+
 To change the admin password, edit the `ADMIN_PASSWORD` constant in `src/components/AdminLogin.jsx`:
 
 ```javascript
 const ADMIN_PASSWORD = 'your-new-password';
 ```
 
-### Security Notes
+### **Security Notes**
 
 - The admin panel uses client-side authentication (localStorage)
 - For production use, consider implementing server-side authentication
