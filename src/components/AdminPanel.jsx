@@ -40,7 +40,8 @@ import {
   Description as DescriptionIcon,
   Settings as SettingsIcon,
   Save as SaveIcon,
-  GitHub as GitHubIcon
+  GitHub as GitHubIcon,
+  FormatIndentIncrease as FormatIcon
 } from '@mui/icons-material';
 import { apiData } from '../data/apiData';
 import { environments, getEnvironmentUrl } from '../config/environments';
@@ -308,9 +309,26 @@ const AdminPanel = () => {
 
   const updateJsonField = (field, value) => {
     try {
-      const jsonValue = JSON.parse(value);
+      // First, try to clean up the value if it's been double-escaped
+      let cleanedValue = value;
+      
+      // Remove extra quotes at the beginning and end if they exist
+      if (cleanedValue.startsWith('"') && cleanedValue.endsWith('"')) {
+        try {
+          // Try to unescape the string
+          cleanedValue = JSON.parse(cleanedValue);
+        } catch (e) {
+          // If that fails, just remove the outer quotes
+          cleanedValue = cleanedValue.slice(1, -1);
+        }
+      }
+      
+      // Parse the JSON
+      const jsonValue = JSON.parse(cleanedValue);
       updateFormData(field, jsonValue);
     } catch (error) {
+      // If parsing fails, store as string but show a warning
+      console.warn(`Failed to parse JSON for ${field}:`, error);
       updateFormData(field, value);
     }
   };
@@ -334,6 +352,36 @@ const AdminPanel = () => {
       uat: uatCurl,
       prod: prodCurl
     };
+  };
+
+  // Helper function to safely get JSON string for display
+  const getJsonDisplayValue = (field) => {
+    const value = formData[field];
+    if (typeof value === 'string') {
+      // If it's already a string, try to parse it as JSON for display
+      try {
+        const parsed = JSON.parse(value);
+        return JSON.stringify(parsed, null, 2);
+      } catch (e) {
+        // If it's not valid JSON, return as is
+        return value;
+      }
+    }
+    // If it's an object, stringify it
+    return JSON.stringify(value, null, 2);
+  };
+
+  // Function to format JSON
+  const formatJson = (field) => {
+    const value = formData[field];
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        updateFormData(field, parsed);
+      } catch (e) {
+        alert('Invalid JSON format. Please check your syntax.');
+      }
+    }
   };
 
   if (loading) {
@@ -530,14 +578,33 @@ const AdminPanel = () => {
                   <Typography>Request Schema (JSON)</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <TextField
-                    multiline
-                    rows={8}
-                    fullWidth
-                    value={JSON.stringify(formData.requestSchema, null, 2)}
-                    onChange={(e) => updateJsonField('requestSchema', e.target.value)}
-                    placeholder='{"type": "object", "properties": {...}}'
-                  />
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Enter valid JSON schema for the request
+                      </Typography>
+                      <Button
+                        size="small"
+                        startIcon={<FormatIcon />}
+                        onClick={() => formatJson('requestSchema')}
+                        variant="outlined"
+                      >
+                        Format JSON
+                      </Button>
+                    </Box>
+                    <TextField
+                      multiline
+                      rows={8}
+                      fullWidth
+                      value={getJsonDisplayValue('requestSchema')}
+                      onChange={(e) => updateJsonField('requestSchema', e.target.value)}
+                      placeholder='{"type": "object", "properties": {...}}'
+                      error={typeof formData.requestSchema === 'string' && formData.requestSchema !== ''}
+                      helperText={typeof formData.requestSchema === 'string' && formData.requestSchema !== '' 
+                        ? '⚠️ Invalid JSON format. Please check your syntax.' 
+                        : 'Paste your JSON here - it will be automatically cleaned up'}
+                    />
+                  </Box>
                 </AccordionDetails>
               </Accordion>
 
@@ -546,14 +613,33 @@ const AdminPanel = () => {
                   <Typography>Response Schema (JSON)</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <TextField
-                    multiline
-                    rows={8}
-                    fullWidth
-                    value={JSON.stringify(formData.responseSchema, null, 2)}
-                    onChange={(e) => updateJsonField('responseSchema', e.target.value)}
-                    placeholder='{"type": "object", "properties": {...}}'
-                  />
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Enter valid JSON schema for the response
+                      </Typography>
+                      <Button
+                        size="small"
+                        startIcon={<FormatIcon />}
+                        onClick={() => formatJson('responseSchema')}
+                        variant="outlined"
+                      >
+                        Format JSON
+                      </Button>
+                    </Box>
+                    <TextField
+                      multiline
+                      rows={8}
+                      fullWidth
+                      value={getJsonDisplayValue('responseSchema')}
+                      onChange={(e) => updateJsonField('responseSchema', e.target.value)}
+                      placeholder='{"type": "object", "properties": {...}}'
+                      error={typeof formData.responseSchema === 'string' && formData.responseSchema !== ''}
+                      helperText={typeof formData.responseSchema === 'string' && formData.responseSchema !== '' 
+                        ? '⚠️ Invalid JSON format. Please check your syntax.' 
+                        : 'Paste your JSON here - it will be automatically cleaned up'}
+                    />
+                  </Box>
                 </AccordionDetails>
               </Accordion>
 
@@ -566,9 +652,13 @@ const AdminPanel = () => {
                     multiline
                     rows={6}
                     fullWidth
-                    value={JSON.stringify(formData.sampleRequest, null, 2)}
+                    value={getJsonDisplayValue('sampleRequest')}
                     onChange={(e) => updateJsonField('sampleRequest', e.target.value)}
                     placeholder='{"key": "value"}'
+                    error={typeof formData.sampleRequest === 'string' && formData.sampleRequest !== ''}
+                    helperText={typeof formData.sampleRequest === 'string' && formData.sampleRequest !== '' 
+                      ? '⚠️ Invalid JSON format. Please check your syntax.' 
+                      : 'Enter sample request data in JSON format'}
                   />
                 </AccordionDetails>
               </Accordion>
