@@ -158,7 +158,8 @@ const AdminPanel = () => {
         endpoint: endpoint.endpoint,
         description: endpoint.description || '',
         category: endpoint.category || '',
-        products: endpoint.products || endpoint.product ? [endpoint.product] : ['Loan Genius'],
+        products: Array.isArray(endpoint.products) ? endpoint.products : 
+                 (endpoint.product ? [endpoint.product] : ['Loan Genius']),
         purpose: endpoint.purpose || '',
         methods: endpoint.methods || [],
         requestSchema: endpoint.requestSchema || {},
@@ -404,7 +405,7 @@ const AdminPanel = () => {
                 <InputLabel>Products</InputLabel>
                 <Select
                   multiple
-                  value={formData.products}
+                  value={Array.isArray(formData.products) ? formData.products : ['Loan Genius']}
                   onChange={(e) => updateFormData('products', e.target.value)}
                   label="Products"
                   renderValue={(selected) => (
