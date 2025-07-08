@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://mohsinfd.github.io/BankKaro-API-documentation",
+  "homepage": ".",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -19,14 +19,11 @@
     "@mui/icons-material": "^7.2.0",
     "@mui/material": "^7.2.0",
     "clsx": "^2.1.1",
-    "cookie": "^1.0.2",
-    "ra-data-json-server": "^4.11.1",
     "react": "18.2.0",
-    "react-admin": "^4.11.1",
     "react-dom": "18.2.0",
+    "react-is": "^19.1.0",
     "react-router-dom": "^7.6.2",
-    "react-transition-group": "^4.4.5",
-    "set-cookie-parser": "^2.7.1"
+    "react-transition-group": "^4.4.5"
   },
   "devDependencies": {
     "@types/react": "^19.1.2",
