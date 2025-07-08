@@ -762,36 +762,53 @@ export const apiData = {
   "purpose": "Used to generate a `partner-token` (JWT) that is required for authorization in subsequent API calls like `/partner-auth`, `/lead-details`, etc.",
   "requestSchema": {
     "type": "object",
+    "required": [
+      "x-api-key"
+    ],
+    "additionalProperties": false,
     "properties": {
       "x-api-key": {
         "type": "string",
-        "description": "Unique key provided by BankKaro (staging/prod specific). Must be kept secret on the backend.",
-        "required": true,
-        "validation": "Must be a valid API key provided by BankKaro"
+        "description": "Secret API key issued by BankKaro (environment-specific)",
+        "minLength": 5
       }
     }
   },
   "responseSchema": {
     "type": "object",
+    "required": [
+      "status",
+      "message",
+      "data"
+    ],
     "properties": {
       "status": {
         "type": "string",
-        "description": "Response status (success/error)"
+        "enum": [
+          "success",
+          "error"
+        ],
+        "description": "Overall operation status"
       },
       "message": {
         "type": "string",
-        "description": "Response message"
+        "description": "Optional human-readable message"
       },
       "data": {
         "type": "object",
+        "required": [
+          "jwttoken",
+          "expiresAt"
+        ],
         "properties": {
           "jwttoken": {
             "type": "string",
-            "description": "JWT token to be sent in the Authorization header of other APIs"
+            "description": "Bearer token (JWT) to be supplied in the Authorization header"
           },
           "expiresAt": {
             "type": "string",
-            "description": "ISO timestamp showing when this token expires"
+            "format": "date-time",
+            "description": "ISO-8601 expiry timestamp (UTC)"
           }
         }
       }
@@ -800,20 +817,7 @@ export const apiData = {
   "sampleRequest": {
     "x-api-key": "test"
   },
-  "sampleResponse": {
-    "status": "success",
-    "message": "",
-    "data": {
-      "jwttoken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-      "expiresAt": "2025-06-20T13:21:57.283Z"
-    }
-  },
-  "errorResponse": {
-    "status": "error",
-    "message": "Invalid API key provided.",
-    "data": null
-  },
-  "curlExample": "curl --location 'http://localhost:8000/partner/api/partner-token' \\\n--header 'Host: abc.example-partner.com' \\\n--header 'origin: abc.example-partner.com' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"x-api-key\": \"test\"\n}'",
+  "curlExample": "# ---------- UAT ----------\ncurl --location 'https://uat-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"test\"\n}'\n\n# ---------- Production ----------\ncurl --location 'https://prod-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"YOUR_PROD_KEY\"\n}'\n",
   "validationNotes": [
     "x-api-key must be a valid API key provided by BankKaro",
     "This API must only be called from the server-side to prevent leaking the x-api-key",
@@ -833,7 +837,22 @@ export const apiData = {
       "required": "Yes",
       "description": "Unique key provided by BankKaro (staging/prod specific). Must be kept secret on the backend."
     }
-  ]
+  ],
+  "products": [
+    "Loan Genius",
+    "Card Genius"
+  ],
+  "sampleResponses": [
+    {
+      "status": "success",
+      "message": "",
+      "data": {
+        "jwttoken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.******",
+        "expiresAt": "2025-07-08T12:50:24.634Z"
+      }
+    }
+  ],
+  "errorResponses": []
 },
   'initial-data': {
   "name": "Initialization Bundle",
