@@ -195,28 +195,10 @@ const generateApiDataContent = (mergedData) => {
   return content;
 };
 
-// Perform the sync
-console.log('🔄 Syncing admin changes to frontend...\n');
+// Move all logic into syncUtil.js and import it here
+import { syncAdminToFrontend } from './syncUtil.js';
 
-const mergedData = mergeAdminChanges(existingApiData, adminData.endpoints);
-const newApiDataContent = generateApiDataContent(mergedData);
-
-// Write the updated apiData.js
-try {
-  fs.writeFileSync(apiDataPath, newApiDataContent);
-  console.log(`\n✅ Successfully synced ${adminData.endpoints.length} endpoints to apiData.js`);
-  console.log(`📁 Updated file: ${apiDataPath}`);
-} catch (error) {
-  console.error('❌ Error writing apiData.js:', error.message);
-  process.exit(1);
-}
-
-console.log('\n📋 Summary:');
-console.log(`- Total endpoints processed: ${adminData.endpoints.length}`);
-console.log(`- Endpoints updated: ${Object.keys(mergedData).length}`);
-console.log(`- File updated: src/data/apiData.js`);
-
-console.log('\n💡 Next steps:');
-console.log('1. Review the changes in apiData.js');
-console.log('2. Test the frontend to ensure everything works');
-console.log('3. Commit and push the changes'); 
+// Call the function when this script is run directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  syncAdminToFrontend();
+} 
