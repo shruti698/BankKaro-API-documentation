@@ -27,7 +27,9 @@ import {
   AccordionDetails,
   Tabs,
   Tab,
-  Alert
+  Alert,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import { 
   Edit as EditIcon, 
@@ -36,12 +38,11 @@ import {
   ExpandMore as ExpandMoreIcon,
   Code as CodeIcon,
   Description as DescriptionIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Save as SaveIcon,
+  GitHub as GitHubIcon
 } from '@mui/icons-material';
-import { getApiBaseUrl, getEnvironmentUrl } from '../config/environments';
 import { apiData } from '../data/apiData';
-
-const API_BASE_URL = getApiBaseUrl();
 
 const AdminPanel = () => {
   const [endpoints, setEndpoints] = useState([]);
@@ -49,6 +50,8 @@ const AdminPanel = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [editingEndpoint, setEditingEndpoint] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
+  const [autoCommit, setAutoCommit] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     id: '',
     name: '',
@@ -74,55 +77,8 @@ const AdminPanel = () => {
 
   const fetchEndpoints = async () => {
     try {
-      // If no API URL is configured, use static data
-      if (!API_BASE_URL) {
-        const staticEndpoints = Object.entries(apiData).map(([id, data]) => {
-          // Generate dynamic cURL example using environment URLs
-          const baseUrl = getEnvironmentUrl('uat', data.endpoint?.startsWith('v1-'));
-          const dynamicCurlExample = data.curlExample ? 
-            data.curlExample.replace(/https:\/\/[^\/]+/, baseUrl) : 
-            `curl --location '${baseUrl}${data.endpoint}' \\\n--header 'Authorization: Bearer <jwt>'`;
-          
-          return {
-            id,
-            name: data.name,
-            endpoint: data.endpoint,
-            description: data.description || '',
-            category: data.category || '',
-            products: data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius'],
-            purpose: data.purpose || '',
-            methods: data.methods || [],
-            requestSchema: data.requestSchema || {},
-            responseSchema: data.responseSchema || {},
-            sampleRequest: data.sampleRequest || {},
-            sampleResponse: data.sampleResponse || {},
-            sampleResponses: data.sampleResponses || [],
-            errorResponse: data.errorResponse || {},
-            errorResponses: data.errorResponses || [],
-            curlExample: dynamicCurlExample,
-            validationNotes: data.validationNotes || [],
-            fieldTable: data.fieldTable || []
-          };
-        });
-        setEndpoints(staticEndpoints);
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch(`${API_BASE_URL}/endpoints`);
-      const data = await response.json();
-      setEndpoints(data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching endpoints:', error);
-      // Fallback to static data if API fails
+      // Use static data from apiData.js
       const staticEndpoints = Object.entries(apiData).map(([id, data]) => {
-        // Generate dynamic cURL example using environment URLs
-        const baseUrl = getEnvironmentUrl('uat', data.endpoint?.startsWith('v1-'));
-        const dynamicCurlExample = data.curlExample ? 
-          data.curlExample.replace(/https:\/\/[^\/]+/, baseUrl) : 
-          `curl --location '${baseUrl}${data.endpoint}' \\\n--header 'Authorization: Bearer <jwt>'`;
-        
         return {
           id,
           name: data.name,
@@ -139,12 +95,16 @@ const AdminPanel = () => {
           sampleResponses: data.sampleResponses || [],
           errorResponse: data.errorResponse || {},
           errorResponses: data.errorResponses || [],
-          curlExample: dynamicCurlExample,
+          curlExample: data.curlExample || '',
           validationNotes: data.validationNotes || [],
           fieldTable: data.fieldTable || []
         };
       });
+      
       setEndpoints(staticEndpoints);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching endpoints:', error);
       setLoading(false);
     }
   };
@@ -201,50 +161,133 @@ const AdminPanel = () => {
     setEditingEndpoint(null);
   };
 
-  const handleSubmit = async () => {
+  const saveToApiData = async (updatedEndpoints) => {
     try {
-      if (!API_BASE_URL) {
-        // In production (no API), show demo message
-        alert('Demo Mode: Changes would be saved to the database in a real environment.\n\nIn this demo, changes are simulated for demonstration purposes.');
-        handleCloseDialog();
-        return;
+      // Call the backend API to save changes
+      const response = await fetch('/api/update-api-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          updatedEndpoints,
+          autoCommit: autoCommit
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save changes');
       }
 
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error('Error saving to apiData.js:', error);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async () => {
+    setSaving(true);
+    try {
+      // Create updated endpoints object
+      const updatedEndpoints = { ...apiData };
+      
       if (editingEndpoint) {
-        await fetch(`${API_BASE_URL}/endpoints/${editingEndpoint.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
+        // Update existing endpoint
+        updatedEndpoints[formData.id] = {
+          ...apiData[formData.id],
+          name: formData.name,
+          endpoint: formData.endpoint,
+          description: formData.description,
+          category: formData.category,
+          purpose: formData.purpose,
+          methods: formData.methods,
+          requestSchema: formData.requestSchema,
+          responseSchema: formData.responseSchema,
+          sampleRequest: formData.sampleRequest,
+          sampleResponse: formData.sampleResponse,
+          sampleResponses: formData.sampleResponses,
+          errorResponse: formData.errorResponse,
+          errorResponses: formData.errorResponses,
+          curlExample: formData.curlExample,
+          validationNotes: formData.validationNotes,
+          fieldTable: formData.fieldTable
+        };
       } else {
-        await fetch(`${API_BASE_URL}/endpoints`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
+        // Add new endpoint
+        updatedEndpoints[formData.id] = {
+          name: formData.name,
+          endpoint: formData.endpoint,
+          description: formData.description,
+          category: formData.category,
+          purpose: formData.purpose,
+          methods: formData.methods,
+          requestSchema: formData.requestSchema,
+          responseSchema: formData.responseSchema,
+          sampleRequest: formData.sampleRequest,
+          sampleResponse: formData.sampleResponse,
+          sampleResponses: formData.sampleResponses,
+          errorResponse: formData.errorResponse,
+          errorResponses: formData.errorResponses,
+          curlExample: formData.curlExample,
+          validationNotes: formData.validationNotes,
+          fieldTable: formData.fieldTable
+        };
       }
-      fetchEndpoints();
-      handleCloseDialog();
+
+      // Save to apiData.js
+      const result = await saveToApiData(updatedEndpoints);
+      
+      if (result.success) {
+        if (result.committed) {
+          alert('✅ Changes saved and committed to production!');
+        } else if (result.gitError) {
+          alert(`⚠️ Changes saved but git commit failed: ${result.gitError}`);
+        } else {
+          alert('✅ Changes saved locally!');
+        }
+        
+        handleCloseDialog();
+        fetchEndpoints(); // Refresh the list
+      } else {
+        alert('❌ Failed to save changes. Please try again.');
+      }
     } catch (error) {
       console.error('Error saving endpoint:', error);
+      alert('❌ Error saving changes: ' + error.message);
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this endpoint?')) {
       try {
-        if (!API_BASE_URL) {
-          // In production (no API), show demo message
-          alert('Demo Mode: Endpoint deletion would be processed in a real environment.\n\nIn this demo, deletion is simulated for demonstration purposes.');
-          return;
-        }
+        // Create updated endpoints object without the deleted endpoint
+        const updatedEndpoints = { ...apiData };
+        delete updatedEndpoints[id];
 
-        await fetch(`${API_BASE_URL}/endpoints/${id}`, {
-          method: 'DELETE'
-        });
-        fetchEndpoints();
+        // Save to apiData.js
+        const result = await saveToApiData(updatedEndpoints);
+        
+        if (result.success) {
+          if (result.committed) {
+            alert('✅ Endpoint deleted and committed to production!');
+          } else if (result.gitError) {
+            alert(`⚠️ Endpoint deleted but git commit failed: ${result.gitError}`);
+          } else {
+            alert('✅ Endpoint deleted locally!');
+          }
+          
+          fetchEndpoints(); // Refresh the list
+        } else {
+          alert('❌ Failed to delete endpoint. Please try again.');
+        }
       } catch (error) {
         console.error('Error deleting endpoint:', error);
+        alert('❌ Error deleting endpoint: ' + error.message);
       }
     }
   };
@@ -281,14 +324,33 @@ const AdminPanel = () => {
         <Typography variant="h4" component="h1">
           API Documentation Admin
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-        >
-          Add Endpoint
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={autoCommit}
+                onChange={(e) => setAutoCommit(e.target.checked)}
+              />
+            }
+            label="Auto-commit to production"
+          />
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog()}
+          >
+            Add Endpoint
+          </Button>
+        </Box>
       </Box>
+
+      <Alert severity="info" sx={{ mb: 3 }}>
+        <Typography variant="body2">
+          <strong>Direct File Editing Mode:</strong> Changes are saved directly to apiData.js
+          {autoCommit && ' and automatically committed to production.'}
+          {!autoCommit && ' Use the switch above to enable auto-commit to production.'}
+        </Typography>
+      </Alert>
 
       <TableContainer component={Paper}>
         <Table>
@@ -628,8 +690,13 @@ const AdminPanel = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained">
-            {editingEndpoint ? 'Update' : 'Create'}
+          <Button 
+            onClick={handleSubmit} 
+            variant="contained"
+            disabled={saving}
+            startIcon={saving ? null : <SaveIcon />}
+          >
+            {saving ? 'Saving...' : (editingEndpoint ? 'Update' : 'Create')}
           </Button>
         </DialogActions>
       </Dialog>
