@@ -43,6 +43,7 @@ import {
   GitHub as GitHubIcon
 } from '@mui/icons-material';
 import { apiData } from '../data/apiData';
+import { environments, getEnvironmentUrl } from '../config/environments';
 
 const AdminPanel = () => {
   const [endpoints, setEndpoints] = useState([]);
@@ -312,6 +313,27 @@ const AdminPanel = () => {
     } catch (error) {
       updateFormData(field, value);
     }
+  };
+
+  // Function to generate environment-aware cURL examples
+  const generateEnvironmentCurlExamples = (baseCurl, endpoint) => {
+    if (!baseCurl) return { uat: '', prod: '', base: '' };
+    
+    const isCardGenius = endpoint && endpoint.startsWith('cardgenius');
+    
+    // UAT environment
+    const uatUrl = getEnvironmentUrl('uat', isCardGenius);
+    const uatCurl = baseCurl.replace(/https:\/\/[^/]+/, uatUrl);
+    
+    // Production environment
+    const prodUrl = getEnvironmentUrl('production', isCardGenius);
+    const prodCurl = baseCurl.replace(/https:\/\/[^/]+/, prodUrl);
+    
+    return {
+      base: baseCurl,
+      uat: uatCurl,
+      prod: prodCurl
+    };
   };
 
   if (loading) {
@@ -641,15 +663,72 @@ const AdminPanel = () => {
                 </AccordionDetails>
               </Accordion>
 
-              <TextField
-                label="cURL Example"
-                value={formData.curlExample}
-                onChange={(e) => updateFormData('curlExample', e.target.value)}
-                multiline
-                rows={4}
-                fullWidth
-                placeholder="curl --location 'https://api.example.com/endpoint' \--header 'Content-Type: application/json'"
-              />
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>cURL Examples</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Add cURL examples for different environments. The frontend will automatically use the appropriate one based on the selected environment.
+                    </Typography>
+                    
+                    <TextField
+                      label="Base cURL Example (Default)"
+                      value={formData.curlExample}
+                      onChange={(e) => updateFormData('curlExample', e.target.value)}
+                      multiline
+                      rows={3}
+                      fullWidth
+                      placeholder="curl --location 'https://api.example.com/endpoint' \--header 'Content-Type: application/json'"
+                      helperText="This will be used as the default and for environment switching"
+                    />
+                    
+                    {/* Environment-aware cURL preview */}
+                    {formData.curlExample && (
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="subtitle2" color="primary" gutterBottom>
+                          🔄 Environment-Aware Preview (Frontend will show these):
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                          {(() => {
+                            const examples = generateEnvironmentCurlExamples(formData.curlExample, formData.endpoint);
+                            return (
+                              <>
+                                <Box sx={{ p: 2, bgcolor: '#f5f5f5', borderRadius: 1, border: '1px solid #ddd' }}>
+                                  <Typography variant="caption" color="text.secondary" display="block">
+                                    <strong>UAT Environment:</strong>
+                                  </Typography>
+                                  <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', m: 0, whiteSpace: 'pre-wrap' }}>
+                                    {examples.uat}
+                                  </Typography>
+                                </Box>
+                                <Box sx={{ p: 2, bgcolor: '#f5f5f5', borderRadius: 1, border: '1px solid #ddd' }}>
+                                  <Typography variant="caption" color="text.secondary" display="block">
+                                    <strong>Production Environment:</strong>
+                                  </Typography>
+                                  <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', m: 0, whiteSpace: 'pre-wrap' }}>
+                                    {examples.prod}
+                                  </Typography>
+                                </Box>
+                              </>
+                            );
+                          })()}
+                        </Box>
+                      </Box>
+                    )}
+                    
+                    <Alert severity="info">
+                      <Typography variant="body2">
+                        <strong>How it works:</strong>
+                        <br />• The base cURL above will be automatically modified for each environment
+                        <br />• Frontend users can switch between UAT and Production environments
+                        <br />• The preview above shows exactly what users will see in the frontend
+                      </Typography>
+                    </Alert>
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
             </Box>
           )}
 

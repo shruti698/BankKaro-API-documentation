@@ -64,22 +64,6 @@ export const apiData = {
     "mobile": "9999999999",
     "otp": "123456"
   },
-  "sampleResponse": {
-    "status": "success",
-    "message": "",
-    "data": {
-      "auth_token": "eyJhbGciOiJIUzI1NiIs...",
-      "user_data": {
-        "mobile": "9999999999",
-        "name": "John Doe"
-      }
-    }
-  },
-  "errorResponse": {
-    "status": "error",
-    "message": "Invalid OTP or mobile number.",
-    "data": null
-  },
   "curlExample": "curl --location 'https://yourdomain.com/partner/api/partner-auth' \\\n--header 'Authorization: Bearer <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"mobile\": \"9999999999\",\n  \"otp\": \"123456\"\n}'",
   "validationNotes": [
     "mobile must be a valid 10-digit number",
@@ -100,7 +84,12 @@ export const apiData = {
       "required": "Yes",
       "description": "One-time password for verification (6 digits)"
     }
-  ]
+  ],
+  "products": [
+    "Loan Genius"
+  ],
+  "sampleResponses": [],
+  "errorResponses": []
 },
   'lead-details': {
   "name": "Lead Details",
@@ -396,7 +385,18 @@ export const apiData = {
         "description": "Purpose of the loan (personal, business, home, vehicle)"
       }
     ]
-  }
+  },
+  "products": [
+    "Loan Genius"
+  ],
+  "requestSchema": {},
+  "responseSchema": {},
+  "sampleRequest": {},
+  "sampleResponses": [],
+  "errorResponses": [],
+  "curlExample": "",
+  "validationNotes": [],
+  "fieldTable": []
 },
   'application': {
   "name": "Loan Application",
@@ -534,26 +534,6 @@ export const apiData = {
       "https://example.com/salary-slip.pdf"
     ]
   },
-  "sampleResponse": {
-    "status": "success",
-    "message": "Application submitted successfully",
-    "data": {
-      "applicationId": "app_1234567890abcdef",
-      "status": "submitted",
-      "submittedAt": "2024-01-15T10:30:00Z",
-      "estimatedProcessingTime": "3-5 business days",
-      "nextSteps": [
-        "Document verification",
-        "Credit check",
-        "Loan approval"
-      ]
-    }
-  },
-  "errorResponse": {
-    "status": "error",
-    "message": "Invalid application data or missing required documents.",
-    "data": null
-  },
   "curlExample": "curl --location 'https://yourdomain.com/partner/api/application' \\\n--header 'Authorization: Bearer <auth_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"leadId\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"personalInfo\": {\n    \"dateOfBirth\": \"1990-05-15\",\n    \"panNumber\": \"ABCDE1234F\",\n    \"aadharNumber\": \"123456789012\"\n  },\n  \"employmentInfo\": {\n    \"employmentType\": \"salaried\",\n    \"monthlyIncome\": 75000,\n    \"companyName\": \"Tech Solutions Ltd\"\n  },\n  \"documents\": [\n    \"https://example.com/pan-card.pdf\",\n    \"https://example.com/aadhar-card.pdf\",\n    \"https://example.com/salary-slip.pdf\"\n  ]\n}'",
   "validationNotes": [
     "leadId must be a valid UUID and must exist",
@@ -613,7 +593,12 @@ export const apiData = {
       "required": "Yes",
       "description": "Array of document URLs (at least one required)"
     }
-  ]
+  ],
+  "products": [
+    "Loan Genius"
+  ],
+  "sampleResponses": [],
+  "errorResponses": []
 },
   'partner-autoAuth': {
   "name": "Partner Auto Authentication",
@@ -692,30 +677,6 @@ export const apiData = {
   "sampleRequest": {
     "mobile": "7011048697"
   },
-  "sampleResponse": {
-    "status": "success",
-    "message": "",
-    "data": {
-      "message": "Auto Login Success",
-      "token": "<auth_token>",
-      "user_id": "197",
-      "partner": "EXAMPLE_PARTNER",
-      "newUser": false,
-      "user_data": {
-        "status": "success",
-        "message": "",
-        "data": {
-          "user_data": {
-            "mobile": "7011048697",
-            "email": null,
-            "partner": "EXAMPLE_PARTNER"
-          },
-          "spendingHabits": [],
-          "tag_genius_data": []
-        }
-      }
-    }
-  },
   "curlExample": "curl --location 'https://bk-api.bankkaro.com/partner/api/partner-autoAuth' \\\n--header 'Host: abc.example-partner.com' \\\n--header 'origin: abc.example-partner.com' \\\n--header 'partner-token: <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"mobile\": \"7011048697\"\n}'",
   "validationNotes": [
     "One of mobile or exit_id + vendor must be provided",
@@ -784,7 +745,11 @@ export const apiData = {
       "curl": "curl --location 'https://bk-api.bankkaro.com/partner/api/partner-autoAuth' \\\n--header 'partner-token: <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"exit_id\": \"A VALID PS exit\",\n  \"vendor\": \"PS\"\n}'"
     }
   ],
-  "errorResponse": {}
+  "products": [
+    "Loan Genius"
+  ],
+  "sampleResponses": [],
+  "errorResponses": []
 },
   'partner-token': {
   "name": "Partner Token Generation",
