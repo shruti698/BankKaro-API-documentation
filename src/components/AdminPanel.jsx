@@ -85,7 +85,7 @@ const AdminPanel = () => {
           endpoint: data.endpoint,
           description: data.description || '',
           category: data.category || '',
-          products: data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius'],
+          products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
           purpose: data.purpose || '',
           methods: data.methods || [],
           requestSchema: data.requestSchema || {},
