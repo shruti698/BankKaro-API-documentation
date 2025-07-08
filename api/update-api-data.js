@@ -1,7 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-import { execSync } from 'child_process';
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -31,39 +27,18 @@ export default async function handler(req, res) {
     content += 'export const cardGeniusApiData = {\n  // Card Genius specific data\n};\n\n';
     content += 'export const projects = {\n  // Project data\n};\n\n';
     
-    // Write to apiData.js
-    const apiDataPath = path.join(process.cwd(), 'src', 'data', 'apiData.js');
-    fs.writeFileSync(apiDataPath, content);
-
-    let result = { success: true, message: 'Changes saved to apiData.js' };
-
-    // Commit and push if autoCommit is enabled
-    if (autoCommit) {
-      try {
-        // Add the file to git
-        execSync('git add src/data/apiData.js', { cwd: process.cwd() });
-        
-        // Commit the changes
-        const commitMessage = `Update API documentation - ${new Date().toISOString()}`;
-        execSync(`git commit -m "${commitMessage}"`, { cwd: process.cwd() });
-        
-        // Push to remote
-        execSync('git push origin main', { cwd: process.cwd() });
-        
-        result.message += ' and committed to production';
-        result.committed = true;
-      } catch (gitError) {
-        console.error('Git operation failed:', gitError);
-        result.message += ' but git commit failed';
-        result.gitError = gitError.message;
-      }
-    }
-
-    return res.status(200).json(result);
+    // Return the generated content instead of writing to file
+    // The frontend will handle downloading and saving the file
+    return res.status(200).json({
+      success: true,
+      message: 'Generated updated apiData.js content',
+      content: content,
+      autoCommit: autoCommit
+    });
   } catch (error) {
-    console.error('Error updating apiData.js:', error);
+    console.error('Error generating apiData.js content:', error);
     return res.status(500).json({ 
-      error: 'Failed to update apiData.js',
+      error: 'Failed to generate apiData.js content',
       details: error.message 
     });
   }

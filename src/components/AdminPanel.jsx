@@ -163,7 +163,7 @@ const AdminPanel = () => {
 
   const saveToApiData = async (updatedEndpoints) => {
     try {
-      // Call the backend API to save changes
+      // Call the backend API to generate updated content
       const response = await fetch('/api/update-api-data', {
         method: 'POST',
         headers: {
@@ -177,13 +177,30 @@ const AdminPanel = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to save changes');
+        throw new Error(errorData.error || 'Failed to generate updated content');
       }
 
       const result = await response.json();
+      
+      // Create a download link for the updated file
+      if (result.success && result.content) {
+        const blob = new Blob([result.content], { type: 'application/javascript' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'apiData.js';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Show instructions to the user
+        alert(`✅ Generated updated apiData.js file!\n\n📥 The file has been downloaded to your computer.\n\n📋 Next steps:\n1. Replace the existing src/data/apiData.js with the downloaded file\n2. Commit and push the changes to deploy to production\n\n💡 For automatic deployment, you can use:\n   git add src/data/apiData.js\n   git commit -m "Update API documentation"\n   git push origin main`);
+      }
+      
       return result;
     } catch (error) {
-      console.error('Error saving to apiData.js:', error);
+      console.error('Error generating updated content:', error);
       throw error;
     }
   };
@@ -243,18 +260,11 @@ const AdminPanel = () => {
       const result = await saveToApiData(updatedEndpoints);
       
       if (result.success) {
-        if (result.committed) {
-          alert('✅ Changes saved and committed to production!');
-        } else if (result.gitError) {
-          alert(`⚠️ Changes saved but git commit failed: ${result.gitError}`);
-        } else {
-          alert('✅ Changes saved locally!');
-        }
-        
+        // The file download and instructions are handled in saveToApiData
         handleCloseDialog();
         fetchEndpoints(); // Refresh the list
       } else {
-        alert('❌ Failed to save changes. Please try again.');
+        alert('❌ Failed to generate updated content. Please try again.');
       }
     } catch (error) {
       console.error('Error saving endpoint:', error);
@@ -275,14 +285,7 @@ const AdminPanel = () => {
         const result = await saveToApiData(updatedEndpoints);
         
         if (result.success) {
-          if (result.committed) {
-            alert('✅ Endpoint deleted and committed to production!');
-          } else if (result.gitError) {
-            alert(`⚠️ Endpoint deleted but git commit failed: ${result.gitError}`);
-          } else {
-            alert('✅ Endpoint deleted locally!');
-          }
-          
+          // The file download and instructions are handled in saveToApiData
           fetchEndpoints(); // Refresh the list
         } else {
           alert('❌ Failed to delete endpoint. Please try again.');
@@ -348,9 +351,8 @@ const AdminPanel = () => {
 
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>Direct File Editing Mode:</strong> Changes are saved directly to apiData.js
-          {autoCommit && ' and automatically committed to production.'}
-          {!autoCommit && ' Use the switch above to enable auto-commit to production.'}
+          <strong>File Download Mode:</strong> Changes generate an updated apiData.js file for download.
+          After downloading, replace the existing file and commit to deploy to production.
         </Typography>
       </Alert>
 
