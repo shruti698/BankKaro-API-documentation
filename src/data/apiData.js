@@ -945,49 +945,111 @@ export const apiData = {
   "responseSchema": {
     "type": "object",
     "properties": {
-      "banks": {
-        "type": "array",
-        "description": "List of banks",
-        "items": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer",
-              "description": "Bank ID"
-            },
-            "name": {
-              "type": "string",
-              "description": "Bank name"
-            },
-            "logo_url": {
-              "type": "string",
-              "description": "Bank logo URL"
+      "status": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "bank_data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "criff_bank_name": {
+                  "type": "string"
+                },
+                "max_card_limit_in_criff": {
+                  "type": "integer"
+                },
+                "logo": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "boolean"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "status",
+                "createdAt",
+                "updatedAt"
+              ]
             }
           }
-        }
+        },
+        "required": [
+          "bank_data"
+        ]
       }
-    }
-  },
-  "sampleResponse": {
-    "banks": [
-      {
-        "id": 1,
-        "name": "HDFC Bank",
-        "logo_url": "https://example.com/hdfc-logo.png"
-      },
-      {
-        "id": 2,
-        "name": "SBI",
-        "logo_url": "https://example.com/sbi-logo.png"
-      }
+    },
+    "required": [
+      "status",
+      "message",
+      "data"
     ]
   },
-  "curlExample": "curl --location 'https://api.bankkaro.com/cardgenius/banks' \\\n--header 'Authorization: Bearer <jwt>'",
-  "requestSchema": {},
+  "curlExample": "curl --location 'https://api.bankkaro.com/partner/cardgenius/bank' \\\n--header 'partner-token: <your_token>'",
+  "requestSchema": {
+    "type": "object",
+    "additionalProperties": false
+  },
   "sampleRequest": {},
-  "errorResponse": {},
   "validationNotes": [],
-  "fieldTable": []
+  "fieldTable": [],
+  "products": [
+    "Card Genius"
+  ],
+  "methodDescriptions": {},
+  "sampleResponses": {
+    "status": "success",
+    "message": "",
+    "data": {
+      "bank_data": [
+        {
+          "id": 3,
+          "name": "SBI",
+          "criff_bank_name": "STATE BANK OF INDIA",
+          "max_card_limit_in_criff": 500000,
+          "logo": "https://cdn.bankkaro.com/logos/sbi.svg",
+          "status": true,
+          "createdAt": "2024-11-15T09:12:44.000Z",
+          "updatedAt": "2025-06-15T14:10:09.000Z"
+        },
+        {
+          "id": 7,
+          "name": "HDFC Bank",
+          "criff_bank_name": "HDFC BANK LTD",
+          "max_card_limit_in_criff": 800000,
+          "logo": "https://cdn.bankkaro.com/logos/hdfc.svg",
+          "status": true,
+          "createdAt": "2024-11-15T09:12:44.000Z",
+          "updatedAt": "2025-06-15T14:10:09.000Z"
+        }
+      ]
+    }
+  },
+  "errorResponses": [],
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/bank' \\\n--header 'partner-token: <your_token>'",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/bank' \\\n--header 'partner-token: <your_token>'"
 },
   'categories': {
   "name": "Categories List",

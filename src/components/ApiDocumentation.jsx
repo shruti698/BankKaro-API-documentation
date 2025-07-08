@@ -571,20 +571,43 @@ const ApiDocumentation = () => {
         </Grid>
 
         {/* Sample Request */}
-        {currentApiData.sampleRequest && (
-          <Grid item xs={12} md={6}>
-            <Card sx={{ borderRadius: 2 }}>
-              <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <CheckCircleIcon sx={{ mr: 1, color: 'success.main' }} />
-                  Sample Request
-                </Typography>
-                <Divider sx={{ mb: 3 }} />
-                {renderJson(currentApiData.sampleRequest)}
-              </CardContent>
-            </Card>
-          </Grid>
-        )}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ borderRadius: 2 }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <CheckCircleIcon sx={{ mr: 1, color: 'success.main' }} />
+                Sample Request
+              </Typography>
+              <Divider sx={{ mb: 3 }} />
+              {(() => {
+                // Check if this is a GET request with no request body
+                const isGetRequest = api.methods.includes('GET') && api.methods.length === 1;
+                const hasEmptyRequest = !currentApiData.sampleRequest || 
+                  (typeof currentApiData.sampleRequest === 'object' && 
+                   Object.keys(currentApiData.sampleRequest).length === 0);
+                
+                if (isGetRequest && hasEmptyRequest) {
+                  return (
+                    <Alert severity="info" sx={{ borderRadius: 2 }}>
+                      <AlertTitle>No Request Body Required</AlertTitle>
+                      This is a GET request that doesn't require a request body. 
+                      Simply make the HTTP request with the appropriate headers.
+                    </Alert>
+                  );
+                } else if (currentApiData.sampleRequest && Object.keys(currentApiData.sampleRequest).length > 0) {
+                  return renderJson(currentApiData.sampleRequest);
+                } else {
+                  return (
+                    <Alert severity="info" sx={{ borderRadius: 2 }}>
+                      <AlertTitle>No Sample Request Available</AlertTitle>
+                      No sample request data has been provided for this endpoint.
+                    </Alert>
+                  );
+                }
+              })()}
+            </CardContent>
+          </Card>
+        </Grid>
 
         {/* Success Response */}
         {currentApiData.sampleResponse && (

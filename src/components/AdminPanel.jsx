@@ -760,18 +760,43 @@ const AdminPanel = () => {
                   <Typography>Sample Request (JSON)</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <TextField
-                    multiline
-                    rows={6}
-                    fullWidth
-                    value={getJsonDisplayValue('sampleRequest')}
-                    onChange={(e) => updateJsonField('sampleRequest', e.target.value)}
-                    placeholder='{"key": "value"}'
-                    error={typeof formData.sampleRequest === 'string' && formData.sampleRequest !== ''}
-                    helperText={typeof formData.sampleRequest === 'string' && formData.sampleRequest !== '' 
-                      ? '⚠️ Invalid JSON format. Please check your syntax.' 
-                      : 'Enter sample request data in JSON format'}
-                  />
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {formData.methods.includes('GET') && formData.methods.length === 1 
+                        ? 'For GET requests, leave this empty if no request body is required.'
+                        : 'Enter sample request data in JSON format'}
+                    </Typography>
+                    <TextField
+                      multiline
+                      rows={6}
+                      fullWidth
+                      value={getJsonDisplayValue('sampleRequest')}
+                      onChange={(e) => updateJsonField('sampleRequest', e.target.value)}
+                      placeholder={formData.methods.includes('GET') && formData.methods.length === 1 
+                        ? '{} (empty for GET requests with no body)'
+                        : '{"key": "value"}'}
+                      error={typeof formData.sampleRequest === 'string' && formData.sampleRequest !== ''}
+                      helperText={(() => {
+                        if (typeof formData.sampleRequest === 'string' && formData.sampleRequest !== '') {
+                          return '⚠️ Invalid JSON format. Please check your syntax.';
+                        }
+                        if (formData.methods.includes('GET') && formData.methods.length === 1) {
+                          return 'Leave empty for GET requests that don\'t require a request body. The frontend will show "No Request Body Required".';
+                        }
+                        return 'Enter sample request data in JSON format';
+                      })()}
+                    />
+                    {formData.methods.includes('GET') && formData.methods.length === 1 && (
+                      <Alert severity="info">
+                        <Typography variant="body2">
+                          <strong>GET Request Note:</strong>
+                          <br />• If this endpoint doesn't require a request body, leave this field empty or as {}
+                          <br />• The frontend will automatically display "No Request Body Required" for GET requests
+                          <br />• Only add sample data here if your GET request actually requires parameters in the body
+                        </Typography>
+                      </Alert>
+                    )}
+                  </Box>
                 </AccordionDetails>
               </Accordion>
 
