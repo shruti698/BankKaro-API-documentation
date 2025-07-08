@@ -1007,7 +1007,7 @@ export const apiData = {
       "data"
     ]
   },
-  "curlExample": "curl --location 'https://api.bankkaro.com/partner/cardgenius/bank' \\\n--header 'partner-token: <your_token>'",
+  "curlExample": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/bank' \\\n     --header 'partner-token: <your_partner_jwt_here>'",
   "requestSchema": {
     "type": "object",
     "additionalProperties": false
@@ -1048,8 +1048,8 @@ export const apiData = {
     }
   },
   "errorResponses": [],
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/bank' \\\n--header 'partner-token: <your_token>'",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/bank' \\\n--header 'partner-token: <your_token>'"
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/bank' \\\n     --header 'partner-token: <your_partner_jwt_here>'",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/bank' \\\n     --header 'partner-token: <your_partner_jwt_here>'"
 },
   'categories': {
   "name": "Categories List",

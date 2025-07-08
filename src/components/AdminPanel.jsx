@@ -766,6 +766,29 @@ const AdminPanel = () => {
                         ? 'For GET requests, leave this empty if no request body is required.'
                         : 'Enter sample request data in JSON format'}
                     </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Enter valid JSON for sample request
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                          size="small"
+                          startIcon={<FormatIcon />}
+                          onClick={() => formatJson('sampleRequest')}
+                          variant="outlined"
+                        >
+                          Format JSON
+                        </Button>
+                        <Button
+                          size="small"
+                          onClick={() => clearJsonField('sampleRequest')}
+                          variant="outlined"
+                          color="warning"
+                        >
+                          Clear
+                        </Button>
+                      </Box>
+                    </Box>
                     <TextField
                       multiline
                       rows={6}
@@ -783,7 +806,7 @@ const AdminPanel = () => {
                         if (formData.methods.includes('GET') && formData.methods.length === 1) {
                           return 'Leave empty for GET requests that don\'t require a request body. The frontend will show "No Request Body Required".';
                         }
-                        return 'Enter sample request data in JSON format';
+                        return 'Paste your JSON here - it will be automatically cleaned up';
                       })()}
                     />
                     {formData.methods.includes('GET') && formData.methods.length === 1 && (
@@ -809,11 +832,34 @@ const AdminPanel = () => {
                     <Typography variant="body2" color="text.secondary">
                       Add multiple sample responses for different scenarios (success, partial success, etc.).
                     </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Enter valid JSON array for sample responses
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                          size="small"
+                          startIcon={<FormatIcon />}
+                          onClick={() => formatJson('sampleResponses')}
+                          variant="outlined"
+                        >
+                          Format JSON
+                        </Button>
+                        <Button
+                          size="small"
+                          onClick={() => clearJsonField('sampleResponses')}
+                          variant="outlined"
+                          color="warning"
+                        >
+                          Clear
+                        </Button>
+                      </Box>
+                    </Box>
                     <TextField
                       multiline
                       rows={8}
                       fullWidth
-                      value={JSON.stringify(formData.sampleResponses, null, 2)}
+                      value={getJsonDisplayValue('sampleResponses')}
                       onChange={(e) => updateJsonField('sampleResponses', e.target.value)}
                       placeholder='[
   {
@@ -834,6 +880,10 @@ const AdminPanel = () => {
     }
   }
 ]'
+                      error={typeof formData.sampleResponses === 'string' && formData.sampleResponses !== ''}
+                      helperText={typeof formData.sampleResponses === 'string' && formData.sampleResponses !== '' 
+                        ? '⚠️ Invalid JSON format. Please check your syntax.' 
+                        : 'Paste your JSON array here - it will be automatically cleaned up'}
                     />
                     <Alert severity="info">
                       <Typography variant="body2">
@@ -856,11 +906,34 @@ const AdminPanel = () => {
                     <Typography variant="body2" color="text.secondary">
                       Add multiple error responses for different scenarios. Each error should have a status code, message, and description.
                     </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Enter valid JSON array for error responses
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                          size="small"
+                          startIcon={<FormatIcon />}
+                          onClick={() => formatJson('errorResponses')}
+                          variant="outlined"
+                        >
+                          Format JSON
+                        </Button>
+                        <Button
+                          size="small"
+                          onClick={() => clearJsonField('errorResponses')}
+                          variant="outlined"
+                          color="warning"
+                        >
+                          Clear
+                        </Button>
+                      </Box>
+                    </Box>
                     <TextField
                       multiline
                       rows={8}
                       fullWidth
-                      value={JSON.stringify(formData.errorResponses, null, 2)}
+                      value={getJsonDisplayValue('errorResponses')}
                       onChange={(e) => updateJsonField('errorResponses', e.target.value)}
                       placeholder='[
   {
@@ -876,6 +949,10 @@ const AdminPanel = () => {
     "description": "The provided API key is invalid or expired"
   }
 ]'
+                      error={typeof formData.errorResponses === 'string' && formData.errorResponses !== ''}
+                      helperText={typeof formData.errorResponses === 'string' && formData.errorResponses !== '' 
+                        ? '⚠️ Invalid JSON format. Please check your syntax.' 
+                        : 'Paste your JSON array here - it will be automatically cleaned up'}
                     />
                     <Alert severity="info">
                       <Typography variant="body2">
