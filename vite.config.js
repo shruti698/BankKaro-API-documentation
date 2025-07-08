@@ -1,47 +1,24 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  server: {
-    port: 5173,
-    host: true,
-    open: true
-  },
-  preview: {
-    port: 5173,
-    host: true
-  },
   build: {
+    target: 'es2015',
+    sourcemap: false,
+    minify: 'esbuild',
     rollupOptions: {
-      external: ['react-transition-group', 'set-cookie-parser', '@mui/icons-material'],
+      external: ['clsx', 'react-is', 'react-transition-group', 'cookie', 'set-cookie-parser'],
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           mui: ['@mui/material', '@emotion/react', '@emotion/styled']
         }
       }
-    },
-    chunkSizeWarningLimit: 1000,
-    sourcemap: false,
-    minify: 'esbuild'
+    }
   },
   optimizeDeps: {
-    include: [
-      '@mui/material', 
-      '@emotion/react', 
-      '@emotion/styled',
-      'react-is',
-      'react-transition-group',
-      'set-cookie-parser'
-    ],
-    exclude: ['@mui/icons-material']
-  },
-  resolve: {
-    alias: {
-      cookie: 'cookie',
-      'react-is': 'react-is'
-    }
+    exclude: ['@mui/icons-material'],
+    include: ['@mui/material', '@emotion/react', '@emotion/styled']
   }
 })
