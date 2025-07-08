@@ -57,10 +57,17 @@ const ApiSandbox = ({ api }) => {
     
     try {
       const baseUrl = getEnvironmentUrl(selectedEnvironment, false);
-      const response = await fetch(`${baseUrl}/partner/token`, {
+      
+      // Use CORS proxy for production environments to bypass CORS restrictions
+      const isProduction = selectedEnvironment === 'production' || selectedEnvironment === 'uat';
+      const proxyUrl = isProduction ? 'https://cors-anywhere.herokuapp.com/' : '';
+      const targetUrl = `${baseUrl}/partner/token`;
+      
+      const response = await fetch(`${proxyUrl}${targetUrl}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(isProduction && { 'Origin': window.location.origin })
         },
         body: JSON.stringify({
           'x-api-key': 'test'
@@ -76,170 +83,64 @@ const ApiSandbox = ({ api }) => {
         setTokenError('Failed to get partner token: ' + (data.message || 'Unknown error'));
       }
     } catch (err) {
+      console.error('Error fetching partner token:', err);
       setTokenError('Error fetching partner token: ' + err.message);
     } finally {
       setTokenLoading(false);
     }
   };
 
-  // Predefined test data
+  // Test data for dropdown options
   const testData = {
     cards: [
-      {
-        id: 'card_001',
-        name: 'HDFC Regalia Credit Card',
-        bank: 'HDFC Bank',
-        type: 'Credit',
-        limit: '₹500,000',
-        features: ['Rewards', 'Travel Insurance', 'Airport Lounge Access'],
-        annualFee: '₹2,500',
-        interestRate: '3.49%'
-      },
-      {
-        id: 'card_002',
-        name: 'SBI SimplyCLICK Credit Card',
-        bank: 'State Bank of India',
-        type: 'Credit',
-        limit: '₹200,000',
-        features: ['Online Shopping Rewards', 'Fuel Surcharge Waiver'],
-        annualFee: '₹999',
-        interestRate: '3.99%'
-      },
-      {
-        id: 'card_003',
-        name: 'ICICI Amazon Pay Credit Card',
-        bank: 'ICICI Bank',
-        type: 'Credit',
-        limit: '₹300,000',
-        features: ['Amazon Rewards', 'No Annual Fee', 'Contactless'],
-        annualFee: '₹0',
-        interestRate: '3.99%'
-      },
-      {
-        id: 'card_004',
-        name: 'Axis Flipkart Credit Card',
-        bank: 'Axis Bank',
-        type: 'Credit',
-        limit: '₹400,000',
-        features: ['Flipkart Rewards', 'Welcome Benefits', 'Fuel Surcharge Waiver'],
-        annualFee: '₹500',
-        interestRate: '3.49%'
-      }
+      { id: 1, name: 'SBI Cashback Credit Card', bank: 'SBI' },
+      { id: 2, name: 'HDFC Regalia Credit Card', bank: 'HDFC' },
+      { id: 3, name: 'ICICI Platinum Chip Credit Card', bank: 'ICICI' }
     ],
     banks: [
-      {
-        id: 'bank_001',
-        name: 'HDFC Bank',
-        code: 'HDFC0000001',
-        type: 'Private',
-        rating: '4.5',
-        features: ['Digital Banking', '24/7 Support', 'Wide Network']
-      },
-      {
-        id: 'bank_002',
-        name: 'State Bank of India',
-        code: 'SBIN0000001',
-        type: 'Public',
-        rating: '4.2',
-        features: ['Government Backed', 'Rural Presence', 'Low Charges']
-      },
-      {
-        id: 'bank_003',
-        name: 'ICICI Bank',
-        code: 'ICIC0000001',
-        type: 'Private',
-        rating: '4.3',
-        features: ['Digital First', 'Innovative Products', 'Good Customer Service']
-      },
-      {
-        id: 'bank_004',
-        name: 'Axis Bank',
-        code: 'UTIB0000001',
-        type: 'Private',
-        rating: '4.1',
-        features: ['Corporate Banking', 'Investment Services', 'International Presence']
-      }
+      { id: 1, name: 'SBI', type: 'Public' },
+      { id: 2, name: 'HDFC Bank', type: 'Private' },
+      { id: 3, name: 'ICICI Bank', type: 'Private' }
     ],
     users: [
-      {
-        id: 'user_001',
-        name: 'Rahul Sharma',
-        email: 'rahul.sharma@example.com',
-        mobile: '9876543210',
-        pan: 'ABCDE1234F',
-        aadhar: '123456789012',
-        income: '₹750,000',
-        creditScore: '750'
-      },
-      {
-        id: 'user_002',
-        name: 'Priya Patel',
-        email: 'priya.patel@example.com',
-        mobile: '9876543211',
-        pan: 'FGHIJ5678K',
-        aadhar: '123456789013',
-        income: '₹850,000',
-        creditScore: '780'
-      },
-      {
-        id: 'user_003',
-        name: 'Amit Kumar',
-        email: 'amit.kumar@example.com',
-        mobile: '9876543212',
-        pan: 'LMNOP9012Q',
-        aadhar: '123456789014',
-        income: '₹650,000',
-        creditScore: '720'
-      },
-      {
-        id: 'user_004',
-        name: 'Neha Singh',
-        email: 'neha.singh@example.com',
-        mobile: '9876543213',
-        pan: 'RSTUV3456W',
-        aadhar: '123456789015',
-        income: '₹950,000',
-        creditScore: '800'
-      }
+      { name: 'John Doe', mobile: '9876543210' },
+      { name: 'Jane Smith', mobile: '9876543211' },
+      { name: 'Bob Johnson', mobile: '9876543212' }
     ],
     loans: [
-      {
-        id: 'loan_001',
-        type: 'Personal Loan',
-        amount: '₹500,000',
-        tenure: '36 months',
-        interestRate: '12.5%',
-        emi: '₹16,750',
-        purpose: 'Home Renovation'
-      },
-      {
-        id: 'loan_002',
-        type: 'Business Loan',
-        amount: '₹1,000,000',
-        tenure: '60 months',
-        interestRate: '14.5%',
-        emi: '₹23,500',
-        purpose: 'Business Expansion'
-      },
-      {
-        id: 'loan_003',
-        type: 'Education Loan',
-        amount: '₹800,000',
-        tenure: '84 months',
-        interestRate: '10.5%',
-        emi: '₹12,800',
-        purpose: 'Higher Education'
-      },
-      {
-        id: 'loan_004',
-        type: 'Vehicle Loan',
-        amount: '₹600,000',
-        tenure: '48 months',
-        interestRate: '11.5%',
-        emi: '₹15,600',
-        purpose: 'Car Purchase'
-      }
+      { id: 1, type: 'Personal Loan', amount: '500000' },
+      { id: 2, type: 'Home Loan', amount: '5000000' },
+      { id: 3, type: 'Business Loan', amount: '1000000' }
     ]
+  };
+
+  const getTestDataOptions = (field) => {
+    try {
+      if (field.toLowerCase().includes('card')) {
+        return testData.cards.map(card => ({
+          value: card.id,
+          label: `${card.name} (${card.bank})`
+        }));
+      } else if (field.toLowerCase().includes('bank')) {
+        return testData.banks.map(bank => ({
+          value: bank.id,
+          label: `${bank.name} (${bank.type})`
+        }));
+      } else if (field.toLowerCase().includes('user') || field.toLowerCase().includes('mobile')) {
+        return testData.users.map(user => ({
+          value: user.mobile,
+          label: `${user.name} (${user.mobile})`
+        }));
+      } else if (field.toLowerCase().includes('loan')) {
+        return testData.loans.map(loan => ({
+          value: loan.id,
+          label: `${loan.type} - ${loan.amount}`
+        }));
+      }
+    } catch (error) {
+      console.warn('Error generating test data options:', error);
+    }
+    return [];
   };
 
   useEffect(() => {
@@ -288,31 +189,6 @@ const ApiSandbox = ({ api }) => {
     }));
   };
 
-  const getTestDataOptions = (field) => {
-    if (field.toLowerCase().includes('card')) {
-      return testData.cards.map(card => ({
-        value: card.id,
-        label: `${card.name} (${card.bank})`
-      }));
-    } else if (field.toLowerCase().includes('bank')) {
-      return testData.banks.map(bank => ({
-        value: bank.id,
-        label: `${bank.name} (${bank.type})`
-      }));
-    } else if (field.toLowerCase().includes('user') || field.toLowerCase().includes('mobile')) {
-      return testData.users.map(user => ({
-        value: user.mobile,
-        label: `${user.name} (${user.mobile})`
-      }));
-    } else if (field.toLowerCase().includes('loan')) {
-      return testData.loans.map(loan => ({
-        value: loan.id,
-        label: `${loan.type} - ${loan.amount}`
-      }));
-    }
-    return [];
-  };
-
   const makeApiCall = async () => {
     if (!api) return;
 
@@ -342,7 +218,19 @@ const ApiSandbox = ({ api }) => {
       // Try real API first, fallback to mock if it fails
       let response;
       try {
-        response = await fetch(url, options);
+        // Check if we're in a production environment and need CORS proxy
+        const isProduction = selectedEnvironment === 'production' || selectedEnvironment === 'uat';
+        const proxyUrl = isProduction ? 'https://cors-anywhere.herokuapp.com/' : '';
+        const targetUrl = isProduction ? `${proxyUrl}${url}` : url;
+        
+        response = await fetch(targetUrl, {
+          ...options,
+          headers: {
+            ...options.headers,
+            ...(isProduction && { 'Origin': window.location.origin })
+          }
+        });
+        
         const data = await response.json();
 
         setResponse({
@@ -352,7 +240,7 @@ const ApiSandbox = ({ api }) => {
           data
         });
       } catch (apiError) {
-        console.warn('Real API failed, falling back to mock server:', apiError.message);
+        console.warn('Real API failed (likely CORS), falling back to mock server:', apiError.message);
         
         // Fallback to mock server
         const mockResponse = await mockApiServer.makeRequest(url, options);
@@ -364,9 +252,12 @@ const ApiSandbox = ({ api }) => {
           headers: Object.fromEntries(mockResponse.headers.entries()),
           data: mockData
         });
+        
+        // Show warning about CORS
+        setError('⚠️ CORS Error: Real API call blocked. Using mock data instead. For production use, consider using a backend proxy or server-side API calls.');
       }
     } catch (err) {
-      setError(err.message);
+      setError('Error making API call: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -598,9 +489,16 @@ const ApiSandbox = ({ api }) => {
             )}
             {partnerToken && (
               <Alert severity="success" sx={{ mt: 2 }}>
-                Partner token loaded successfully! This will be used for Card Genius API calls.
+                ✅ Token fetched successfully! This will be used for Card Genius API calls.
               </Alert>
             )}
+            <Alert severity="info" sx={{ mt: 2 }}>
+              <Typography variant="body2">
+                <strong>CORS Note:</strong> If you encounter CORS errors, the sandbox will automatically fall back to mock data.
+                <br />• For production use, consider using a backend proxy or server-side API calls
+                <br />• The mock server provides realistic test data for development
+              </Typography>
+            </Alert>
           </Paper>
         )}
 
