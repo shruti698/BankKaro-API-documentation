@@ -992,7 +992,7 @@ ype: application/json' \\
   },
   'partner-token': {
     name: 'Partner Token Generation',
-    endpoint: '/partner/api/partner-token',
+    endpoint: '/partner/token',
     methods: ['POST'],
     description: 'Generate a partner-token (JWT) that is required for authorization in subsequent API calls',
     category: 'Partner APIs',
@@ -1068,9 +1068,7 @@ ype: application/json' \\
         }
       }
     ],
-    curlExample: `curl --location 'http://localhost:8000/partner/api/partner-token' \\
---header 'Host: abc.example-partner.com' \\
---header 'origin: abc.example-partner.com' \\
+    curlExample: `curl --location 'https://uat-platform.bankkaro.com/partner/token' \\
 --header 'Content-Type: application/json' \\
 --data '{
     "x-api-key": "test"

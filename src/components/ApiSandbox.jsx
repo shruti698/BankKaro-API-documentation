@@ -45,7 +45,42 @@ const ApiSandbox = ({ api }) => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [partnerToken, setPartnerToken] = useState('');
+  const [tokenLoading, setTokenLoading] = useState(false);
+  const [tokenError, setTokenError] = useState(null);
   const theme = useTheme();
+
+  // Function to fetch partner token
+  const fetchPartnerToken = async () => {
+    setTokenLoading(true);
+    setTokenError(null);
+    
+    try {
+      const baseUrl = getEnvironmentUrl(selectedEnvironment, false);
+      const response = await fetch(`${baseUrl}/partner/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'x-api-key': 'test'
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.status === 'success' && data.data?.jwttoken) {
+        setPartnerToken(data.data.jwttoken);
+        setTokenError(null);
+      } else {
+        setTokenError('Failed to get partner token: ' + (data.message || 'Unknown error'));
+      }
+    } catch (err) {
+      setTokenError('Error fetching partner token: ' + err.message);
+    } finally {
+      setTokenLoading(false);
+    }
+  };
 
   // Predefined test data
   const testData = {
@@ -289,9 +324,13 @@ const ApiSandbox = ({ api }) => {
       const baseUrl = getEnvironmentUrl(selectedEnvironment, api.endpoint?.startsWith('v1-'));
       const url = `${baseUrl}${api.endpoint}`;
       
+      // Use partner token for Card Genius APIs, fallback to sandbox token
+      const isCardGeniusApi = api.endpoint?.startsWith('/cardgenius') || api.endpoint?.startsWith('v1-');
+      const authToken = isCardGeniusApi && partnerToken ? partnerToken : 'sandbox_token_12345';
+      
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer sandbox_token_12345'
+        'Authorization': `Bearer ${authToken}`
       };
 
       const options = {
@@ -345,9 +384,13 @@ const ApiSandbox = ({ api }) => {
     const baseUrl = getEnvironmentUrl(selectedEnvironment, api.endpoint?.startsWith('v1-'));
     const url = `${baseUrl}${api.endpoint}`;
     
+    // Use partner token for Card Genius APIs, fallback to sandbox token
+    const isCardGeniusApi = api.endpoint?.startsWith('/cardgenius') || api.endpoint?.startsWith('v1-');
+    const authToken = isCardGeniusApi && partnerToken ? partnerToken : 'sandbox_token_12345';
+    
     let curl = `curl -X ${selectedMethod} "${url}" \\\n`;
     curl += `  -H "Content-Type: application/json" \\\n`;
-    curl += `  -H "Authorization: Bearer sandbox_token_12345"`;
+    curl += `  -H "Authorization: Bearer ${authToken}"`;
     
     if (selectedMethod !== 'GET' && Object.keys(requestData).length > 0) {
       curl += ` \\\n  -d '${JSON.stringify(requestData, null, 2)}'`;
@@ -517,6 +560,49 @@ const ApiSandbox = ({ api }) => {
             </FormControl>
           </Grid>
         </Grid>
+
+        {/* Partner Token Management for Card Genius APIs */}
+        {(api.endpoint?.startsWith('/cardgenius') || api.endpoint?.startsWith('v1-')) && (
+          <Paper sx={{ p: 2, mb: 3, backgroundColor: '#f8fafc' }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Partner Token Management
+            </Typography>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={8}>
+                <TextField
+                  label="Partner Token (JWT)"
+                  value={partnerToken}
+                  onChange={(e) => setPartnerToken(e.target.value)}
+                  fullWidth
+                  size="small"
+                  placeholder="Click 'Get Token' to fetch from /partner/token API"
+                  disabled={tokenLoading}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Button
+                  variant="contained"
+                  onClick={fetchPartnerToken}
+                  disabled={tokenLoading}
+                  startIcon={tokenLoading ? <CircularProgress size={20} /> : <RefreshIcon />}
+                  fullWidth
+                >
+                  {tokenLoading ? 'Getting Token...' : 'Get Token'}
+                </Button>
+              </Grid>
+            </Grid>
+            {tokenError && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {tokenError}
+              </Alert>
+            )}
+            {partnerToken && (
+              <Alert severity="success" sx={{ mt: 2 }}>
+                Partner token loaded successfully! This will be used for Card Genius API calls.
+              </Alert>
+            )}
+          </Paper>
+        )}
 
         {/* Tabs */}
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
