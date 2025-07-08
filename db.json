@@ -9,7 +9,6 @@
       ],
       "description": "Authenticate a partner and get access token",
       "category": "Partner APIs",
-      "product": "Loan Genius",
       "purpose": "Authenticate a partner using mobile number and OTP to obtain access token for API operations",
       "requestSchema": {
         "type": "object",
@@ -103,6 +102,10 @@
           "required": "Yes",
           "description": "One-time password for verification (6 digits)"
         }
+      ],
+      "products": [
+        "Loan Genius",
+        "Card Genius"
       ]
     },
     {
@@ -115,7 +118,6 @@
       ],
       "description": "Retrieve or create lead information",
       "category": "Partner APIs",
-      "product": "Loan Genius",
       "purpose": "Manage lead information including customer details and loan requirements",
       "get": {
         "requestSchema": {
@@ -401,7 +403,11 @@
             "description": "Purpose of the loan (personal, business, home, vehicle)"
           }
         ]
-      }
+      },
+      "products": [
+        "Loan Genius",
+        "Card Genius"
+      ]
     },
     {
       "id": "application",
@@ -412,7 +418,6 @@
       ],
       "description": "Submit a complete loan application",
       "category": "Partner APIs",
-      "product": "Loan Genius",
       "purpose": "Submit comprehensive loan application with personal, employment, and document information",
       "requestSchema": {
         "type": "object",
@@ -624,7 +629,11 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Loan Genius",
+        "Card Genius"
+      ]
     },
     {
       "id": "partner-autoAuth",
@@ -635,7 +644,6 @@
       ],
       "description": "Auto-authenticate partners using mobile number or exit_id without UI",
       "category": "Partner APIs",
-      "product": "Loan Genius",
       "purpose": "If a partner has their own login system, they can directly pass the mobile number or a valid exit_id to this endpoint. This will create or log in the user at BankKaro without showing any UI.",
       "requestSchema": {
         "type": "object",
@@ -761,7 +769,11 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Loan Genius",
+        "Card Genius"
+      ]
     },
     {
       "id": "partner-token",
@@ -772,7 +784,6 @@
       ],
       "description": "Generate a partner-token (JWT) that is required for authorization in subsequent API calls",
       "category": "Partner APIs",
-      "product": "Loan Genius",
       "purpose": "Used to generate a `partner-token` (JWT) that is required for authorization in subsequent API calls like `/partner-auth`, `/lead-details`, etc.",
       "requestSchema": {
         "type": "object",
@@ -845,7 +856,11 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Loan Genius",
+        "Card Genius"
+      ]
     },
     {
       "id": "initial-data",
@@ -856,7 +871,6 @@
       ],
       "description": "Returns all static data required to initialize the CardGenius app.",
       "category": "Card APIs",
-      "product": "Card Genius",
       "purpose": "Provides banks, categories, and other static data needed for app initialization.",
       "requestSchema": {},
       "responseSchema": {
@@ -922,7 +936,10 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Card Genius"
+      ]
     },
     {
       "id": "banks",
@@ -933,7 +950,6 @@
       ],
       "description": "Get a list of all available banks.",
       "category": "Card APIs",
-      "product": "Card Genius",
       "purpose": "Retrieve all banks that offer credit cards through the platform.",
       "requestSchema": {},
       "responseSchema": {
@@ -984,7 +1000,10 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Card Genius"
+      ]
     },
     {
       "id": "categories",
@@ -995,7 +1014,6 @@
       ],
       "description": "Get a list of all card categories.",
       "category": "Card APIs",
-      "product": "Card Genius",
       "purpose": "Retrieve all available card categories for filtering and organization.",
       "requestSchema": {},
       "responseSchema": {
@@ -1046,7 +1064,10 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Card Genius"
+      ]
     },
     {
       "id": "cards",
@@ -1057,7 +1078,6 @@
       ],
       "description": "Get a paginated list of all available credit cards.",
       "category": "Card APIs",
-      "product": "Card Genius",
       "purpose": "Retrieve a comprehensive list of credit cards with filtering and pagination options.",
       "requestSchema": {
         "type": "object",
@@ -1174,7 +1194,10 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Card Genius"
+      ]
     },
     {
       "id": "card",
@@ -1185,7 +1208,6 @@
       ],
       "description": "Fetch the full specification and meta‑data for a single credit card.",
       "category": "Card APIs",
-      "product": "Card Genius",
       "purpose": "Used on product‑detail pages, comparison views, or pre‑filled applications to obtain every field we store for a card.",
       "requestSchema": {},
       "responseSchema": {},
@@ -1360,7 +1382,10 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Card Genius"
+      ]
     },
     {
       "id": "v1-card-genius-calculator",
@@ -1371,7 +1396,6 @@
       ],
       "description": "Given a detailed spend profile, ranks cards by potential annual savings.",
       "category": "Card APIs",
-      "product": "Card Genius",
       "purpose": "Drive personalised recommendations on the \"Card Genius\" results page.",
       "requestSchema": {
         "type": "object",
@@ -1801,7 +1825,10 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Card Genius"
+      ]
     },
     {
       "id": "v1-eligibility",
@@ -1812,7 +1839,6 @@
       ],
       "description": "Check if a user qualifies for one or more cards based on pincode, in‑hand salary and employment type.",
       "category": "Card APIs",
-      "product": "Card Genius",
       "purpose": "Surface only cards the user is eligible for before they start the application flow.",
       "requestSchema": {
         "type": "object",
@@ -1976,7 +2002,10 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Card Genius"
+      ]
     },
     {
       "id": "v1-redemption-planner",
@@ -1987,7 +2016,6 @@
       ],
       "description": "Calculate the best way to redeem reward points.",
       "category": "Card APIs",
-      "product": "Card Genius",
       "purpose": "Help users maximize the value of their accumulated reward points.",
       "requestSchema": {
         "type": "object",
@@ -2039,7 +2067,10 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Card Genius"
+      ]
     },
     {
       "id": "v1-instant-offers",
@@ -2050,7 +2081,6 @@
       ],
       "description": "Get live issuer–brand promotions for a specific card.",
       "category": "Card APIs",
-      "product": "Card Genius",
       "purpose": "Display relevant, real-time offers and deals associated with a card.",
       "requestSchema": {},
       "responseSchema": {},
@@ -2071,7 +2101,10 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Card Genius"
+      ]
     },
     {
       "id": "v1-lounge-finder",
@@ -2082,7 +2115,6 @@
       ],
       "description": "Get airport and railway lounge access details for a specific card.",
       "category": "Card APIs",
-      "product": "Card Genius",
       "purpose": "Provide users with information about their travel lounge benefits.",
       "requestSchema": {},
       "responseSchema": {},
@@ -2103,7 +2135,10 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Card Genius"
+      ]
     },
     {
       "id": "v1-omni",
@@ -2114,7 +2149,6 @@
       ],
       "description": "A single endpoint to get nested data from multiple modules.",
       "category": "Card APIs",
-      "product": "Card Genius",
       "purpose": "Enable low-development integrations by fetching multiple data types in one API call.",
       "requestSchema": {},
       "responseSchema": {},
@@ -2135,7 +2169,10 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Card Genius"
+      ]
     },
     {
       "id": "v1-webhooks",
@@ -2146,7 +2183,6 @@
       ],
       "description": "Subscribe to webhook events for real-time notifications.",
       "category": "Card APIs",
-      "product": "Card Genius",
       "purpose": "Allow partners to receive real-time updates on events like application status changes.",
       "requestSchema": {
         "type": "object",
@@ -2178,7 +2214,10 @@
       "get": null,
       "post": null,
       "put": null,
-      "delete": null
+      "delete": null,
+      "products": [
+        "Card Genius"
+      ]
     }
   ]
 }

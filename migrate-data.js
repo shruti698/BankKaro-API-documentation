@@ -105,10 +105,12 @@ function extractEndpointData(content, key) {
 endpointKeys.forEach(key => {
   const data = extractEndpointData(apiDataContent, key);
   if (data) {
-    // Determine product type based on endpoint
-    let product = 'Loan Genius';
-    if (key.startsWith('v1-') || ['initial-data', 'banks', 'categories', 'cards', 'card'].includes(key)) {
-      product = 'Card Genius';
+    // Determine products based on endpoint category and type
+    let products = ['Loan Genius'];
+    if (data.category === 'Partner APIs') {
+      products = ['Loan Genius', 'Card Genius']; // Partner APIs are platform-wide
+    } else if (key.startsWith('v1-') || ['initial-data', 'banks', 'categories', 'cards', 'card'].includes(key)) {
+      products = ['Card Genius'];
     }
     // Note: Education Genius endpoints can be added manually in the admin panel
     
@@ -119,7 +121,7 @@ endpointKeys.forEach(key => {
       methods: data.methods || [],
       description: data.description || '',
       category: data.category || '',
-      product: product,
+      products: products,
       purpose: data.purpose || '',
       requestSchema: data.requestSchema || {},
       responseSchema: data.responseSchema || {},
@@ -167,5 +169,6 @@ console.log(`- Existing endpoints preserved: ${existingDb.endpoints.length - new
 // List all endpoints
 console.log('\nAll endpoints:');
 existingDb.endpoints.forEach(endpoint => {
-  console.log(`- ${endpoint.id} (${endpoint.product})`);
+  const products = endpoint.products || [endpoint.product];
+  console.log(`- ${endpoint.id} (${products.join(', ')})`);
 }); 

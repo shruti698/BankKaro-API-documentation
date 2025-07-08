@@ -54,7 +54,7 @@ const AdminPanel = () => {
     endpoint: '',
     description: '',
     category: '',
-    product: 'Loan Genius',
+    products: ['Loan Genius'],
     purpose: '',
     methods: [],
     requestSchema: {},
@@ -88,7 +88,7 @@ const AdminPanel = () => {
             endpoint: data.endpoint,
             description: data.description || '',
             category: data.category || '',
-            product: data.category === 'Partner APIs' ? 'Loan Genius' : 'Card Genius',
+            products: data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius'],
             purpose: data.purpose || '',
             methods: data.methods || [],
             requestSchema: data.requestSchema || {},
@@ -128,7 +128,7 @@ const AdminPanel = () => {
           endpoint: data.endpoint,
           description: data.description || '',
           category: data.category || '',
-          product: data.category === 'Partner APIs' ? 'Loan Genius' : 'Card Genius',
+          products: data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius'],
           purpose: data.purpose || '',
           methods: data.methods || [],
           requestSchema: data.requestSchema || {},
@@ -157,7 +157,7 @@ const AdminPanel = () => {
         endpoint: endpoint.endpoint,
         description: endpoint.description || '',
         category: endpoint.category || '',
-        product: endpoint.product || 'Loan Genius',
+        products: endpoint.products || endpoint.product ? [endpoint.product] : ['Loan Genius'],
         purpose: endpoint.purpose || '',
         methods: endpoint.methods || [],
         requestSchema: endpoint.requestSchema || {},
@@ -177,7 +177,7 @@ const AdminPanel = () => {
         endpoint: '',
         description: '',
         category: '',
-        product: 'Loan Genius',
+        products: ['Loan Genius'],
         purpose: '',
         methods: [],
         requestSchema: {},
@@ -295,7 +295,7 @@ const AdminPanel = () => {
               <TableCell>ID</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Endpoint</TableCell>
-              <TableCell>Product</TableCell>
+              <TableCell>Products</TableCell>
               <TableCell>Category</TableCell>
               <TableCell>Methods</TableCell>
               <TableCell>Actions</TableCell>
@@ -308,11 +308,15 @@ const AdminPanel = () => {
                 <TableCell>{endpoint.name}</TableCell>
                 <TableCell>{endpoint.endpoint}</TableCell>
                 <TableCell>
-                  <Chip 
-                    label={endpoint.product || 'Not Set'} 
-                    color={endpoint.product === 'Loan Genius' ? 'primary' : 'secondary'}
-                    size="small"
-                  />
+                  {(endpoint.products || [endpoint.product]).filter(Boolean).map((product, index) => (
+                    <Chip 
+                      key={index}
+                      label={product} 
+                      color={product === 'Loan Genius' ? 'primary' : 'secondary'}
+                      size="small"
+                      sx={{ mr: 0.5, mb: 0.5 }}
+                    />
+                  ))}
                 </TableCell>
                 <TableCell>{endpoint.category}</TableCell>
                 <TableCell>
@@ -396,16 +400,25 @@ const AdminPanel = () => {
                 helperText="API category (e.g., Partner APIs, User APIs)"
               />
               <FormControl fullWidth>
-                <InputLabel>Product</InputLabel>
+                <InputLabel>Products</InputLabel>
                 <Select
-                  value={formData.product}
-                  onChange={(e) => updateFormData('product', e.target.value)}
-                  label="Product"
+                  multiple
+                  value={formData.products}
+                  onChange={(e) => updateFormData('products', e.target.value)}
+                  label="Products"
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value) => (
+                        <Chip key={value} label={value} size="small" />
+                      ))}
+                    </Box>
+                  )}
                 >
                   <MenuItem value="Loan Genius">Loan Genius</MenuItem>
                   <MenuItem value="Card Genius">Card Genius</MenuItem>
                   <MenuItem value="Education Genius">Education Genius (Coming Soon)</MenuItem>
                 </Select>
+                <FormHelperText>Select all products this endpoint supports</FormHelperText>
               </FormControl>
               <TextField
                 label="Methods (comma-separated)"
