@@ -70,7 +70,7 @@ const Home = () => {
             endpoint: data.endpoint,
             description: data.description,
             category: data.category,
-            product: data.category === 'Partner APIs' ? 'Loan Genius' : 'Card Genius',
+            products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
             methods: data.methods,
             purpose: data.purpose
           }));
@@ -93,7 +93,7 @@ const Home = () => {
           endpoint: data.endpoint,
           description: data.description,
           category: data.category,
-          product: data.category === 'Partner APIs' ? 'Loan Genius' : 'Card Genius',
+          products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
           methods: data.methods,
           purpose: data.purpose
         }));
@@ -112,9 +112,12 @@ const Home = () => {
       'Education Genius': []
     };
     endpoints.forEach(endpoint => {
-      if (organized[endpoint.product]) {
-        organized[endpoint.product].push(endpoint);
-      }
+      const products = endpoint.products || [endpoint.product];
+      products.forEach(product => {
+        if (organized[product]) {
+          organized[product].push(endpoint);
+        }
+      });
     });
     return organized;
   };

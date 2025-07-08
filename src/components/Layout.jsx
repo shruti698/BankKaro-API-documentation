@@ -64,7 +64,7 @@ const Layout = ({ children }) => {
             endpoint: data.endpoint,
             description: data.description,
             category: data.category,
-            product: data.category === 'Partner APIs' ? 'Loan Genius' : 'Card Genius',
+            products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
             methods: data.methods,
             purpose: data.purpose
           }));
@@ -87,7 +87,7 @@ const Layout = ({ children }) => {
           endpoint: data.endpoint,
           description: data.description,
           category: data.category,
-          product: data.category === 'Partner APIs' ? 'Loan Genius' : 'Card Genius',
+          products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
           methods: data.methods,
           purpose: data.purpose
         }));
@@ -109,9 +109,12 @@ const Layout = ({ children }) => {
     };
 
     endpoints.forEach(endpoint => {
-      if (organized[endpoint.product]) {
-        organized[endpoint.product].push(endpoint);
-      }
+      const products = endpoint.products || [endpoint.product];
+      products.forEach(product => {
+        if (organized[product]) {
+          organized[product].push(endpoint);
+        }
+      });
     });
 
     return organized;
@@ -132,11 +135,12 @@ const Layout = ({ children }) => {
       const endpointSlug = path.substring('/docs/'.length);
       const endpoint = endpoints.find(ep => ep.id === endpointSlug);
       if (endpoint) {
-        if (endpoint.product === 'Card Genius') {
+        const products = endpoint.products || [endpoint.product];
+        if (products.includes('Card Genius')) {
           setSelectedProject('cardGenius');
-        } else if (endpoint.product === 'Loan Genius') {
+        } else if (products.includes('Loan Genius')) {
           setSelectedProject('bankkaro');
-        } else if (endpoint.product === 'Education Genius') {
+        } else if (products.includes('Education Genius')) {
           setSelectedProject('educationGenius');
         }
       }
