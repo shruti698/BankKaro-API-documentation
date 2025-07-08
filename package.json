@@ -11,7 +11,10 @@
     "api": "json-server --watch db.json --port 4000 --host 0.0.0.0",
     "serve": "concurrently -k -n \"API,WEB\" -c \"green,blue\" \"npm run api\" \"npm run dev -- --port 5173 --strictPort\"",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "sync-admin": "node sync-admin-to-frontend.js",
+    "migrate-data": "node migrate-data.js",
+    "update-products": "node update-products.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
