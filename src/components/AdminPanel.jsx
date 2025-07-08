@@ -50,7 +50,7 @@ const AdminPanel = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [editingEndpoint, setEditingEndpoint] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
-  const [autoCommit, setAutoCommit] = useState(true);
+  const [saveMode, setSaveMode] = useState('local'); // 'local' or 'download'
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     id: '',
@@ -171,7 +171,7 @@ const AdminPanel = () => {
         },
         body: JSON.stringify({
           updatedEndpoints,
-          autoCommit: autoCommit
+          mode: saveMode
         })
       });
 
@@ -182,20 +182,26 @@ const AdminPanel = () => {
 
       const result = await response.json();
       
-      // Create a download link for the updated file
-      if (result.success && result.content) {
-        const blob = new Blob([result.content], { type: 'application/javascript' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'apiData.js';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        // Show instructions to the user
-        alert(`✅ Generated updated apiData.js file!\n\n📥 The file has been downloaded to your computer.\n\n📋 Next steps:\n1. Replace the existing src/data/apiData.js with the downloaded file\n2. Commit and push the changes to deploy to production\n\n💡 For automatic deployment, you can use:\n   git add src/data/apiData.js\n   git commit -m "Update API documentation"\n   git push origin main`);
+      // Handle different modes
+      if (result.success) {
+        if (result.mode === 'local') {
+          // Local mode - changes saved directly to file
+          alert('✅ Changes saved to local apiData.js file!\n\n🔄 The admin panel will refresh to show the updated data.');
+        } else if (result.mode === 'download' && result.content) {
+          // Download mode - create download link
+          const blob = new Blob([result.content], { type: 'application/javascript' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'apiData.js';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          
+          // Show instructions to the user
+          alert(`✅ Generated updated apiData.js file!\n\n📥 The file has been downloaded to your computer.\n\n📋 Next steps:\n1. Replace the existing src/data/apiData.js with the downloaded file\n2. Commit and push the changes to deploy to production\n\n💡 For automatic deployment, you can use:\n   git add src/data/apiData.js\n   git commit -m "Update API documentation"\n   git push origin main`);
+        }
       }
       
       return result;
@@ -333,11 +339,11 @@ const AdminPanel = () => {
           <FormControlLabel
             control={
               <Switch
-                checked={autoCommit}
-                onChange={(e) => setAutoCommit(e.target.checked)}
+                checked={saveMode === 'local'}
+                onChange={(e) => setSaveMode(e.target.checked ? 'local' : 'download')}
               />
             }
-            label="Auto-commit to production"
+            label="Local save mode (recommended for development)"
           />
           <Button
             variant="contained"
@@ -351,8 +357,11 @@ const AdminPanel = () => {
 
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>File Download Mode:</strong> Changes generate an updated apiData.js file for download.
-          After downloading, replace the existing file and commit to deploy to production.
+          <strong>Save Mode:</strong> 
+          {saveMode === 'local' 
+            ? ' Changes are saved directly to the local apiData.js file. Perfect for development with multiple changes.'
+            : ' Changes generate a downloadable apiData.js file. Use this for production deployment.'
+          }
         </Typography>
       </Alert>
 
