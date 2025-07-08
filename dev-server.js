@@ -13,9 +13,6 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-// Serve static files
-app.use(express.static(path.join(__dirname, 'dist')));
-
 // API endpoint to update apiData.js
 app.post('/api/update-api-data', (req, res) => {
   try {
@@ -72,13 +69,18 @@ app.post('/api/update-api-data', (req, res) => {
   }
 });
 
-// Serve the main app
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+// Simple status endpoint
+app.get('/api/status', (req, res) => {
+  res.json({ 
+    status: 'running', 
+    message: 'Development server is running',
+    apiEndpoint: '/api/update-api-data'
+  });
 });
 
 app.listen(PORT, () => {
   console.log(`🚀 Development server running on http://localhost:${PORT}`);
   console.log(`📝 API endpoint: http://localhost:${PORT}/api/update-api-data`);
   console.log(`💡 Use this for local development with file writing capabilities`);
+  console.log(`📋 This server only handles API calls - use 'npm run dev' for the frontend`);
 }); 
