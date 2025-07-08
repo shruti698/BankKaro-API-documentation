@@ -163,8 +163,12 @@ const AdminPanel = () => {
 
   const saveToApiData = async (updatedEndpoints) => {
     try {
-      // Call the backend API to generate updated content
-      const response = await fetch('/api/update-api-data', {
+      // Try local development server first, fall back to Vercel API
+      const apiUrl = window.location.hostname === 'localhost' && window.location.port === '3001' 
+        ? 'http://localhost:3001/api/update-api-data'
+        : '/api/update-api-data';
+        
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -187,6 +191,8 @@ const AdminPanel = () => {
         if (result.mode === 'local') {
           // Local mode - changes saved directly to file
           alert('✅ Changes saved to local apiData.js file!\n\n🔄 The admin panel will refresh to show the updated data.');
+          // Force refresh the page to reload the updated apiData.js
+          window.location.reload();
         } else if (result.mode === 'download' && result.content) {
           // Download mode - create download link
           const blob = new Blob([result.content], { type: 'application/javascript' });
@@ -200,7 +206,7 @@ const AdminPanel = () => {
           URL.revokeObjectURL(url);
           
           // Show instructions to the user
-          alert(`✅ Generated updated apiData.js file!\n\n📥 The file has been downloaded to your computer.\n\n📋 Next steps:\n1. Replace the existing src/data/apiData.js with the downloaded file\n2. Commit and push the changes to deploy to production\n\n💡 For automatic deployment, you can use:\n   git add src/data/apiData.js\n   git commit -m "Update API documentation"\n   git push origin main`);
+          alert(`✅ Generated updated apiData.js file!\n\n📥 The file has been downloaded to your computer.\n\n📋 Next steps:\n1. Replace the existing src/data/apiData.js with the downloaded file\n2. Refresh this page to see the changes\n3. Commit and push the changes to deploy to production\n\n💡 For automatic deployment, you can use:\n   git add src/data/apiData.js\n   git commit -m "Update API documentation"\n   git push origin main`);
         }
       }
       
@@ -359,7 +365,7 @@ const AdminPanel = () => {
         <Typography variant="body2">
           <strong>Save Mode:</strong> 
           {saveMode === 'local' 
-            ? ' Changes are saved directly to the local apiData.js file. Perfect for development with multiple changes.'
+            ? ' Changes are saved directly to the local apiData.js file. Perfect for development with multiple changes. For true local development, run "npm run dev-server" and access via http://localhost:3001'
             : ' Changes generate a downloadable apiData.js file. Use this for production deployment.'
           }
         </Typography>
