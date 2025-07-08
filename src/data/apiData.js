@@ -757,6 +757,12 @@ export const apiData = {
   "methods": [
     "POST"
   ],
+  "methodDescriptions": {
+    "POST": {
+      "title": "Generate Token",
+      "description": "Generate a partner-token (JWT) that is required for authorization in subsequent API calls"
+    }
+  },
   "description": "Generate a partner-token (JWT) that is required for authorization in subsequent API calls",
   "category": "Partner APIs",
   "purpose": "Used to generate a `partner-token` (JWT) that is required for authorization in subsequent API calls like `/partner-auth`, `/lead-details`, etc.",
@@ -817,7 +823,9 @@ export const apiData = {
   "sampleRequest": {
     "x-api-key": "test"
   },
-  "curlExample": "# ---------- UAT ----------\ncurl --location 'https://uat-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"test\"\n}'\n\n# ---------- Production ----------\ncurl --location 'https://prod-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"YOUR_PROD_KEY\"\n}'\n",
+  "curlExample": "curl --location 'https://api.bankkaro.com/partner/api/partner-token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"test\"\n}'",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"test\"\n}'",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"YOUR_PROD_KEY\"\n}'",
   "validationNotes": [
     "x-api-key must be a valid API key provided by BankKaro",
     "This API must only be called from the server-side to prevent leaking the x-api-key",

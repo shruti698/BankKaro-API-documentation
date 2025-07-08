@@ -200,12 +200,21 @@ const ApiDocumentation = () => {
   const renderCurlExample = (curlExample, environment = 'staging') => {
     if (!curlExample) return null;
     
-    // Replace the URL in the cURL example with the selected environment
-    const baseUrl = getEnvironmentUrl(environment, endpoint.startsWith('v1-'));
-    const updatedCurl = curlExample.replace(
-      /https:\/\/[^/]+/,
-      baseUrl
-    );
+    // Use environment-specific cURL if available, otherwise fall back to the default
+    let curlToUse = curlExample;
+    
+    if (environment === 'staging' && currentApiData.curlExampleStaging) {
+      curlToUse = currentApiData.curlExampleStaging;
+    } else if (environment === 'production' && currentApiData.curlExampleProduction) {
+      curlToUse = currentApiData.curlExampleProduction;
+    } else {
+      // Fall back to the default cURL and replace the URL
+      const baseUrl = getEnvironmentUrl(environment, endpoint.startsWith('v1-'));
+      curlToUse = curlExample.replace(
+        /https:\/\/[^/]+/,
+        baseUrl
+      );
+    }
 
     return (
       <Box
@@ -222,7 +231,7 @@ const ApiDocumentation = () => {
           lineHeight: 1.6
         }}
       >
-        {updatedCurl}
+        {curlToUse}
       </Box>
     );
   };
@@ -710,14 +719,16 @@ const ApiDocumentation = () => {
                           sx={{ mr: 2 }}
                         />
                         <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                          {method === 'GET' ? 'Retrieve data' : 
-                           method === 'POST' ? 'Create/Submit data' : 'Update data'}
+                          {currentApiData.methodDescriptions?.[method]?.title || 
+                           (method === 'GET' ? 'Retrieve data' : 
+                            method === 'POST' ? 'Create/Submit data' : 'Update data')}
                         </Typography>
                       </Box>
                       <Typography variant="body2" color="text.secondary">
-                        {method === 'GET' ? 'Use this method to retrieve lead information' :
-                         method === 'POST' ? 'Use this method to create new leads or submit applications' :
-                         'Use this method to update existing data'}
+                        {currentApiData.methodDescriptions?.[method]?.description ||
+                         (method === 'GET' ? 'Use this method to retrieve lead information' :
+                          method === 'POST' ? 'Use this method to create new leads or submit applications' :
+                          'Use this method to update existing data')}
                       </Typography>
                     </Paper>
                   </Grid>

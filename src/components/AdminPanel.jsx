@@ -63,12 +63,15 @@ const AdminPanel = () => {
     products: ['Loan Genius'],
     purpose: '',
     methods: [],
+    methodDescriptions: {},
     requestSchema: {},
     responseSchema: {},
     sampleRequest: {},
     sampleResponses: [],
     errorResponses: [],
     curlExample: '',
+    curlExampleStaging: '',
+    curlExampleProduction: '',
     validationNotes: [],
     fieldTable: []
   });
@@ -90,6 +93,7 @@ const AdminPanel = () => {
           products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
           purpose: data.purpose || '',
           methods: data.methods || [],
+          methodDescriptions: data.methodDescriptions || {},
           requestSchema: data.requestSchema || {},
           responseSchema: data.responseSchema || {},
           sampleRequest: data.sampleRequest || {},
@@ -98,6 +102,8 @@ const AdminPanel = () => {
           errorResponse: data.errorResponse || {},
           errorResponses: data.errorResponses || [],
           curlExample: data.curlExample || '',
+          curlExampleStaging: data.curlExampleStaging || '',
+          curlExampleProduction: data.curlExampleProduction || '',
           validationNotes: data.validationNotes || [],
           fieldTable: data.fieldTable || []
         };
@@ -124,12 +130,15 @@ const AdminPanel = () => {
                  (endpoint.product ? [endpoint.product] : ['Loan Genius']),
         purpose: endpoint.purpose || '',
         methods: endpoint.methods || [],
+        methodDescriptions: endpoint.methodDescriptions || {},
         requestSchema: endpoint.requestSchema || {},
         responseSchema: endpoint.responseSchema || {},
         sampleRequest: endpoint.sampleRequest || {},
         sampleResponses: endpoint.sampleResponses || [],
         errorResponses: endpoint.errorResponses || [],
         curlExample: endpoint.curlExample || '',
+        curlExampleStaging: endpoint.curlExampleStaging || '',
+        curlExampleProduction: endpoint.curlExampleProduction || '',
         validationNotes: endpoint.validationNotes || [],
         fieldTable: endpoint.fieldTable || []
       });
@@ -144,12 +153,15 @@ const AdminPanel = () => {
         products: ['Loan Genius'],
         purpose: '',
         methods: [],
+        methodDescriptions: {},
         requestSchema: {},
         responseSchema: {},
         sampleRequest: {},
         sampleResponses: [],
         errorResponses: [],
         curlExample: '',
+        curlExampleStaging: '',
+        curlExampleProduction: '',
         validationNotes: [],
         fieldTable: []
       });
@@ -223,6 +235,7 @@ const AdminPanel = () => {
           products: formData.products,
           purpose: formData.purpose,
           methods: formData.methods,
+          methodDescriptions: formData.methodDescriptions,
           requestSchema: formData.requestSchema,
           responseSchema: formData.responseSchema,
           sampleRequest: formData.sampleRequest,
@@ -231,6 +244,8 @@ const AdminPanel = () => {
           errorResponse: formData.errorResponse,
           errorResponses: formData.errorResponses,
           curlExample: formData.curlExample,
+          curlExampleStaging: formData.curlExampleStaging,
+          curlExampleProduction: formData.curlExampleProduction,
           validationNotes: formData.validationNotes,
           fieldTable: formData.fieldTable
         };
@@ -244,6 +259,7 @@ const AdminPanel = () => {
           products: formData.products,
           purpose: formData.purpose,
           methods: formData.methods,
+          methodDescriptions: formData.methodDescriptions,
           requestSchema: formData.requestSchema,
           responseSchema: formData.responseSchema,
           sampleRequest: formData.sampleRequest,
@@ -252,6 +268,8 @@ const AdminPanel = () => {
           errorResponse: formData.errorResponse,
           errorResponses: formData.errorResponses,
           curlExample: formData.curlExample,
+          curlExampleStaging: formData.curlExampleStaging,
+          curlExampleProduction: formData.curlExampleProduction,
           validationNotes: formData.validationNotes,
           fieldTable: formData.fieldTable
         };
@@ -586,6 +604,62 @@ const AdminPanel = () => {
                 fullWidth
                 helperText="HTTP methods supported by this endpoint"
               />
+              
+              {/* HTTP Method Descriptions */}
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>HTTP Method Descriptions</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Add descriptions for each HTTP method. These will be displayed in the API documentation.
+                    </Typography>
+                    {formData.methods.map((method) => (
+                      <Box key={method} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          {method}
+                        </Typography>
+                        <TextField
+                          label={`${method} Title`}
+                          value={formData.methodDescriptions[method]?.title || ''}
+                          onChange={(e) => {
+                            const newDescriptions = { ...formData.methodDescriptions };
+                            if (!newDescriptions[method]) newDescriptions[method] = {};
+                            newDescriptions[method].title = e.target.value;
+                            updateFormData('methodDescriptions', newDescriptions);
+                          }}
+                          placeholder={method === 'GET' ? 'Retrieve data' : method === 'POST' ? 'Create/Submit data' : 'Update data'}
+                          fullWidth
+                          size="small"
+                          helperText={`Short title for ${method} method`}
+                        />
+                        <TextField
+                          label={`${method} Description`}
+                          value={formData.methodDescriptions[method]?.description || ''}
+                          onChange={(e) => {
+                            const newDescriptions = { ...formData.methodDescriptions };
+                            if (!newDescriptions[method]) newDescriptions[method] = {};
+                            newDescriptions[method].description = e.target.value;
+                            updateFormData('methodDescriptions', newDescriptions);
+                          }}
+                          placeholder={method === 'GET' ? 'Use this method to retrieve lead information' : method === 'POST' ? 'Use this method to create new leads or submit applications' : 'Use this method to update existing data'}
+                          multiline
+                          rows={2}
+                          fullWidth
+                          size="small"
+                          helperText={`Detailed description for ${method} method`}
+                        />
+                      </Box>
+                    ))}
+                    {formData.methods.length === 0 && (
+                      <Alert severity="info">
+                        Add HTTP methods above to configure their descriptions.
+                      </Alert>
+                    )}
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
             </Box>
           )}
 
@@ -810,6 +884,28 @@ const AdminPanel = () => {
                       fullWidth
                       placeholder="curl --location 'https://api.example.com/endpoint' \--header 'Content-Type: application/json'"
                       helperText="This will be used as the default and for environment switching"
+                    />
+                    
+                    <TextField
+                      label="Staging cURL Example"
+                      value={formData.curlExampleStaging}
+                      onChange={(e) => updateFormData('curlExampleStaging', e.target.value)}
+                      multiline
+                      rows={3}
+                      fullWidth
+                      placeholder="curl --location 'https://staging.api.example.com/endpoint' \--header 'Content-Type: application/json'"
+                      helperText="cURL example for the staging environment"
+                    />
+
+                    <TextField
+                      label="Production cURL Example"
+                      value={formData.curlExampleProduction}
+                      onChange={(e) => updateFormData('curlExampleProduction', e.target.value)}
+                      multiline
+                      rows={3}
+                      fullWidth
+                      placeholder="curl --location 'https://api.example.com/endpoint' \--header 'Content-Type: application/json'"
+                      helperText="cURL example for the production environment"
                     />
                     
                     {/* Environment-aware cURL preview */}
