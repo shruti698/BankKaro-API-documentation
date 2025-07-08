@@ -308,6 +308,12 @@ const AdminPanel = () => {
   };
 
   const updateJsonField = (field, value) => {
+    // If the value is empty, set it to an empty object
+    if (!value || value.trim() === '') {
+      updateFormData(field, {});
+      return;
+    }
+    
     try {
       // First, try to clean up the value if it's been double-escaped
       let cleanedValue = value;
@@ -357,6 +363,12 @@ const AdminPanel = () => {
   // Helper function to safely get JSON string for display
   const getJsonDisplayValue = (field) => {
     const value = formData[field];
+    
+    // If it's empty or null, return empty string
+    if (!value || (typeof value === 'object' && Object.keys(value).length === 0)) {
+      return '';
+    }
+    
     if (typeof value === 'string') {
       // If it's already a string, try to parse it as JSON for display
       try {
@@ -367,6 +379,7 @@ const AdminPanel = () => {
         return value;
       }
     }
+    
     // If it's an object, stringify it
     return JSON.stringify(value, null, 2);
   };
@@ -382,6 +395,11 @@ const AdminPanel = () => {
         alert('Invalid JSON format. Please check your syntax.');
       }
     }
+  };
+
+  // Function to clear JSON field
+  const clearJsonField = (field) => {
+    updateFormData(field, {});
   };
 
   if (loading) {
@@ -583,14 +601,24 @@ const AdminPanel = () => {
                       <Typography variant="body2" color="text.secondary">
                         Enter valid JSON schema for the request
                       </Typography>
-                      <Button
-                        size="small"
-                        startIcon={<FormatIcon />}
-                        onClick={() => formatJson('requestSchema')}
-                        variant="outlined"
-                      >
-                        Format JSON
-                      </Button>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                          size="small"
+                          startIcon={<FormatIcon />}
+                          onClick={() => formatJson('requestSchema')}
+                          variant="outlined"
+                        >
+                          Format JSON
+                        </Button>
+                        <Button
+                          size="small"
+                          onClick={() => clearJsonField('requestSchema')}
+                          variant="outlined"
+                          color="warning"
+                        >
+                          Clear
+                        </Button>
+                      </Box>
                     </Box>
                     <TextField
                       multiline
@@ -618,14 +646,24 @@ const AdminPanel = () => {
                       <Typography variant="body2" color="text.secondary">
                         Enter valid JSON schema for the response
                       </Typography>
-                      <Button
-                        size="small"
-                        startIcon={<FormatIcon />}
-                        onClick={() => formatJson('responseSchema')}
-                        variant="outlined"
-                      >
-                        Format JSON
-                      </Button>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                          size="small"
+                          startIcon={<FormatIcon />}
+                          onClick={() => formatJson('responseSchema')}
+                          variant="outlined"
+                        >
+                          Format JSON
+                        </Button>
+                        <Button
+                          size="small"
+                          onClick={() => clearJsonField('responseSchema')}
+                          variant="outlined"
+                          color="warning"
+                        >
+                          Clear
+                        </Button>
+                      </Box>
                     </Box>
                     <TextField
                       multiline
