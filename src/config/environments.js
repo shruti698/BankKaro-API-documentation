@@ -27,10 +27,10 @@ export const getApiBaseUrl = () => {
     return 'http://localhost:4000';
   }
   
-  // For production deployment, use UAT API by default
-  // This allows real API testing in the sandbox
-  return 'https://uat-platform.bankkaro.com';
+  // For production deployment, return null to use static data
+  // This prevents CORS issues and allows the admin panel to work without a backend
+  return null;
   
-  // TODO: You can switch to production API when ready
-  // return 'https://prod-platform.bankkaro.com';
+  // TODO: If you have a proper admin API backend, you can uncomment and configure it here
+  // return 'https://your-admin-api.com';
 };
