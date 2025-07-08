@@ -1113,121 +1113,536 @@ export const apiData = {
   "methods": [
     "GET"
   ],
-  "description": "Get a paginated list of all available credit cards.",
+  "description": "Get a list of all available credit cards.",
   "category": "Card APIs",
-  "purpose": "Retrieve a comprehensive list of credit cards with filtering and pagination options.",
+  "purpose": "Retrieve a comprehensive list of credit cards with filtering options.",
   "requestSchema": {
     "type": "object",
+    "description": "Generate a list of credit cards that match user-supplied preferences and eligibility.",
     "properties": {
-      "page": {
-        "type": "integer",
-        "description": "Page number for pagination",
-        "required": false,
-        "validation": "Must be a positive integer"
+      "slug": {
+        "type": "string",
+        "description": "Card-category slug (e.g. \"best-fuel-credit-card\"). Optional when you want an unfiltered catalogue."
       },
-      "limit": {
-        "type": "integer",
-        "description": "Number of cards per page",
-        "required": false,
-        "validation": "Must be between 1 and 100"
+      "banks_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        },
+        "description": "Restrict results to these bank IDs."
       },
-      "bank_id": {
-        "type": "integer",
-        "description": "Filter by bank ID",
-        "required": false
+      "card_networks": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Restrict results to these card networks (Visa, RuPay, etc.)."
       },
-      "category_id": {
-        "type": "integer",
-        "description": "Filter by category ID",
-        "required": false
+      "annualFees": {
+        "type": "string",
+        "description": "Annual-fee filter (empty string means no filter)."
+      },
+      "credit_score": {
+        "type": "string",
+        "description": "Credit-score filter; pass empty string when not required."
+      },
+      "sort_by": {
+        "type": "string",
+        "description": "Sort key (priority, savings, etc.)."
+      },
+      "free_cards": {
+        "type": "string",
+        "description": "\"1\" to return only lifetime-free cards; empty string disables the filter."
+      },
+      "eligiblityPayload": {
+        "type": "object",
+        "properties": {
+          "pincode": {
+            "type": "string"
+          },
+          "inhandIncome": {
+            "type": "string"
+          },
+          "empStatus": {
+            "type": "string",
+            "enum": [
+              "salaried",
+              "self-employed"
+            ]
+          }
+        },
+        "required": [
+          "pincode",
+          "inhandIncome",
+          "empStatus"
+        ]
+      },
+      "cardGeniusPayload": {
+        "type": "object",
+        "properties": {
+          "tag_id": {
+            "type": "string"
+          },
+          "fuel": {
+            "type": "string",
+            "description": "₹ value of monthly fuel spend (example field—others may be added)."
+          }
+        }
       }
-    }
+    },
+    "required": [
+      "eligiblityPayload",
+      "cardGeniusPayload"
+    ]
   },
   "responseSchema": {
     "type": "object",
     "properties": {
-      "cards": {
-        "type": "array",
-        "description": "List of credit cards",
-        "items": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer",
-              "description": "Card ID"
-            },
-            "name": {
-              "type": "string",
-              "description": "Card name"
-            },
-            "bank_name": {
-              "type": "string",
-              "description": "Bank name"
-            },
-            "image_url": {
-              "type": "string",
-              "description": "Card image URL"
-            },
-            "annual_fee": {
-              "type": "string",
-              "description": "Annual fee"
-            },
-            "joining_fee": {
-              "type": "string",
-              "description": "Joining fee"
-            }
-          }
-        }
+      "status": {
+        "type": "string"
       },
-      "pagination": {
+      "message": {
+        "type": "string"
+      },
+      "data": {
         "type": "object",
         "properties": {
-          "current_page": {
-            "type": "integer",
-            "description": "Current page number"
+          "cards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/card"
+            }
           },
-          "total_pages": {
-            "type": "integer",
-            "description": "Total number of pages"
+          "filteredCards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/card"
+            }
           },
-          "total_cards": {
-            "type": "integer",
-            "description": "Total number of cards"
+          "tag_slug": {
+            "type": "boolean"
+          },
+          "card_slug": {
+            "type": "boolean"
+          },
+          "tag": {
+            "type": "object"
+          },
+          "card_details": {
+            "type": "object"
+          },
+          "tag_genius_data": {
+            "type": "object"
           }
-        }
+        },
+        "required": [
+          "cards",
+          "filteredCards",
+          "tag_slug",
+          "card_slug",
+          "tag",
+          "card_details",
+          "tag_genius_data"
+        ]
       }
-    }
-  },
-  "sampleResponse": {
-    "cards": [
-      {
-        "id": 1,
-        "name": "HDFC Regalia Credit Card",
-        "bank_name": "HDFC Bank",
-        "image_url": "https://example.com/hdfc-regalia.png",
-        "annual_fee": "₹2,500",
-        "joining_fee": "₹2,500"
-      },
-      {
-        "id": 2,
-        "name": "SBI Cashback Credit Card",
-        "bank_name": "SBI",
-        "image_url": "https://example.com/sbi-cashback.png",
-        "annual_fee": "₹999",
-        "joining_fee": "₹999"
-      }
+    },
+    "required": [
+      "status",
+      "message",
+      "data"
     ],
-    "pagination": {
-      "current_page": 1,
-      "total_pages": 10,
-      "total_cards": 100
+    "$defs": {
+      "card": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nick_name": {
+            "type": "string"
+          },
+          "product_type": {
+            "type": "string"
+          },
+          "card_type": {
+            "type": "string"
+          },
+          "user_rating_count": {
+            "type": "integer"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "bank_id": {
+            "type": "integer"
+          },
+          "priority": {
+            "type": "integer"
+          },
+          "bk_commission": {
+            "type": "string"
+          },
+          "new_to_credit": {
+            "type": "boolean"
+          },
+          "existing_customer": {
+            "type": "boolean"
+          },
+          "commission_type": {
+            "type": "string"
+          },
+          "commission": {
+            "type": "string"
+          },
+          "commission_percent": {
+            "type": "string"
+          },
+          "sub_agent_commission": {
+            "type": "string"
+          },
+          "seo_card_alias": {
+            "type": "string"
+          },
+          "card_alias": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "card_bg_image": {
+            "type": "string"
+          },
+          "card_bg_gradient": {
+            "type": "string"
+          },
+          "other_images": {
+            "type": "string"
+          },
+          "age_criteria": {
+            "type": "string"
+          },
+          "age_criteria_comment": {
+            "type": "string"
+          },
+          "age_self_emp": {
+            "type": "string"
+          },
+          "age_self_emp_comment": {
+            "type": "string"
+          },
+          "min_age": {
+            "type": "integer"
+          },
+          "max_age": {
+            "type": "integer"
+          },
+          "crif": {
+            "type": "string"
+          },
+          "crif_comment": {
+            "type": "string"
+          },
+          "income": {
+            "type": "string"
+          },
+          "income_comment": {
+            "type": "string"
+          },
+          "crif_self_emp": {
+            "type": "string"
+          },
+          "crif_self_emp_comment": {
+            "type": "string"
+          },
+          "income_salaried": {
+            "type": "string"
+          },
+          "income_self_emp": {
+            "type": "string"
+          },
+          "income_self_emp_comment": {
+            "type": "string"
+          },
+          "joining_fee_text": {
+            "type": "string"
+          },
+          "joining_fee_offset": {
+            "type": "string"
+          },
+          "joining_fee_comment": {
+            "type": "string"
+          },
+          "annual_fee_text": {
+            "type": "string"
+          },
+          "annual_fee_waiver": {
+            "type": "string"
+          },
+          "annual_fee_comment": {
+            "type": "string"
+          },
+          "annual_saving": {
+            "type": "string"
+          },
+          "annual_saving_comment": {
+            "type": "string"
+          },
+          "reward_conversion_rate": {
+            "type": "string"
+          },
+          "redemption_options": {
+            "type": "string"
+          },
+          "redemption_catalogue": {
+            "type": "string"
+          },
+          "exclusion_earnings": {
+            "type": "string"
+          },
+          "exclusion_spends": {
+            "type": "string"
+          },
+          "network_url": {
+            "type": "string"
+          },
+          "employment_type": {
+            "type": "string"
+          },
+          "tnc": {
+            "type": "string"
+          },
+          "status": {
+            "type": "boolean"
+          },
+          "redirectionFlag": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "meta_title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta_description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "product_usps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "priority": {
+                  "type": "integer"
+                },
+                "tag_id": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "bk_product_tags": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "product_id": {
+                      "type": "integer"
+                    },
+                    "tag_id": {
+                      "type": "integer"
+                    },
+                    "priority": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "bank_id",
+          "status"
+        ]
+      }
     }
   },
-  "curlExample": "curl --location 'https://api.bankkaro.com/cardgenius/cards?page=1&limit=20' \\\n--header 'Authorization: Bearer <jwt>'",
-  "sampleRequest": {},
-  "errorResponse": {},
+  "curlExample": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,11],\n    \"card_networks\": [\"VISA\",\"Mastercard\"],\n    \"annualFees\": \"0-999\",\n    \"credit_score\": \"700-800\",\n    \"sort_by\": \"annual_savings\",\n    \"free_cards\": \"true\",\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"100\"\n    }\n  }'\n",
+  "sampleRequest": {
+    "slug": "best-fuel-credit-card",
+    "banks_ids": [],
+    "card_networks": [],
+    "annualFees": "",
+    "credit_score": "",
+    "sort_by": "",
+    "free_cards": "",
+    "eligiblityPayload": {
+      "pincode": "110001",
+      "inhandIncome": "50000",
+      "empStatus": "salaried"
+    },
+    "cardGeniusPayload": {
+      "tag_id": "1",
+      "fuel": "100"
+    }
+  },
   "validationNotes": [],
-  "fieldTable": []
+  "fieldTable": [],
+  "products": [
+    "Card Genius"
+  ],
+  "methodDescriptions": {},
+  "sampleResponses": {
+    "status": "success",
+    "message": "Cards generated successfully",
+    "data": {
+      "cards": [
+        {
+          "id": 27,
+          "name": "SBI Cashback Credit Card",
+          "nick_name": "SBI Cashback,Credit Card",
+          "product_type": "credit_card",
+          "card_type": "VISA,Mastercard",
+          "user_rating_count": 413,
+          "rating": 4,
+          "bank_id": 3,
+          "priority": 29,
+          "bk_commission": "2000",
+          "new_to_credit": true,
+          "existing_customer": false,
+          "commission_type": "Flat",
+          "commission": "1800",
+          "commission_percent": "90",
+          "sub_agent_commission": "0",
+          "seo_card_alias": "sbi-cashback-credit-card",
+          "card_alias": "sbi-cashback-credit-card",
+          "image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_SBI%20Cashback.png1732257446742",
+          "card_bg_image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Mockup-24.webp1736921642945",
+          "card_bg_gradient": "radial-gradient(99.6% 170.48% at 50% -70.48%, #B79DE8 0%, #1B1B1B 100%)",
+          "other_images": "",
+          "age_criteria": "21-60",
+          "age_criteria_comment": "While the bank permits a minimum age of 18 and a maximum age of 70 for eligibility, our experts advice believe that higher chances of approval for the people falling in the age group of 21-60",
+          "age_self_emp": "25-60",
+          "age_self_emp_comment": "",
+          "min_age": 21,
+          "max_age": 60,
+          "crif": "720",
+          "crif_comment": "",
+          "income": "20000",
+          "income_comment": "",
+          "crif_self_emp": "720",
+          "crif_self_emp_comment": "",
+          "income_salaried": "4",
+          "income_self_emp": "4",
+          "income_self_emp_comment": "Banks asks for an annual income of Rs 4 LPA for business owners but BankKaro suggests a salary of 4.8 LPA for a better approval rate",
+          "joining_fee_text": "999",
+          "joining_fee_offset": "No joining fee offset",
+          "joining_fee_comment": "While the card is not free for first year with an average spend of just Rs 20,000 per month you can save upto Rs 12,000 which can easily cover your joining fee",
+          "annual_fee_text": "999",
+          "annual_fee_waiver": "Annual fee can be waived off if you spend Rs 2 lakh annually on your card",
+          "annual_fee_comment": "Annual fee can be waived off if you spend Rs 2 lakh annually on your card. Which comes to roughly 17k per month. Also compared to similar cards in category like Axis Flipkart card which gives annual fee waiver at Rs 3.5 Lakh this is a much better deal",
+          "annual_saving": "60000",
+          "annual_saving_comment": "",
+          "reward_conversion_rate": "1 reward point = ₹0.25",
+          "redemption_options": "<p>The rewards you earn are auto adjusted within two working days of your next month's statement.&nbsp;</p>",
+          "redemption_catalogue": "N/A",
+          "exclusion_earnings": "Rent payment, Fuel, Insurance, EMI Transactions, Cash Withdrawals, Jewellery, School & Educational Services, Government related transactions, Wallet transactions - Load money, Fees, GST charges, All Reversals, Gambling, Tolls, Security Broker Services, Charity, Railways, Utility Bill Payments, Balance Transfer, Financial Charges (Late Fee, dishonored cheque charges, transaction charges & etc), Payments made using standard instructions",
+          "exclusion_spends": "Rent payment, Fuel, Insurance, EMI Transactions, Cash Withdrawals, Jewellery, School & Educational Services, Government related transactions, Wallet transactions - Load money, Fees, GST charges, All Reversals, Gambling, Tolls, Security Broker Services, Charity, Railways, Utility Bill Payments, Balance Transfer, Financial Charges (Late Fee, dishonored cheque charges, transaction charges & etc), Payments made using standard instructions",
+          "network_url": "https://secure.traqkarr.com/click?pid=10&offer_id=1049&sub2=",
+          "employment_type": "both",
+          "tnc": "The bank may offer a different card variant based on your eligibility. Please carefully read the features of the card offered before submitting your application || A minimum transaction of Rs.100 within 30 days is required to activate the card, otherwise, you won’t be eligible for the Rewards",
+          "status": true,
+          "redirectionFlag": true,
+          "createdAt": "2024-02-13T17:09:06.000Z",
+          "updatedAt": "2025-03-18T12:08:10.000Z",
+          "meta_title": "",
+          "meta_description": "",
+          "product_usps": [
+            {
+              "header": "5% Cashback ",
+              "description": "on all online spends including Amazon, Flipkart, Myntra, Ajio, Makemytrip",
+              "priority": 1,
+              "tag_id": 0
+            },
+            {
+              "header": "Flat 1%",
+              "description": "cashback on all offline spends",
+              "priority": 2,
+              "tag_id": 0
+            }
+          ],
+          "tags": [
+            {
+              "id": 2,
+              "name": "Shopping",
+              "bk_product_tags": {
+                "id": 1444,
+                "product_id": 27,
+                "tag_id": 2,
+                "priority": null,
+                "createdAt": "2025-03-18T12:08:10.000Z",
+                "updatedAt": "2025-03-18T12:08:10.000Z"
+              }
+            }
+          ]
+        }
+      ],
+      "filteredCards": [],
+      "tag_slug": false,
+      "card_slug": true,
+      "tag": {},
+      "card_details": {},
+      "tag_genius_data": {}
+    }
+  },
+  "errorResponses": [],
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,11],\n    \"card_networks\": [\"VISA\",\"Mastercard\"],\n    \"annualFees\": \"0-999\",\n    \"credit_score\": \"700-800\",\n    \"sort_by\": \"annual_savings\",\n    \"free_cards\": \"true\",\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"100\"\n    }\n  }'\n",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: <your_partner_token>' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,7],\n    \"card_networks\": [\"VISA\",\"Mastercard\"],\n    \"annualFees\": \"0-999\",\n    \"credit_score\": \"700-800\",\n    \"sort_by\": \"annual_savings\",\n    \"free_cards\": \"true\",\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"2\",\n      \"fuel\": \"3000\"\n    }\n  }'\n"
 },
   'card': {
   "name": "Card Detail",
@@ -1246,168 +1661,590 @@ export const apiData = {
       "description": "The SEO‑friendly slug of the card (e.g. sbi-cashback-credit-card)."
     }
   ],
-  "sampleResponse": {
+  "curlExample": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>'\n",
+  "requestSchema": {
+    "type": "object",
+    "properties": {
+      "card_alias": {
+        "type": "string",
+        "description": "Path parameter: the slug/alias of the card (e.g. \"icici-platinum-chip-credit-card\")"
+      }
+    },
+    "required": [
+      "card_alias"
+    ]
+  },
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      },
+      "data": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "nick_name": {
+              "type": "string"
+            },
+            "product_type": {
+              "type": "string"
+            },
+            "card_type": {
+              "type": "string"
+            },
+            "user_rating_count": {
+              "type": "integer"
+            },
+            "rating": {
+              "type": "number"
+            },
+            "bank_id": {
+              "type": "integer"
+            },
+            "priority": {
+              "type": "integer"
+            },
+            "bk_commission": {
+              "type": "string"
+            },
+            "new_to_credit": {
+              "type": "boolean"
+            },
+            "existing_customer": {
+              "type": "boolean"
+            },
+            "commission_type": {
+              "type": "string"
+            },
+            "commission": {
+              "type": "string"
+            },
+            "commission_percent": {
+              "type": "string"
+            },
+            "sub_agent_commission": {
+              "type": "string"
+            },
+            "seo_card_alias": {
+              "type": "string"
+            },
+            "card_alias": {
+              "type": "string"
+            },
+            "image": {
+              "type": "string"
+            },
+            "card_bg_image": {
+              "type": "string"
+            },
+            "card_bg_gradient": {
+              "type": "string"
+            },
+            "other_images": {
+              "type": "string"
+            },
+            "age_criteria": {
+              "type": "string"
+            },
+            "age_criteria_comment": {
+              "type": "string"
+            },
+            "min_age": {
+              "type": "integer"
+            },
+            "max_age": {
+              "type": "integer"
+            },
+            "crif": {
+              "type": "string"
+            },
+            "crif_comment": {
+              "type": "string"
+            },
+            "income": {
+              "type": "string"
+            },
+            "income_comment": {
+              "type": "string"
+            },
+            "joining_fee_text": {
+              "type": "string"
+            },
+            "joining_fee_offset": {
+              "type": "string"
+            },
+            "joining_fee_comment": {
+              "type": "string"
+            },
+            "annual_fee_text": {
+              "type": "string"
+            },
+            "annual_fee_waiver": {
+              "type": "string"
+            },
+            "annual_fee_comment": {
+              "type": "string"
+            },
+            "annual_saving": {
+              "type": "string"
+            },
+            "annual_saving_comment": {
+              "type": "string"
+            },
+            "reward_conversion_rate": {
+              "type": "string"
+            },
+            "redemption_options": {
+              "type": "string"
+            },
+            "redemption_catalogue": {
+              "type": "string"
+            },
+            "exclusion_earnings": {
+              "type": "string"
+            },
+            "exclusion_spends": {
+              "type": "string"
+            },
+            "network_url": {
+              "type": "string"
+            },
+            "employment_type": {
+              "type": "string"
+            },
+            "tnc": {
+              "type": "string"
+            },
+            "status": {
+              "type": "boolean"
+            },
+            "redirectionFlag": {
+              "type": "boolean"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "meta_title": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "meta_description": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "banks": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            },
+            "product_usps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "header": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "priority": {
+                    "type": "integer"
+                  },
+                  "tag_id": {
+                    "type": "integer"
+                  }
+                }
+              }
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "string"
+                  },
+                  "image2": {
+                    "type": "string"
+                  },
+                  "genius_title": {
+                    "type": "string"
+                  },
+                  "genius_subtitle": {
+                    "type": "string"
+                  },
+                  "genius_title2": {
+                    "type": "string"
+                  },
+                  "genius_subtitle2": {
+                    "type": "string"
+                  },
+                  "genius_bg_color": {
+                    "type": "string"
+                  },
+                  "genius_image": {
+                    "type": "string"
+                  },
+                  "genius_image_web": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "boolean"
+                  },
+                  "seo_alias": {
+                    "type": "string"
+                  },
+                  "seo_tag_title": {
+                    "type": "string"
+                  },
+                  "meta_title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "meta_description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "bk_product_tags": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "priority": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "bank_fee_structure": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "product_id": {
+                  "type": "integer"
+                },
+                "forex_markup": {
+                  "type": "string"
+                },
+                "forex_markup_comment": {
+                  "type": "string"
+                },
+                "apr_fees": {
+                  "type": "string"
+                },
+                "apr_fees_comment": {
+                  "type": "string"
+                },
+                "atm_withdrawal": {
+                  "type": "string"
+                },
+                "atm_withdrawal_comment": {
+                  "type": "string"
+                },
+                "reward_redemption_fees": {
+                  "type": "string"
+                },
+                "link": {
+                  "type": "string"
+                },
+                "railway_surcharge": {
+                  "type": "string"
+                },
+                "railway_surcharge_comment": {
+                  "type": "string"
+                },
+                "rent_payment_fees": {
+                  "type": "string"
+                },
+                "check_payment_fees": {
+                  "type": "string"
+                },
+                "check_payment_fees_comment": {
+                  "type": "string"
+                },
+                "cash_payment_fees": {
+                  "type": "string"
+                },
+                "cash_payment_fees_comment": {
+                  "type": "string"
+                },
+                "late_payment_annual": {
+                  "type": "string"
+                },
+                "late_payment_fine": {
+                  "type": "string"
+                },
+                "late_payment_comment": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            },
+            "product_benefits": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "product_id": {
+                    "type": "integer"
+                  },
+                  "benefit_type": {
+                    "type": "string"
+                  },
+                  "sub_type": {
+                    "type": "string"
+                  },
+                  "html_text": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "card_alias",
+            "status"
+          ]
+        }
+      }
+    },
+    "required": [
+      "status",
+      "message",
+      "data"
+    ]
+  },
+  "sampleRequest": {},
+  "validationNotes": [],
+  "products": [
+    "Card Genius"
+  ],
+  "methodDescriptions": {},
+  "sampleResponses": {
     "status": "success",
     "message": "",
-    "data": {
-      "cards": [],
-      "filteredCards": [],
-      "tag_slug": false,
-      "card_slug": true,
-      "tag": {},
-      "card_details": {
-        "id": 27,
-        "name": "SBI Cashback Credit Card",
-        "nick_name": "SBI Cashback,Credit Card",
+    "data": [
+      {
+        "id": 51,
+        "name": "ICICI Platinum Chip Credit Card",
+        "nick_name": "ICICI Platinum Chip",
         "product_type": "credit_card",
         "card_type": "VISA,Mastercard",
-        "user_rating_count": 413,
+        "user_rating_count": 325,
         "rating": 4,
-        "bank_id": 3,
-        "priority": 29,
-        "bk_commission": "2000",
+        "bank_id": 5,
+        "priority": 15,
+        "bk_commission": "1500",
         "new_to_credit": true,
-        "existing_customer": false,
-        "commission_type": "Flat",
+        "existing_customer": true,
+        "commission_type": "Percentage",
         "commission": "1800",
         "commission_percent": "90",
-        "sub_agent_commission": "0",
-        "seo_card_alias": "sbi-cashback-credit-card",
-        "card_alias": "sbi-cashback-credit-card",
-        "image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_SBI%20Cashback.png1732257446742",
-        "card_bg_image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Mockup-24.webp1736921642945",
-        "card_bg_gradient": "radial-gradient(99.6% 170.48% at 50% -70.48%, #B79DE8 0%, #1B1B1B 100%)",
+        "sub_agent_commission": "200",
+        "seo_card_alias": "icici-platinum-chip-credit-card",
+        "card_alias": "icici-platinum-chip-credit-card",
+        "image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_ICICI%20Platinum.png",
+        "card_bg_image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_ICICI_Bg.webp",
+        "card_bg_gradient": "linear-gradient(180deg, #EDEEF1 0%, #FFFFFF 100%)",
         "other_images": "",
-        "age_criteria": "21-60",
-        "age_criteria_comment": "While the bank permits a minimum age of 18 and a maximum age of 70 for eligibility, our experts advice believe that higher chances of approval for the people falling in the age group of 21-60",
-        "age_self_emp": "25-60",
-        "age_self_emp_comment": "",
-        "min_age": 21,
+        "age_criteria": "18-60",
+        "age_criteria_comment": "Recommended age 21-60 for best approval odds",
+        "min_age": 18,
         "max_age": 60,
-        "crif": "720",
-        "crif_comment": "",
-        "income": "20000",
-        "income_comment": "",
-        "crif_self_emp": "720",
-        "crif_self_emp_comment": "",
-        "income_salaried": "4",
-        "income_self_emp": "4",
-        "income_self_emp_comment": "Banks asks for an annual income of Rs 4 LPA for business owners but BankKaro suggests a salary of 4.8 LPA for a better approval rate",
-        "joining_fee_text": "999",
-        "joining_fee_offset": "No joining fee offset",
-        "joining_fee_comment": "While the card is not free for first year with an average spend of just Rs 20,000 per month you can save upto Rs 12,000 which can easily cover your joining fee",
-        "annual_fee_text": "999",
-        "annual_fee_waiver": "Annual fee can be waived off if you spend Rs 2 lakh annually on your card",
-        "annual_fee_comment": "Annual fee can be waived off if you spend Rs 2 lakh annually on your card. Which comes to roughly 17k per month. Also compared to similar cards in category like Axis Flipkart card which gives annual fee waiver at Rs 3.5 Lakh this is a much better deal",
-        "annual_saving": "60000",
+        "crif": "700",
+        "crif_comment": "Minimum credit score 700",
+        "income": "25000",
+        "income_comment": "Minimum monthly income ₹25,000",
+        "joining_fee_text": "499",
+        "joining_fee_offset": "No offset available",
+        "joining_fee_comment": "Fee ₹499 yearly",
+        "annual_fee_text": "499",
+        "annual_fee_waiver": "Waived on ₹1.5L annual spend",
+        "annual_fee_comment": "Spend ₹1.5L/year to waive fee",
+        "annual_saving": "12000",
         "annual_saving_comment": "",
-        "reward_conversion_rate": "1 reward point = ₹0.25",
-        "redemption_options": "<p>The rewards you earn are auto adjusted within two working days of your next month's statement.&nbsp;</p>",
-        "redemption_catalogue": "N/A",
-        "exclusion_earnings": "Rent payment, Fuel, Insurance, EMI Transactions, Cash Withdrawals, Jewellery, School & Educational Services, Government related transactions, Wallet transactions - Load money, Fees, GST charges, All Reversals, Gambling, Tolls, Security Broker Services, Charity, Railways, Utility Bill Payments, Balance Transfer, Financial Charges (Late Fee, dishonored cheque charges, transaction charges & etc), Payments made using standard instructions",
-        "exclusion_spends": "Rent payment, Fuel, Insurance, EMI Transactions, Cash Withdrawals, Jewellery, School & Educational Services, Government related transactions, Wallet transactions - Load money, Fees, GST charges, All Reversals, Gambling, Tolls, Security Broker Services, Charity, Railways, Utility Bill Payments, Balance Transfer, Financial Charges (Late Fee, dishonored cheque charges, transaction charges & etc), Payments made using standard instructions",
-        "network_url": "https://secure.traqkarr.com/click?pid=10&offer_id=1049&sub2=",
+        "reward_conversion_rate": "1 RP = ₹0.25",
+        "redemption_options": "<p>Redeem points for Amazon vouchers</p>",
+        "redemption_catalogue": "Amazon, Flipkart, Travel",
+        "exclusion_earnings": "Fuel, EMI, Utility Bills",
+        "exclusion_spends": "Government transactions",
+        "network_url": "https://secure.traqkarr.com/click?pid=5&offer_id=512&sub2=",
         "employment_type": "both",
-        "tnc": "The bank may offer a different card variant based on your eligibility. Please carefully read the features of the card offered before submitting your application || A minimum transaction of Rs.100 within 30 days is required to activate the card, otherwise, you won't be eligible for the Rewards",
+        "tnc": "T&C apply. Read carefully before applying.",
         "status": true,
         "redirectionFlag": true,
-        "createdAt": "2024-02-13T17:09:06.000Z",
-        "updatedAt": "2025-03-18T12:08:10.000Z",
-        "meta_title": "",
-        "meta_description": "",
+        "createdAt": "2024-03-01T11:00:00.000Z",
+        "updatedAt": "2025-04-20T09:15:30.000Z",
+        "meta_title": "ICICI Platinum Chip Credit Card",
+        "meta_description": "ICICI Platinum Chip card overview, fees & rewards",
         "banks": {
-          "id": 3,
-          "name": "SBI"
+          "id": 5,
+          "name": "ICICI Bank"
         },
         "product_usps": [
           {
-            "header": "5% Cashback ",
-            "description": "on all online spends including Amazon, Flipkart, Myntra, Ajio, Makemytrip",
+            "header": "1% Cashback",
+            "description": "on all dining spends",
             "priority": 1,
-            "tag_id": 0
+            "tag_id": 3
           },
           {
-            "header": "Flat 1%",
-            "description": "cashback on all offline spends",
+            "header": "2% Fuel Surcharge Waiver",
+            "description": "up to ₹100 per cycle",
             "priority": 2,
-            "tag_id": 0
-          },
-          {
-            "header": "5% Cashback",
-            "description": "on all online spends capped at ₹5,000 per statement cycle",
-            "priority": 1,
-            "tag_id": 2
+            "tag_id": 1
           }
         ],
         "tags": [
           {
-            "id": 2,
-            "name": "Shopping"
+            "id": 1,
+            "name": "Fuel",
+            "bk_product_tags": {
+              "id": 1401,
+              "priority": 1
+            }
           },
           {
-            "id": 5,
-            "name": "Online Food Ordering"
-          },
-          {
-            "id": 6,
-            "name": "Dining"
-          },
-          {
-            "id": 7,
-            "name": "Grocery Shopping"
+            "id": 3,
+            "name": "Dining",
+            "bk_product_tags": {
+              "id": 1405,
+              "priority": 2
+            }
           }
         ],
         "bank_fee_structure": {
-          "id": 24,
-          "product_id": 27,
+          "id": 30,
+          "product_id": 51,
           "forex_markup": "3.5%",
-          "forex_markup_comment": "<p>3.5% Forex Markups... (truncated)</p>",
+          "forex_markup_comment": "<p>3.5% on all foreign currency transactions</p>",
           "apr_fees": "3.5%",
-          "apr_fees_comment": "<p>3.5% monthly fee... (truncated)</p>",
+          "apr_fees_comment": "<p>Monthly interest 3.5%</p>",
           "atm_withdrawal": "2.5%",
-          "atm_withdrawal_comment": "<p>For every withdraw money transaction... (truncated)</p>",
+          "atm_withdrawal_comment": "<p>2.5% or ₹500 whichever higher</p>",
           "reward_redemption_fees": "₹99",
-          "reward_redemption_fees_comment": "",
-          "link": "https://www.sbicard.com/sbi-card-en/assets/docs/pdf/ekit-tncs/cashback-tnc-ekit.pdf",
+          "link": "https://www.icicibank.com/platinum-chip-tnc.pdf",
           "railway_surcharge": "1%",
-          "railway_surcharge_comment": "<p>A surcharge of 1% is applied...</p>",
+          "railway_surcharge_comment": "<p>₹10 per IRCTC transaction</p>",
           "rent_payment_fees": "1%",
-          "rent_payment_fees_comment": "",
           "check_payment_fees": "₹100",
-          "check_payment_fees_comment": "<p>₹100 will be charged for all payments done via Check</p>",
+          "check_payment_fees_comment": "<p>Flat ₹100 per cheque payment</p>",
           "cash_payment_fees": "₹250",
-          "cash_payment_fees_comment": "<p>₹250 + taxes will be charged for all payments done via Cash</p>",
-          "late_payment_annual": "₹0 - ₹500| ₹501 - ₹1000| ...",
-          "late_payment_fine": "₹0 | ₹400 | ₹ 750 | ...",
-          "late_payment_comment": "<p>An additional Late Payment Charge...</p>",
-          "createdAt": "2024-10-28T12:34:26.000Z",
-          "updatedAt": "2025-01-16T17:34:49.000Z"
+          "cash_payment_fees_comment": "<p>Flat ₹250 per cash withdrawal</p>",
+          "late_payment_annual": "₹0–₹1300 slab",
+          "late_payment_fine": "₹0–₹1300",
+          "late_payment_comment": "<p>Charged if minimum due not paid</p>",
+          "createdAt": "2024-03-01T11:00:00.000Z",
+          "updatedAt": "2025-04-20T09:15:30.000Z"
         },
         "product_benefits": [
           {
-            "id": 359,
-            "product_id": 27,
+            "id": 380,
+            "product_id": 51,
             "benefit_type": "all",
             "sub_type": "All Benefits",
-            "html_text": "<ul><li>&nbsp;5% Cashback on all online spends and 1% Cashback on offline spends. Max Cashback per statement cycle is Rs 5000</li><li>Get 1% fuel surcharge waiver upto Rs 100 in a statement cycle. You can get waiver upto Rs 10,000 fuel purchases in a statement cycle.&nbsp;</li></ul>"
+            "html_text": "<ul><li>1% Cashback on dining</li><li>2% Fuel waiver</li></ul>",
+            "createdAt": null,
+            "updatedAt": null
           },
           {
-            "id": 368,
-            "product_id": 27,
-            "benefit_type": "dining",
-            "sub_type": "Dining Benefits",
-            "html_text": "<ul><li>5% Cashback on online dining payments..."
+            "id": 381,
+            "product_id": 51,
+            "benefit_type": "welcome",
+            "sub_type": "Welcome Benefits",
+            "html_text": "<ul><li>₹500 Amazon voucher</li></ul>",
+            "createdAt": null,
+            "updatedAt": null
           }
         ]
       }
-    }
+    ]
   },
-  "curlExample": "curl --location 'https://bk-api.bankkaro.com/cardgenius/cards/sbi-cashback-credit-card' \\\n--header 'Authorization: Bearer <jwt>'",
-  "requestSchema": {},
-  "responseSchema": {},
-  "sampleRequest": {},
-  "errorResponse": {},
-  "validationNotes": []
+  "errorResponses": [],
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>'\n",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>'\n"
 },
   'v1-card-genius-calculator': {
   "name": "Card Genius Calculator",
@@ -1420,10 +2257,105 @@ export const apiData = {
   "purpose": "Drive personalised recommendations on the \"Card Genius\" results page.",
   "requestSchema": {
     "type": "object",
-    "description": "Complete spending profile – all keys optional & default to 0.  Keys ending _annual take annual values; others are monthly.",
-    "additionalProperties": {
-      "type": "number"
-    }
+    "properties": {
+      "amazon_spends": {
+        "type": "number",
+        "description": "Total spending on Amazon."
+      },
+      "flipkart_spends": {
+        "type": "number",
+        "description": "Total spending on Flipkart."
+      },
+      "other_online_spends": {
+        "type": "number",
+        "description": "Total spending on other online platforms."
+      },
+      "other_offline_spends": {
+        "type": "number",
+        "description": "Total spending on other offline platforms."
+      },
+      "grocery_spends_online": {
+        "type": "number",
+        "description": "Total online grocery spending."
+      },
+      "online_food_ordering": {
+        "type": "number",
+        "description": "Total spending on online food ordering services."
+      },
+      "fuel": {
+        "type": "number",
+        "description": "Total spending on fuel."
+      },
+      "dining_or_going_out": {
+        "type": "number",
+        "description": "Total spending on dining out or going out."
+      },
+      "flights_annual": {
+        "type": "number",
+        "description": "Annual spending on flights."
+      },
+      "hotels_annual": {
+        "type": "number",
+        "description": "Annual spending on hotels."
+      },
+      "domestic_lounge_usage_quarterly": {
+        "type": "number",
+        "description": "Quarterly usage of domestic lounges."
+      },
+      "international_lounge_usage_quarterly": {
+        "type": "number",
+        "description": "Quarterly usage of international lounges."
+      },
+      "mobile_phone_bills": {
+        "type": "number",
+        "description": "Monthly mobile phone bills."
+      },
+      "electricity_bills": {
+        "type": "number",
+        "description": "Monthly electricity bills."
+      },
+      "water_bills": {
+        "type": "number",
+        "description": "Monthly water bills."
+      },
+      "insurance_health_annual": {
+        "type": "number",
+        "description": "Annual health insurance costs."
+      },
+      "insurance_car_or_bike_annual": {
+        "type": "number",
+        "description": "Annual car or bike insurance costs."
+      },
+      "rent": {
+        "type": "number",
+        "description": "Monthly rent expenses."
+      },
+      "school_fees": {
+        "type": "number",
+        "description": "Total school fees."
+      }
+    },
+    "required": [
+      "amazon_spends",
+      "flipkart_spends",
+      "other_online_spends",
+      "other_offline_spends",
+      "grocery_spends_online",
+      "online_food_ordering",
+      "fuel",
+      "dining_or_going_out",
+      "flights_annual",
+      "hotels_annual",
+      "domestic_lounge_usage_quarterly",
+      "international_lounge_usage_quarterly",
+      "mobile_phone_bills",
+      "electricity_bills",
+      "water_bills",
+      "insurance_health_annual",
+      "insurance_car_or_bike_annual",
+      "rent",
+      "school_fees"
+    ]
   },
   "fieldTable": [
     {
@@ -1490,353 +2422,289 @@ export const apiData = {
   "responseSchema": {
     "type": "object",
     "properties": {
-      "success": {
-        "type": "boolean",
-        "description": "Indicates if the calculation was successful"
+      "status": {
+        "type": "string"
       },
       "message": {
-        "type": "string",
-        "description": "Response message"
+        "type": "string"
       },
-      "savings": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "card_name": {
-              "type": "string",
-              "description": "Display name of the credit card"
-            },
-            "seo_card_alias": {
-              "type": "string",
-              "description": "SEO-friendly card identifier"
-            },
-            "cg_network_url": {
-              "type": "string",
-              "description": "CardGenius network URL",
-              "nullable": true
-            },
-            "ck_store_url": {
-              "type": "string",
-              "description": "CashKaro store URL for card offers"
-            },
-            "ck_store_url_2": {
-              "type": "string",
-              "description": "Secondary CashKaro store URL"
-            },
-            "id": {
-              "type": "integer",
-              "description": "Internal card ID"
-            },
-            "joining_fees": {
-              "type": "string",
-              "description": "Card joining fees in INR"
-            },
-            "total_savings": {
-              "type": "integer",
-              "description": "Total savings amount in INR"
-            },
-            "total_savings_yearly": {
-              "type": "integer",
-              "description": "Annual savings amount in INR"
-            },
-            "total_extra_benefits": {
-              "type": "integer",
-              "description": "Additional benefits value in INR"
-            },
-            "max_potential_savings": {
-              "type": "integer",
-              "description": "Maximum potential savings in INR"
-            },
-            "redemption_options": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "integer",
-                    "description": "Redemption option ID"
-                  },
-                  "card_id": {
-                    "type": "integer",
-                    "description": "Associated card ID"
-                  },
-                  "method": {
-                    "type": "string",
-                    "description": "Redemption method (e.g., Airmiles, Hotels)"
-                  },
-                  "brand": {
-                    "type": "string",
-                    "description": "Brand name for the redemption option"
-                  },
-                  "min_points": {
-                    "type": "integer",
-                    "description": "Minimum points required"
-                  },
-                  "max_points": {
-                    "type": "integer",
-                    "description": "Maximum points allowed (0 for unlimited)"
-                  },
-                  "conversion_rate": {
-                    "type": "number",
-                    "description": "Points to value conversion rate"
-                  },
-                  "note": {
-                    "type": "string",
-                    "description": "Additional notes",
-                    "nullable": true
-                  },
-                  "createdAt": {
-                    "type": "string",
-                    "description": "Creation timestamp"
-                  },
-                  "updatedAt": {
-                    "type": "string",
-                    "description": "Last update timestamp"
+      "data": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "savings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "card_name": {
+                  "type": "string"
+                },
+                "seo_card_alias": {
+                  "type": "string"
+                },
+                "cg_network_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "ck_store_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "ck_store_url_2": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "type": "integer"
+                },
+                "joining_fees": {
+                  "type": "string"
+                },
+                "total_savings": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "total_savings_yearly": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "total_extra_benefits": {
+                  "type": "integer"
+                },
+                "max_potential_savings": {
+                  "type": "integer"
+                },
+                "redemption_options": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "card_id": {
+                        "type": "integer"
+                      },
+                      "method": {
+                        "type": "string"
+                      },
+                      "brand": {
+                        "type": "string"
+                      },
+                      "min_points": {
+                        "type": "integer"
+                      },
+                      "max_points": {
+                        "type": "integer"
+                      },
+                      "conversion_rate": {
+                        "type": "number"
+                      },
+                      "note": {
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                },
+                "brand_options": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "card_id": {
+                        "type": "integer"
+                      },
+                      "spend_key": {
+                        "type": "string"
+                      },
+                      "brand": {
+                        "type": "string"
+                      },
+                      "note": {
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                },
+                "category_breakdown": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "spend": {
+                        "type": "number"
+                      },
+                      "points_earned": {
+                        "type": "integer"
+                      },
+                      "balance": {
+                        "type": "number"
+                      },
+                      "savings": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                },
+                "spending_breakdown": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "on": {
+                        "type": "string"
+                      },
+                      "spend": {
+                        "type": "number"
+                      },
+                      "points_earned": {
+                        "type": "integer"
+                      },
+                      "savings": {
+                        "type": "integer"
+                      },
+                      "explanation": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "conv_rate": {
+                        "type": "number"
+                      },
+                      "maxCap": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                },
+                "total_beneficial_spends": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "total_spends": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "welcomeBenefits": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "food_dining_benefits": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "travel_benefits": {
+                  "type": "object",
+                  "properties": {
+                    "domestic_lounge_benefits_annual": {
+                      "type": "integer"
+                    },
+                    "international_lounge_benefits_annual": {
+                      "type": "integer"
+                    },
+                    "railway_lounge_beneftis_annual": {
+                      "type": "integer"
+                    },
+                    "domestic_lounges_unlocked": {
+                      "type": "integer"
+                    },
+                    "international_lounges_unlocked": {
+                      "type": "integer"
+                    },
+                    "railway_lounges_unlocked": {
+                      "type": "integer"
+                    },
+                    "total_travel_benefit_annual": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "milestone_benefits": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "roi": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "tags": {
+                  "type": "string"
+                },
+                "bank_id": {
+                  "type": "integer"
+                },
+                "spending_breakdown_array": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
                   }
                 }
-              }
+              },
+              "required": [
+                "card_name",
+                "id"
+              ]
             }
           }
-        }
-      }
-    }
-  },
-  "sampleResponse": {
-    "success": true,
-    "message": "Savings calculated successfully",
-    "savings": [
-      {
-        "card_name": "HDFC Diners Club Black Metal Edition",
-        "seo_card_alias": "hdfc-diners-club-black-metal-credit-card",
-        "cg_network_url": null,
-        "ck_store_url": "cashkaro://stores/hdfc-credit-card-offers",
-        "ck_store_url_2": "cashkaro://stores/hdfc-credit-card-offers",
-        "id": 114,
-        "joining_fees": "10000",
-        "total_savings": 6253,
-        "total_savings_yearly": 75036,
-        "total_extra_benefits": 0,
-        "max_potential_savings": 1884000,
-        "redemption_options": [
-          {
-            "id": 422,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "Air Canada Aeroplan",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 0.65,
-            "note": "",
-            "createdAt": "2025-06-26T11:21:42.000Z",
-            "updatedAt": "2025-06-26T11:21:42.000Z"
-          },
-          {
-            "id": 423,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "Air Asia",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 0.7,
-            "note": "",
-            "createdAt": "2025-06-26T11:23:09.000Z",
-            "updatedAt": "2025-06-26T11:23:09.000Z"
-          },
-          {
-            "id": 424,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "Avianca LifeMiles",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 0.65,
-            "note": "",
-            "createdAt": "2025-06-26T11:23:55.000Z",
-            "updatedAt": "2025-06-26T11:23:55.000Z"
-          },
-          {
-            "id": 425,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "British Airways (Avios)",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 0.65,
-            "note": "",
-            "createdAt": "2025-06-26T11:24:24.000Z",
-            "updatedAt": "2025-06-26T11:24:24.000Z"
-          },
-          {
-            "id": 426,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "Club Vistara",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 1,
-            "note": "",
-            "createdAt": "2025-06-26T11:25:22.000Z",
-            "updatedAt": "2025-06-26T11:25:22.000Z"
-          },
-          {
-            "id": 427,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "Etihad Guest",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 0.5,
-            "note": "",
-            "createdAt": "2025-06-26T11:26:06.000Z",
-            "updatedAt": "2025-06-26T11:26:06.000Z"
-          },
-          {
-            "id": 428,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "Finnair Plus",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 1,
-            "note": "",
-            "createdAt": "2025-06-26T11:26:32.000Z",
-            "updatedAt": "2025-06-26T11:26:32.000Z"
-          },
-          {
-            "id": 429,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "Flying Blue (Air France/KLM)",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 1,
-            "note": "",
-            "createdAt": "2025-06-26T11:26:58.000Z",
-            "updatedAt": "2025-06-26T11:26:58.000Z"
-          },
-          {
-            "id": 430,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "Hainan Airlines Fortune Wings Club",
-            "min_points": 0,
-            "max_points": 0,
-            "conversion_rate": 0.8,
-            "note": "",
-            "createdAt": "2025-06-26T11:27:45.000Z",
-            "updatedAt": "2025-06-26T11:27:45.000Z"
-          },
-          {
-            "id": 431,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "InterMiles",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 0.8,
-            "note": "",
-            "createdAt": "2025-06-26T11:28:12.000Z",
-            "updatedAt": "2025-06-26T11:28:12.000Z"
-          },
-          {
-            "id": 432,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "Singapore Airlines KrisFlyer",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 1,
-            "note": "",
-            "createdAt": "2025-06-26T11:28:35.000Z",
-            "updatedAt": "2025-06-26T11:28:35.000Z"
-          },
-          {
-            "id": 433,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "Turkish Airlines Miles&Smiles",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 0.65,
-            "note": "",
-            "createdAt": "2025-06-26T11:30:59.000Z",
-            "updatedAt": "2025-06-26T11:30:59.000Z"
-          },
-          {
-            "id": 434,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "United MileagePlus",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 0.65,
-            "note": "",
-            "createdAt": "2025-06-26T11:31:33.000Z",
-            "updatedAt": "2025-06-26T11:31:33.000Z"
-          },
-          {
-            "id": 435,
-            "card_id": 114,
-            "method": "Airmiles",
-            "brand": "Vietnam Airlines Lotusmiles",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 0.8,
-            "note": "",
-            "createdAt": "2025-06-26T11:33:06.000Z",
-            "updatedAt": "2025-06-26T11:33:06.000Z"
-          },
-          {
-            "id": 437,
-            "card_id": 114,
-            "method": "Hotels",
-            "brand": "Accor",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 0.5,
-            "note": "",
-            "createdAt": "2025-06-26T11:36:12.000Z",
-            "updatedAt": "2025-06-26T11:36:12.000Z"
-          },
-          {
-            "id": 439,
-            "card_id": 114,
-            "method": "Hotels",
-            "brand": "Club ITC",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 0.25,
-            "note": "",
-            "createdAt": "2025-06-26T11:39:07.000Z",
-            "updatedAt": "2025-06-26T11:39:07.000Z"
-          },
-          {
-            "id": 440,
-            "card_id": 114,
-            "method": "Hotels",
-            "brand": "IHG One Rewards",
-            "min_points": 2000,
-            "max_points": 0,
-            "conversion_rate": 0.4,
-            "note": "",
-            "createdAt": "2025-06-26T11:40:21.000Z",
-            "updatedAt": "2025-06-26T11:40:21.000Z"
-          },
-          {
-            "id": 441,
-            "card_id": 114,
-            "method": "Hotels",
-            "brand": "Wyndham Hotels",
-            "min_points": 0,
-            "max_points": 0,
-            "conversion_rate": 0.4,
-            "note": "",
-            "createdAt": "2025-06-26T11:41:12.000Z",
-            "updatedAt": "2025-06-26T11:41:12.000Z"
-          }
+        },
+        "required": [
+          "success",
+          "savings"
         ]
       }
+    },
+    "required": [
+      "status",
+      "message",
+      "data"
     ]
   },
   "sampleResponseProd": {
@@ -2076,10 +2944,135 @@ export const apiData = {
       }
     ]
   },
-  "curlExample": "curl --location 'https://bk-api.bankkaro.com/cardgenius/cards/calculate' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"amazon_spends\": 5000,\n  \"flipkart_spends\": 3000,\n  \"grocery_spends_online\": 2000,\n  \"grocery_spends_offline\": 4000,\n  \"mobile_phone_bills\": 500,\n  \"electricity_bills\": 800,\n  \"water_bills\": 200,\n  \"ott_channels\": 300,\n  \"hotels_annual\": 50000,\n  \"flights_annual\": 80000\n}'",
-  "sampleRequest": {},
-  "errorResponse": {},
-  "validationNotes": []
+  "curlExample": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'\n",
+  "sampleRequest": {
+    "amazon_spends": 15000,
+    "flipkart_spends": 25000,
+    "other_online_spends": 0,
+    "other_offline_spends": 0,
+    "grocery_spends_online": 0,
+    "online_food_ordering": 0,
+    "fuel": 0,
+    "dining_or_going_out": 0,
+    "flights_annual": 0,
+    "hotels_annual": 0,
+    "domestic_lounge_usage_quarterly": 0,
+    "international_lounge_usage_quarterly": 0,
+    "mobile_phone_bills": 0,
+    "electricity_bills": 0,
+    "water_bills": 0,
+    "insurance_health_annual": 0,
+    "insurance_car_or_bike_annual": 0,
+    "rent": 0,
+    "school_fees": 30000
+  },
+  "validationNotes": [],
+  "products": [
+    "Card Genius"
+  ],
+  "methodDescriptions": {},
+  "sampleResponses": {
+    "status": "success",
+    "message": "",
+    "data": {
+      "success": true,
+      "message": "Savings calculated successfully",
+      "savings": [
+        {
+          "card_name": "HDFC Diners Club Black Metal Edition",
+          "seo_card_alias": "hdfc-diners-club-black-metal-credit-card",
+          "cg_network_url": null,
+          "ck_store_url": "cashkaro://stores/hdfc-credit-card-offers",
+          "ck_store_url_2": "cashkaro://stores/hdfc-credit-card-offers",
+          "id": 114,
+          "joining_fees": "10000",
+          "total_savings": 6253,
+          "total_savings_yearly": 75036,
+          "total_extra_benefits": 0,
+          "max_potential_savings": 1884000,
+          "redemption_options": [
+            {
+              "id": 422,
+              "card_id": 114,
+              "method": "Airmiles",
+              "brand": "Air Canada Aeroplan",
+              "min_points": 2000,
+              "max_points": 0,
+              "conversion_rate": 0.65,
+              "note": "",
+              "createdAt": "2025-06-26T11:21:42.000Z",
+              "updatedAt": "2025-06-26T11:21:42.000Z"
+            }
+          ],
+          "brand_options": [
+            {
+              "id": 166,
+              "card_id": 114,
+              "spend_key": "hotels_annual",
+              "brand": "Smart buy - Product/Voucher",
+              "note": "",
+              "createdAt": "2025-06-26T11:05:31.000Z",
+              "updatedAt": "2025-06-26T11:05:31.000Z"
+            }
+          ],
+          "category_breakdown": {
+            "HDFCM_5RP": {
+              "spend": 33621.58,
+              "points_earned": 1121,
+              "balance": 73879,
+              "savings": 1121
+            }
+          },
+          "spending_breakdown": {
+            "amazon_spends": {
+              "on": "amazon_spends",
+              "spend": 1280,
+              "points_earned": 43,
+              "savings": 43,
+              "explanation": [
+                "On spend of ₹1.28K you get 5 RP for every ₹150, so you will receive 43 RP."
+              ],
+              "conv_rate": 1,
+              "maxCap": 75000
+            }
+          },
+          "total_beneficial_spends": 75121.58,
+          "total_spends": 142261.58,
+          "welcomeBenefits": [],
+          "food_dining_benefits": [],
+          "travel_benefits": {
+            "domestic_lounge_benefits_annual": 60000,
+            "international_lounge_benefits_annual": 65000,
+            "railway_lounge_beneftis_annual": 0,
+            "domestic_lounges_unlocked": 80,
+            "international_lounges_unlocked": 52,
+            "railway_lounges_unlocked": 0,
+            "total_travel_benefit_annual": 125000
+          },
+          "milestone_benefits": [],
+          "roi": 65036,
+          "tags": "dining, travel, grocery shopping,online food ordering",
+          "bank_id": 8,
+          "spending_breakdown_array": [
+            {
+              "on": "amazon_spends",
+              "spend": 1280,
+              "points_earned": 43,
+              "savings": 43,
+              "explanation": [
+                "On spend of ₹1.28K you get 5 RP for every ₹150, so you will receive 43 RP."
+              ],
+              "conv_rate": 1,
+              "maxCap": 75000
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "errorResponses": [],
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'\ncurl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'\ncurl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'\n",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'\n"
 },
   'v1-eligibility': {
   "name": "Eligibility",
