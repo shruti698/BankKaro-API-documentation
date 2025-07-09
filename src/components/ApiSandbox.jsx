@@ -68,30 +68,38 @@ const ApiSandbox = ({ api }) => {
       }
       
       const baseUrl = getEnvironmentUrl(selectedEnvironment, false);
-      
-      // Use CORS proxy for production environments to bypass CORS restrictions
-      const isProduction = selectedEnvironment === 'production' || selectedEnvironment === 'uat';
-      const proxyUrl = isProduction ? 'https://cors-anywhere.herokuapp.com/' : '';
       const targetUrl = `${baseUrl}/partner/token`;
       
-      const response = await fetch(`${proxyUrl}${targetUrl}`, {
+      // Use Vercel serverless function to avoid CORS issues
+      const response = await fetch('/api/proxy', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          ...(isProduction && { 'Origin': window.location.origin })
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          'x-api-key': 'test'
+          targetUrl,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: {
+            'x-api-key': 'test'
+          }
         })
       });
       
-      const data = await response.json();
+      const proxyResponse = await response.json();
       
-      if (data.status === 'success' && data.data?.jwttoken) {
-        setPartnerToken(data.data.jwttoken);
-        setTokenError(null);
+      if (proxyResponse.status >= 200 && proxyResponse.status < 300) {
+        const data = proxyResponse.data;
+        if (data.status === 'success' && data.data?.jwttoken) {
+          setPartnerToken(data.data.jwttoken);
+          setTokenError(null);
+        } else {
+          setTokenError('Failed to get partner token: ' + (data.message || 'Unknown error'));
+        }
       } else {
-        setTokenError('Failed to get partner token: ' + (data.message || 'Unknown error'));
+        setTokenError('Failed to get partner token: ' + (proxyResponse.data?.message || 'HTTP ' + proxyResponse.status));
       }
     } catch (err) {
       console.error('Error fetching partner token:', err);
@@ -246,34 +254,54 @@ const ApiSandbox = ({ api }) => {
         return;
       }
 
-      // For production deployment, try real API first, fallback to mock if it fails
-      let response;
-      try {
-        // Check if we're in a production environment and need CORS proxy
-        const isProduction = selectedEnvironment === 'production' || selectedEnvironment === 'uat';
-        const proxyUrl = isProduction ? 'https://cors-anywhere.herokuapp.com/' : '';
-        const targetUrl = isProduction ? `${proxyUrl}${url}` : url;
-        
-        response = await fetch(targetUrl, {
-          ...options,
-          headers: {
-            ...options.headers,
-            ...(isProduction && { 'Origin': window.location.origin })
+      // For production deployment, use Vercel serverless function to avoid CORS issues
+      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        try {
+          // Use Vercel serverless function to make API calls server-side
+          const proxyResponse = await fetch('/api/proxy', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              targetUrl: url,
+              method: selectedMethod,
+              headers: options.headers,
+              body: selectedMethod !== 'GET' ? requestData : undefined
+            })
+          });
+          
+          const proxyData = await proxyResponse.json();
+          
+          if (proxyData.status >= 200 && proxyData.status < 300) {
+            setResponse({
+              status: proxyData.status,
+              statusText: proxyData.statusText,
+              headers: proxyData.headers,
+              data: proxyData.data
+            });
+          } else {
+            throw new Error(`HTTP ${proxyData.status}: ${proxyData.data?.message || 'Unknown error'}`);
           }
-        });
-        
-        const data = await response.json();
+        } catch (apiError) {
+          console.warn('Serverless function failed, falling back to mock server:', apiError.message);
+          
+          // Fallback to mock server
+          const mockResponse = await mockApiServer.makeRequest(url, options);
+          const mockData = await mockResponse.json();
 
-        setResponse({
-          status: response.status,
-          statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries()),
-          data
-        });
-      } catch (apiError) {
-        console.warn('Real API failed (likely CORS), falling back to mock server:', apiError.message);
-        
-        // Fallback to mock server
+          setResponse({
+            status: mockResponse.status,
+            statusText: mockResponse.statusText,
+            headers: Object.fromEntries(mockResponse.headers.entries()),
+            data: mockData
+          });
+          
+          // Show warning about API failure
+          setError('⚠️ API Error: Serverless function failed. Using mock data instead. Error: ' + apiError.message);
+        }
+      } else {
+        // Local development - use mock server
         const mockResponse = await mockApiServer.makeRequest(url, options);
         const mockData = await mockResponse.json();
 
@@ -283,9 +311,6 @@ const ApiSandbox = ({ api }) => {
           headers: Object.fromEntries(mockResponse.headers.entries()),
           data: mockData
         });
-        
-        // Show warning about CORS
-        setError('⚠️ CORS Error: Real API call blocked. Using mock data instead. For production use, consider using a backend proxy or server-side API calls.');
       }
     } catch (err) {
       setError('Error making API call: ' + err.message);
@@ -533,18 +558,24 @@ const ApiSandbox = ({ api }) => {
                 {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? (
                   <>
                     <strong>🔄 Mock Token Generated:</strong> Using mock partner token for local development. 
-                    Real token will be fetched when deployed to Vercel.
+                    <br />
+                    <small>In production, this will use real API calls via serverless function.</small>
                   </>
                 ) : (
-                  'Partner token loaded successfully! This will be used for Card Genius API calls.'
+                  <>
+                    <strong>✅ Token fetched successfully!</strong> This will be used for Card Genius API calls.
+                    <br />
+                    <small>API calls are made server-side via Vercel serverless function to avoid CORS issues.</small>
+                  </>
                 )}
               </Alert>
             )}
             <Alert severity="info" sx={{ mt: 2 }}>
               <Typography variant="body2">
-                <strong>CORS Note:</strong> If you encounter CORS errors, the sandbox will automatically fall back to mock data.
-                <br />• For production use, consider using a backend proxy or server-side API calls
-                <br />• The mock server provides realistic test data for development
+                <strong>API Call Method:</strong> 
+                <br />• <strong>Local Development:</strong> Uses mock server to avoid CORS issues
+                <br />• <strong>Production (Vercel):</strong> Uses serverless function to make real API calls server-side
+                <br />• <strong>Fallback:</strong> If serverless function fails, automatically falls back to mock data
               </Typography>
             </Alert>
           </Paper>
