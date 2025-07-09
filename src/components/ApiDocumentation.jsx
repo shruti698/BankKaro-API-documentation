@@ -459,9 +459,26 @@ const ApiDocumentation = () => {
         
         {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h3" gutterBottom sx={{ fontWeight: 'bold' }}>
-            {api.name}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+            <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
+              {api.name}
+            </Typography>
+            {api.status && (
+              <Chip
+                label={api.status === 'live' ? 'Live' : api.status === 'coming-soon' ? 'Coming Soon' : api.status}
+                color={api.status === 'live' ? 'success' : api.status === 'coming-soon' ? 'warning' : 'default'}
+                variant="filled"
+                size="medium"
+                sx={{ 
+                  fontSize: '0.875rem',
+                  fontWeight: 'bold',
+                  '& .MuiChip-label': {
+                    px: 2
+                  }
+                }}
+              />
+            )}
+          </Box>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
             {api.description}
           </Typography>
@@ -665,6 +682,31 @@ const ApiDocumentation = () => {
             </Grid>
           )}
 
+          {/* Request Schema */}
+          <Grid item xs={12} md={6}>
+            <Card sx={{ borderRadius: 2, height: 'fit-content' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <CodeIcon sx={{ mr: 1 }} />
+                  Request Schema
+                </Typography>
+                <Divider sx={{ mb: 3 }} />
+                {currentApiData.requestSchema && currentApiData.requestSchema.properties && Object.keys(currentApiData.requestSchema.properties).length > 0 ? (
+                  renderSchemaProperties(currentApiData.requestSchema.properties)
+                ) : (
+                  <Alert severity="info" sx={{ borderRadius: 2 }}>
+                    <AlertTitle>No Request Schema Available</AlertTitle>
+                    {api.methods.includes('GET') && api.methods.length === 1 ? (
+                      'This GET endpoint does not require a request body or parameters.'
+                    ) : (
+                      'Request schema has not been defined for this endpoint. Check the admin panel to add request details.'
+                    )}
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+
           {/* Sample Request */}
           <Grid item xs={12} md={6}>
             <Card sx={{ borderRadius: 2 }}>
@@ -758,31 +800,6 @@ const ApiDocumentation = () => {
         </Box>
         
         <Grid container spacing={4}>
-          {/* Request Schema */}
-          <Grid item xs={12} md={6}>
-            <Card sx={{ borderRadius: 2, height: 'fit-content' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <CodeIcon sx={{ mr: 1 }} />
-                  Request Schema
-                </Typography>
-                <Divider sx={{ mb: 3 }} />
-                {currentApiData.requestSchema && currentApiData.requestSchema.properties && Object.keys(currentApiData.requestSchema.properties).length > 0 ? (
-                  renderSchemaProperties(currentApiData.requestSchema.properties)
-                ) : (
-                  <Alert severity="info" sx={{ borderRadius: 2 }}>
-                    <AlertTitle>No Request Schema Available</AlertTitle>
-                    {api.methods.includes('GET') && api.methods.length === 1 ? (
-                      'This GET endpoint does not require a request body or parameters.'
-                    ) : (
-                      'Request schema has not been defined for this endpoint. Check the admin panel to add request details.'
-                    )}
-                  </Alert>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-
           {/* Response Schema */}
           <Grid item xs={12} md={6}>
             <Card sx={{ borderRadius: 2, height: 'fit-content' }}>

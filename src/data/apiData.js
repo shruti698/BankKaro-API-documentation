@@ -5,6 +5,7 @@ export const apiData = {
     "methods": [
       "POST"
     ],
+    "status": "live",
     "description": "Authenticate a partner and get access token",
     "category": "Partner APIs",
     "purpose": "Authenticate a partner using mobile number and OTP to obtain access token for API operations",
@@ -862,6 +863,7 @@ export const apiData = {
     "methods": [
       "GET"
     ],
+    "status": "live",
     "description": "Returns all static data required to initialize the CardGenius app.",
     "category": "Card APIs",
     "purpose": "Provides banks, categories, and other static data needed for app initialization.",
@@ -996,6 +998,7 @@ export const apiData = {
     "methods": [
       "GET"
     ],
+    "status": "live",
     "description": "Get a list of all available banks.",
     "category": "Card APIs",
     "purpose": "Retrieve all banks that offer credit cards through the platform.",
@@ -3353,6 +3356,7 @@ export const apiData = {
     "methods": [
       "POST"
     ],
+    "status": "coming-soon",
     "description": "Calculate the best way to redeem reward points.",
     "category": "Card APIs",
     "purpose": "Help users maximize the value of their accumulated reward points.",
@@ -3410,6 +3414,7 @@ export const apiData = {
     "methods": [
       "GET"
     ],
+    "status": "coming-soon",
     "description": "Get live issuer–brand promotions for a specific card.",
     "category": "Card APIs",
     "purpose": "Display relevant, real-time offers and deals associated with a card.",
@@ -3436,6 +3441,7 @@ export const apiData = {
     "methods": [
       "GET"
     ],
+    "status": "coming-soon",
     "description": "Get airport and railway lounge access details for a specific card.",
     "category": "Card APIs",
     "purpose": "Provide users with information about their travel lounge benefits.",
@@ -3462,6 +3468,7 @@ export const apiData = {
     "methods": [
       "POST"
     ],
+    "status": "coming-soon",
     "description": "A single endpoint to get nested data from multiple modules.",
     "category": "Card APIs",
     "purpose": "Enable low-development integrations by fetching multiple data types in one API call.",
@@ -3488,6 +3495,7 @@ export const apiData = {
     "methods": [
       "POST"
     ],
+    "status": "coming-soon",
     "description": "Subscribe to webhook events for real-time notifications.",
     "category": "Card APIs",
     "purpose": "Allow partners to receive real-time updates on events like application status changes.",

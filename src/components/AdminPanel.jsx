@@ -55,7 +55,6 @@ const AdminPanel = () => {
   const [saveMode, setSaveMode] = useState('local'); // 'local' or 'download'
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    id: '',
     name: '',
     endpoint: '',
     description: '',
@@ -63,6 +62,7 @@ const AdminPanel = () => {
     products: ['Loan Genius'],
     purpose: '',
     methods: [],
+    status: 'live',
     requestSchema: {},
     responseSchema: {},
     sampleRequest: {},
@@ -87,9 +87,9 @@ const AdminPanel = () => {
   const fetchEndpoints = async () => {
     try {
       // Use static data from apiData.js
-        const staticEndpoints = Object.entries(apiData).map(([id, data]) => {
+        const staticEndpoints = Object.entries(apiData).map(([endpoint, data]) => {
           return {
-            id,
+            endpoint,
             name: data.name,
             endpoint: data.endpoint,
             description: data.description || '',
@@ -97,6 +97,7 @@ const AdminPanel = () => {
           products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
             purpose: data.purpose || '',
             methods: data.methods || [],
+            status: data.status || 'live',
             requestSchema: data.requestSchema || {},
             responseSchema: data.responseSchema || {},
             sampleRequest: data.sampleRequest || {},
@@ -124,7 +125,6 @@ const AdminPanel = () => {
     if (endpoint) {
       setEditingEndpoint(endpoint);
       setFormData({
-        id: endpoint.id,
         name: endpoint.name,
         endpoint: endpoint.endpoint,
         description: endpoint.description || '',
@@ -133,6 +133,7 @@ const AdminPanel = () => {
                  (endpoint.product ? [endpoint.product] : ['Loan Genius']),
         purpose: endpoint.purpose || '',
         methods: endpoint.methods || [],
+        status: endpoint.status || 'live',
         requestSchema: endpoint.requestSchema || {},
         responseSchema: endpoint.responseSchema || {},
         sampleRequest: endpoint.sampleRequest || {},
@@ -152,7 +153,6 @@ const AdminPanel = () => {
     } else {
       setEditingEndpoint(null);
       setFormData({
-        id: '',
         name: '',
         endpoint: '',
         description: '',
@@ -225,8 +225,16 @@ const AdminPanel = () => {
 
       if (editingEndpoint) {
         // Update existing endpoint
-        updatedEndpoints[formData.id] = {
-          ...apiData[formData.id],
+        const oldKey = editingEndpoint.endpoint;
+        const newKey = formData.endpoint;
+        
+        // If endpoint changed, we need to delete the old key and create a new one
+        if (oldKey !== newKey) {
+          delete updatedEndpoints[oldKey];
+        }
+        
+        updatedEndpoints[newKey] = {
+          ...apiData[oldKey],
           name: formData.name,
           endpoint: formData.endpoint,
           description: formData.description,
@@ -234,6 +242,7 @@ const AdminPanel = () => {
           products: formData.products,
           purpose: formData.purpose,
           methods: formData.methods,
+          status: formData.status,
           requestSchema: formData.requestSchema,
           responseSchema: formData.responseSchema,
           sampleRequest: formData.sampleRequest,
@@ -252,7 +261,7 @@ const AdminPanel = () => {
         };
       } else {
         // Add new endpoint
-        updatedEndpoints[formData.id] = {
+        updatedEndpoints[formData.endpoint] = {
           name: formData.name,
           endpoint: formData.endpoint,
           description: formData.description,
@@ -260,6 +269,7 @@ const AdminPanel = () => {
           products: formData.products,
           purpose: formData.purpose,
           methods: formData.methods,
+          status: formData.status,
           requestSchema: formData.requestSchema,
           responseSchema: formData.responseSchema,
           sampleRequest: formData.sampleRequest,
@@ -296,12 +306,12 @@ const AdminPanel = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (endpoint) => {
     if (window.confirm('Are you sure you want to delete this endpoint?')) {
       try {
         // Create updated endpoints object without the deleted endpoint
         const updatedEndpoints = { ...apiData };
-        delete updatedEndpoints[id];
+        delete updatedEndpoints[endpoint];
 
         // Save to apiData.js
         const result = await saveToApiData(updatedEndpoints);
@@ -471,19 +481,18 @@ const AdminPanel = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Endpoint</TableCell>
               <TableCell>Products</TableCell>
               <TableCell>Category</TableCell>
               <TableCell>Methods</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {endpoints.map((endpoint) => (
-              <TableRow key={endpoint.id}>
-                <TableCell>{endpoint.id}</TableCell>
+              <TableRow key={endpoint.endpoint}>
                 <TableCell>{endpoint.name}</TableCell>
                 <TableCell>{endpoint.endpoint}</TableCell>
                 <TableCell>
@@ -504,10 +513,20 @@ const AdminPanel = () => {
                   ))}
                 </TableCell>
                 <TableCell>
+                  {endpoint.status && (
+                    <Chip
+                      label={endpoint.status === 'live' ? 'Live' : endpoint.status === 'coming-soon' ? 'Coming Soon' : endpoint.status}
+                      color={endpoint.status === 'live' ? 'success' : endpoint.status === 'coming-soon' ? 'warning' : 'default'}
+                      size="small"
+                      variant="filled"
+                    />
+                  )}
+                </TableCell>
+                <TableCell>
                   <IconButton onClick={() => handleOpenDialog(endpoint)}>
                     <EditIcon />
                   </IconButton>
-                  <IconButton onClick={() => handleDelete(endpoint.id)}>
+                  <IconButton onClick={() => handleDelete(endpoint.endpoint)}>
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
@@ -532,13 +551,6 @@ const AdminPanel = () => {
 
           {activeTab === 0 && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <TextField
-                label="ID"
-                value={formData.id}
-                onChange={(e) => updateFormData('id', e.target.value)}
-                disabled={!!editingEndpoint}
-                helperText="Unique identifier for the endpoint"
-              />
               <TextField
                 label="Name"
                 value={formData.name}
@@ -607,6 +619,20 @@ const AdminPanel = () => {
                 fullWidth
                 helperText="HTTP methods supported by this endpoint"
               />
+              <FormControl fullWidth>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={formData.status}
+                  onChange={(e) => updateFormData('status', e.target.value)}
+                  label="Status"
+                >
+                  <MenuItem value="live">Live</MenuItem>
+                  <MenuItem value="coming-soon">Coming Soon</MenuItem>
+                  <MenuItem value="deprecated">Deprecated</MenuItem>
+                  <MenuItem value="beta">Beta</MenuItem>
+                </Select>
+                <FormHelperText>Current status of this API endpoint</FormHelperText>
+              </FormControl>
               
 
             </Box>
