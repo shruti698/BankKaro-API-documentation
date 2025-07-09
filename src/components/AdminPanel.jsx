@@ -188,44 +188,32 @@ const AdminPanel = () => {
 
   const saveToApiData = async (updatedEndpoints) => {
     try {
-      // Always use local development server if available, otherwise use Vercel API
-      const apiUrl = 'http://localhost:3001/api/update-api-data';
-        
-      const response = await fetch(apiUrl, {
+      // For local development, save directly to apiData.js file
+      const apiDataContent = `export const apiData = ${JSON.stringify(updatedEndpoints, null, 2)};\n\nexport const cardGeniusApiData = {\n  // Card Genius specific data\n};\n\nexport const projects = {\n  // Project data\n};`;
+      
+      // Save to local file system using the local server
+      const response = await fetch('http://localhost:3001/api/save-api-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          updatedEndpoints,
-          mode: saveMode
+          content: apiDataContent,
+          filename: 'src/data/apiData.js'
         })
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate updated content');
-      }
-
-      const result = await response.json();
       
-      // Handle the response
-      if (result.success) {
-        if (result.mode === 'local') {
-          // Local mode - changes saved directly to file
-          alert('✅ Changes saved to local apiData.js file!\n\n🔄 Refreshing to show updated data...');
-          // Force refresh the page to reload the updated apiData.js
-          setTimeout(() => window.location.reload(), 1000);
-        } else {
-          // Fallback to download mode
-          alert('⚠️ Local save failed, falling back to download mode.\n\nPlease run: npm run dev-server\nThen access: http://localhost:3001/admin');
-        }
+      if (response.ok) {
+        alert('✅ Changes saved to local apiData.js file!\n\n🔄 Refreshing to show updated data...');
+        setTimeout(() => window.location.reload(), 1000);
+        return { success: true, mode: 'local' };
+      } else {
+        throw new Error('Server returned error');
       }
-      
-      return result;
     } catch (error) {
-      console.error('Error generating updated content:', error);
-      throw error;
+      console.error('Error saving to local file:', error);
+      alert('❌ Local server not running!\n\n📝 Please run this command in your terminal:\n\nnpm run local-server\n\nThen try saving again.');
+      return { success: false, mode: 'error' };
     }
   };
 

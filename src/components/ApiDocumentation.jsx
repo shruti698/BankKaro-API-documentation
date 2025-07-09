@@ -759,36 +759,50 @@ const ApiDocumentation = () => {
         
         <Grid container spacing={4}>
           {/* Request Schema */}
-          {currentApiData.requestSchema && currentApiData.requestSchema.properties && Object.keys(currentApiData.requestSchema.properties).length > 0 && (
-            <Grid item xs={12} md={6}>
-              <Card sx={{ borderRadius: 2, height: 'fit-content' }}>
-                <CardContent sx={{ p: 3 }}>
-                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <CodeIcon sx={{ mr: 1 }} />
-                    Request Schema
-                  </Typography>
-                  <Divider sx={{ mb: 3 }} />
-                  {renderSchemaProperties(currentApiData.requestSchema.properties)}
-                </CardContent>
-              </Card>
-            </Grid>
-          )}
+          <Grid item xs={12} md={6}>
+            <Card sx={{ borderRadius: 2, height: 'fit-content' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <CodeIcon sx={{ mr: 1 }} />
+                  Request Schema
+                </Typography>
+                <Divider sx={{ mb: 3 }} />
+                {currentApiData.requestSchema && currentApiData.requestSchema.properties && Object.keys(currentApiData.requestSchema.properties).length > 0 ? (
+                  renderSchemaProperties(currentApiData.requestSchema.properties)
+                ) : (
+                  <Alert severity="info" sx={{ borderRadius: 2 }}>
+                    <AlertTitle>No Request Schema Available</AlertTitle>
+                    {api.methods.includes('GET') && api.methods.length === 1 ? (
+                      'This GET endpoint does not require a request body or parameters.'
+                    ) : (
+                      'Request schema has not been defined for this endpoint. Check the admin panel to add request details.'
+                    )}
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
 
           {/* Response Schema */}
-          {currentApiData.responseSchema && currentApiData.responseSchema.properties && Object.keys(currentApiData.responseSchema.properties).length > 0 && (
-            <Grid item xs={12} md={6}>
-              <Card sx={{ borderRadius: 2, height: 'fit-content' }}>
-                <CardContent sx={{ p: 3 }}>
-                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <CodeIcon sx={{ mr: 1 }} />
-                    Response Schema
-                  </Typography>
-                  <Divider sx={{ mb: 3 }} />
-                  {renderSchemaProperties(currentApiData.responseSchema.properties)}
-                </CardContent>
-              </Card>
-            </Grid>
-          )}
+          <Grid item xs={12} md={6}>
+            <Card sx={{ borderRadius: 2, height: 'fit-content' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <CodeIcon sx={{ mr: 1 }} />
+                  Response Schema
+                </Typography>
+                <Divider sx={{ mb: 3 }} />
+                {currentApiData.responseSchema && currentApiData.responseSchema.properties && Object.keys(currentApiData.responseSchema.properties).length > 0 ? (
+                  renderSchemaProperties(currentApiData.responseSchema.properties)
+                ) : (
+                  <Alert severity="info" sx={{ borderRadius: 2 }}>
+                    <AlertTitle>No Response Schema Available</AlertTitle>
+                    Response schema has not been defined for this endpoint. Check the admin panel to add response details.
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
 
         {/* Sample Responses */}
@@ -827,18 +841,16 @@ const ApiDocumentation = () => {
         </Grid>
 
         {/* Fallback when no response data is available */}
-        {(!currentApiData.requestSchema || !currentApiData.requestSchema.properties || Object.keys(currentApiData.requestSchema.properties).length === 0) &&
-         (!currentApiData.responseSchema || !currentApiData.responseSchema.properties || Object.keys(currentApiData.responseSchema.properties).length === 0) &&
-         (!currentApiData.sampleResponse || Object.keys(currentApiData.sampleResponse).length === 0) &&
+        {(!currentApiData.sampleResponse || Object.keys(currentApiData.sampleResponse).length === 0) &&
          (!currentApiData.errorResponse || Object.keys(currentApiData.errorResponse).length === 0) &&
          (!currentApiData.errorResponses || currentApiData.errorResponses.length === 0) && (
           <Grid item xs={12}>
             <Card sx={{ borderRadius: 2 }}>
               <CardContent sx={{ p: 3 }}>
                 <Alert severity="info" sx={{ borderRadius: 2 }}>
-                  <AlertTitle>No Response Details Available</AlertTitle>
-                  Response schemas and sample responses have not been configured for this endpoint. 
-                  Please check the admin panel to add response details.
+                  <AlertTitle>No Sample Responses Available</AlertTitle>
+                  Sample responses have not been configured for this endpoint. 
+                  Please check the admin panel to add sample response data.
                 </Alert>
               </CardContent>
             </Card>
