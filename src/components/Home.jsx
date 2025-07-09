@@ -116,7 +116,7 @@ const Home = () => {
       products.forEach(product => {
         if (organized[product]) {
           organized[product].push(endpoint);
-        }
+      }
       });
     });
     return organized;

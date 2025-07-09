@@ -56,6 +56,17 @@ const ApiSandbox = ({ api }) => {
     setTokenError(null);
     
     try {
+      // For local development, use mock token to avoid CORS issues
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Mock successful response
+        setPartnerToken('mock_partner_token_for_local_development');
+        setTokenError(null);
+        return;
+      }
+      
       const baseUrl = getEnvironmentUrl(selectedEnvironment, false);
       const response = await fetch(`${baseUrl}/partner/token`, {
         method: 'POST',
@@ -339,7 +350,27 @@ const ApiSandbox = ({ api }) => {
         ...(selectedMethod !== 'GET' && { body: JSON.stringify(requestData) })
       };
 
-      // Try real API first, fallback to mock if it fails
+      // For local development, use mock server to avoid CORS issues
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.log('🔄 Local development detected - using mock server to avoid CORS issues');
+        
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Use mock server for local development
+        const mockResponse = await mockApiServer.makeRequest(url, options);
+        const mockData = await mockResponse.json();
+
+        setResponse({
+          status: mockResponse.status,
+          statusText: mockResponse.statusText,
+          headers: Object.fromEntries(mockResponse.headers.entries()),
+          data: mockData
+        });
+        return;
+      }
+
+      // For production deployment, try real API first, fallback to mock if it fails
       let response;
       try {
         response = await fetch(url, options);
@@ -516,6 +547,16 @@ const ApiSandbox = ({ api }) => {
 
   return (
     <Box sx={{ p: 3 }}>
+      {/* Development Mode Indicator */}
+      {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <Typography variant="body2">
+            <strong>🔄 Local Development Mode:</strong> Using mock server to avoid CORS issues. 
+            Real API calls will work when deployed to Vercel.
+          </Typography>
+        </Alert>
+      )}
+
       <Paper sx={{ p: 3, mb: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h5" component="h2">
@@ -598,7 +639,14 @@ const ApiSandbox = ({ api }) => {
             )}
             {partnerToken && (
               <Alert severity="success" sx={{ mt: 2 }}>
-                Partner token loaded successfully! This will be used for Card Genius API calls.
+                {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? (
+                  <>
+                    <strong>🔄 Mock Token Generated:</strong> Using mock partner token for local development. 
+                    Real token will be fetched when deployed to Vercel.
+                  </>
+                ) : (
+                  'Partner token loaded successfully! This will be used for Card Genius API calls.'
+                )}
               </Alert>
             )}
           </Paper>

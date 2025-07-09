@@ -63,17 +63,21 @@ const AdminPanel = () => {
     products: ['Loan Genius'],
     purpose: '',
     methods: [],
-    methodDescriptions: {},
     requestSchema: {},
     responseSchema: {},
     sampleRequest: {},
+    sampleResponse: {},
     sampleResponses: [],
+    errorResponse: {},
     errorResponses: [],
     curlExample: '',
     curlExampleStaging: '',
     curlExampleProduction: '',
     validationNotes: [],
-    fieldTable: []
+    fieldTable: [],
+    importantNotes: [],
+    headers: [],
+    additionalExamples: []
   });
 
   useEffect(() => {
@@ -83,33 +87,32 @@ const AdminPanel = () => {
   const fetchEndpoints = async () => {
     try {
       // Use static data from apiData.js
-      const staticEndpoints = Object.entries(apiData).map(([id, data]) => {
-        return {
-          id,
-          name: data.name,
-          endpoint: data.endpoint,
-          description: data.description || '',
-          category: data.category || '',
+        const staticEndpoints = Object.entries(apiData).map(([id, data]) => {
+          return {
+            id,
+            name: data.name,
+            endpoint: data.endpoint,
+            description: data.description || '',
+            category: data.category || '',
           products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
-          purpose: data.purpose || '',
-          methods: data.methods || [],
-          methodDescriptions: data.methodDescriptions || {},
-          requestSchema: data.requestSchema || {},
-          responseSchema: data.responseSchema || {},
-          sampleRequest: data.sampleRequest || {},
-          sampleResponse: data.sampleResponse || {},
-          sampleResponses: data.sampleResponses || [],
-          errorResponse: data.errorResponse || {},
-          errorResponses: data.errorResponses || [],
+            purpose: data.purpose || '',
+            methods: data.methods || [],
+            requestSchema: data.requestSchema || {},
+            responseSchema: data.responseSchema || {},
+            sampleRequest: data.sampleRequest || {},
+            sampleResponse: data.sampleResponse || {},
+            sampleResponses: data.sampleResponses || [],
+            errorResponse: data.errorResponse || {},
+            errorResponses: data.errorResponses || [],
           curlExample: data.curlExample || '',
           curlExampleStaging: data.curlExampleStaging || '',
           curlExampleProduction: data.curlExampleProduction || '',
-          validationNotes: data.validationNotes || [],
-          fieldTable: data.fieldTable || []
-        };
-      });
+            validationNotes: data.validationNotes || [],
+            fieldTable: data.fieldTable || []
+          };
+        });
       
-      setEndpoints(staticEndpoints);
+        setEndpoints(staticEndpoints);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching endpoints:', error);
@@ -130,17 +133,21 @@ const AdminPanel = () => {
                  (endpoint.product ? [endpoint.product] : ['Loan Genius']),
         purpose: endpoint.purpose || '',
         methods: endpoint.methods || [],
-        methodDescriptions: endpoint.methodDescriptions || {},
         requestSchema: endpoint.requestSchema || {},
         responseSchema: endpoint.responseSchema || {},
         sampleRequest: endpoint.sampleRequest || {},
+        sampleResponse: endpoint.sampleResponse || {},
         sampleResponses: endpoint.sampleResponses || [],
+        errorResponse: endpoint.errorResponse || {},
         errorResponses: endpoint.errorResponses || [],
         curlExample: endpoint.curlExample || '',
         curlExampleStaging: endpoint.curlExampleStaging || '',
         curlExampleProduction: endpoint.curlExampleProduction || '',
         validationNotes: endpoint.validationNotes || [],
-        fieldTable: endpoint.fieldTable || []
+        fieldTable: endpoint.fieldTable || [],
+        importantNotes: endpoint.importantNotes || [],
+        headers: endpoint.headers || [],
+        additionalExamples: endpoint.additionalExamples || []
       });
     } else {
       setEditingEndpoint(null);
@@ -153,17 +160,21 @@ const AdminPanel = () => {
         products: ['Loan Genius'],
         purpose: '',
         methods: [],
-        methodDescriptions: {},
         requestSchema: {},
         responseSchema: {},
         sampleRequest: {},
+        sampleResponse: {},
         sampleResponses: [],
+        errorResponse: {},
         errorResponses: [],
         curlExample: '',
         curlExampleStaging: '',
         curlExampleProduction: '',
         validationNotes: [],
-        fieldTable: []
+        fieldTable: [],
+        importantNotes: [],
+        headers: [],
+        additionalExamples: []
       });
     }
     setOpenDialog(true);
@@ -223,7 +234,7 @@ const AdminPanel = () => {
     try {
       // Create updated endpoints object
       const updatedEndpoints = { ...apiData };
-      
+
       if (editingEndpoint) {
         // Update existing endpoint
         updatedEndpoints[formData.id] = {
@@ -235,7 +246,6 @@ const AdminPanel = () => {
           products: formData.products,
           purpose: formData.purpose,
           methods: formData.methods,
-          methodDescriptions: formData.methodDescriptions,
           requestSchema: formData.requestSchema,
           responseSchema: formData.responseSchema,
           sampleRequest: formData.sampleRequest,
@@ -247,7 +257,10 @@ const AdminPanel = () => {
           curlExampleStaging: formData.curlExampleStaging,
           curlExampleProduction: formData.curlExampleProduction,
           validationNotes: formData.validationNotes,
-          fieldTable: formData.fieldTable
+          fieldTable: formData.fieldTable,
+          importantNotes: formData.importantNotes,
+          headers: formData.headers,
+          additionalExamples: formData.additionalExamples
         };
       } else {
         // Add new endpoint
@@ -259,7 +272,6 @@ const AdminPanel = () => {
           products: formData.products,
           purpose: formData.purpose,
           methods: formData.methods,
-          methodDescriptions: formData.methodDescriptions,
           requestSchema: formData.requestSchema,
           responseSchema: formData.responseSchema,
           sampleRequest: formData.sampleRequest,
@@ -271,7 +283,10 @@ const AdminPanel = () => {
           curlExampleStaging: formData.curlExampleStaging,
           curlExampleProduction: formData.curlExampleProduction,
           validationNotes: formData.validationNotes,
-          fieldTable: formData.fieldTable
+          fieldTable: formData.fieldTable,
+          importantNotes: formData.importantNotes,
+          headers: formData.headers,
+          additionalExamples: formData.additionalExamples
         };
       }
 
@@ -280,7 +295,7 @@ const AdminPanel = () => {
       
       if (result.success) {
         // The file download and instructions are handled in saveToApiData
-        handleCloseDialog();
+      handleCloseDialog();
         fetchEndpoints(); // Refresh the list
       } else {
         alert('❌ Failed to generate updated content. Please try again.');
@@ -444,13 +459,13 @@ const AdminPanel = () => {
             }
             label="Local save mode (recommended for development)"
           />
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => handleOpenDialog()}
-          >
-            Add Endpoint
-          </Button>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenDialog()}
+        >
+          Add Endpoint
+        </Button>
         </Box>
       </Box>
 
@@ -605,61 +620,7 @@ const AdminPanel = () => {
                 helperText="HTTP methods supported by this endpoint"
               />
               
-              {/* HTTP Method Descriptions */}
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>HTTP Method Descriptions</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Add descriptions for each HTTP method. These will be displayed in the API documentation.
-                    </Typography>
-                    {formData.methods.map((method) => (
-                      <Box key={method} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                          {method}
-                        </Typography>
-                        <TextField
-                          label={`${method} Title`}
-                          value={formData.methodDescriptions[method]?.title || ''}
-                          onChange={(e) => {
-                            const newDescriptions = { ...formData.methodDescriptions };
-                            if (!newDescriptions[method]) newDescriptions[method] = {};
-                            newDescriptions[method].title = e.target.value;
-                            updateFormData('methodDescriptions', newDescriptions);
-                          }}
-                          placeholder={method === 'GET' ? 'Retrieve data' : method === 'POST' ? 'Create/Submit data' : 'Update data'}
-                          fullWidth
-                          size="small"
-                          helperText={`Short title for ${method} method`}
-                        />
-                        <TextField
-                          label={`${method} Description`}
-                          value={formData.methodDescriptions[method]?.description || ''}
-                          onChange={(e) => {
-                            const newDescriptions = { ...formData.methodDescriptions };
-                            if (!newDescriptions[method]) newDescriptions[method] = {};
-                            newDescriptions[method].description = e.target.value;
-                            updateFormData('methodDescriptions', newDescriptions);
-                          }}
-                          placeholder={method === 'GET' ? 'Use this method to retrieve lead information' : method === 'POST' ? 'Use this method to create new leads or submit applications' : 'Use this method to update existing data'}
-                          multiline
-                          rows={2}
-                          fullWidth
-                          size="small"
-                          helperText={`Detailed description for ${method} method`}
-                        />
-                      </Box>
-                    ))}
-                    {formData.methods.length === 0 && (
-                      <Alert severity="info">
-                        Add HTTP methods above to configure their descriptions.
-                      </Alert>
-                    )}
-                  </Box>
-                </AccordionDetails>
-              </Accordion>
+
             </Box>
           )}
 
@@ -694,18 +655,18 @@ const AdminPanel = () => {
                         </Button>
                       </Box>
                     </Box>
-                    <TextField
-                      multiline
-                      rows={8}
-                      fullWidth
+                  <TextField
+                    multiline
+                    rows={8}
+                    fullWidth
                       value={getJsonDisplayValue('requestSchema')}
-                      onChange={(e) => updateJsonField('requestSchema', e.target.value)}
-                      placeholder='{"type": "object", "properties": {...}}'
+                    onChange={(e) => updateJsonField('requestSchema', e.target.value)}
+                    placeholder='{"type": "object", "properties": {...}}'
                       error={typeof formData.requestSchema === 'string' && formData.requestSchema !== ''}
                       helperText={typeof formData.requestSchema === 'string' && formData.requestSchema !== '' 
                         ? '⚠️ Invalid JSON format. Please check your syntax.' 
                         : 'Paste your JSON here - it will be automatically cleaned up'}
-                    />
+                  />
                   </Box>
                 </AccordionDetails>
               </Accordion>
@@ -739,18 +700,18 @@ const AdminPanel = () => {
                         </Button>
                       </Box>
                     </Box>
-                    <TextField
-                      multiline
-                      rows={8}
-                      fullWidth
+                  <TextField
+                    multiline
+                    rows={8}
+                    fullWidth
                       value={getJsonDisplayValue('responseSchema')}
-                      onChange={(e) => updateJsonField('responseSchema', e.target.value)}
-                      placeholder='{"type": "object", "properties": {...}}'
+                    onChange={(e) => updateJsonField('responseSchema', e.target.value)}
+                    placeholder='{"type": "object", "properties": {...}}'
                       error={typeof formData.responseSchema === 'string' && formData.responseSchema !== ''}
                       helperText={typeof formData.responseSchema === 'string' && formData.responseSchema !== '' 
                         ? '⚠️ Invalid JSON format. Please check your syntax.' 
                         : 'Paste your JSON here - it will be automatically cleaned up'}
-                    />
+                  />
                   </Box>
                 </AccordionDetails>
               </Accordion>
@@ -789,12 +750,12 @@ const AdminPanel = () => {
                         </Button>
                       </Box>
                     </Box>
-                    <TextField
-                      multiline
-                      rows={6}
-                      fullWidth
+                  <TextField
+                    multiline
+                    rows={6}
+                    fullWidth
                       value={getJsonDisplayValue('sampleRequest')}
-                      onChange={(e) => updateJsonField('sampleRequest', e.target.value)}
+                    onChange={(e) => updateJsonField('sampleRequest', e.target.value)}
                       placeholder={formData.methods.includes('GET') && formData.methods.length === 1 
                         ? '{} (empty for GET requests with no body)'
                         : '{"key": "value"}'}
@@ -819,6 +780,118 @@ const AdminPanel = () => {
                         </Typography>
                       </Alert>
                     )}
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>Sample Response (JSON)</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Enter a single sample response for successful API calls.
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Enter valid JSON for sample response
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                          size="small"
+                          startIcon={<FormatIcon />}
+                          onClick={() => formatJson('sampleResponse')}
+                          variant="outlined"
+                        >
+                          Format JSON
+                        </Button>
+                        <Button
+                          size="small"
+                          onClick={() => clearJsonField('sampleResponse')}
+                          variant="outlined"
+                          color="warning"
+                        >
+                          Clear
+                        </Button>
+                      </Box>
+                    </Box>
+                    <TextField
+                      multiline
+                      rows={6}
+                      fullWidth
+                      value={getJsonDisplayValue('sampleResponse')}
+                      onChange={(e) => updateJsonField('sampleResponse', e.target.value)}
+                      placeholder='{"status": "success", "data": {...}}'
+                      error={typeof formData.sampleResponse === 'string' && formData.sampleResponse !== ''}
+                      helperText={typeof formData.sampleResponse === 'string' && formData.sampleResponse !== '' 
+                        ? '⚠️ Invalid JSON format. Please check your syntax.' 
+                        : 'Paste your JSON here - it will be automatically cleaned up'}
+                    />
+                    <Alert severity="info">
+                      <Typography variant="body2">
+                        <strong>Sample Response Note:</strong>
+                        <br />• This is for a single success response
+                        <br />• Use "Sample Responses" below for multiple scenarios
+                        <br />• The frontend will show this as "Success Response"
+                      </Typography>
+                    </Alert>
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>Error Response (JSON)</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Enter a single error response for failed API calls.
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Enter valid JSON for error response
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                          size="small"
+                          startIcon={<FormatIcon />}
+                          onClick={() => formatJson('errorResponse')}
+                          variant="outlined"
+                        >
+                          Format JSON
+                        </Button>
+                        <Button
+                          size="small"
+                          onClick={() => clearJsonField('errorResponse')}
+                          variant="outlined"
+                          color="warning"
+                        >
+                          Clear
+                        </Button>
+                      </Box>
+                    </Box>
+                    <TextField
+                      multiline
+                      rows={6}
+                      fullWidth
+                      value={getJsonDisplayValue('errorResponse')}
+                      onChange={(e) => updateJsonField('errorResponse', e.target.value)}
+                      placeholder='{"status": "error", "message": "Error description"}'
+                      error={typeof formData.errorResponse === 'string' && formData.errorResponse !== ''}
+                      helperText={typeof formData.errorResponse === 'string' && formData.errorResponse !== '' 
+                        ? '⚠️ Invalid JSON format. Please check your syntax.' 
+                        : 'Paste your JSON here - it will be automatically cleaned up'}
+                    />
+                    <Alert severity="info">
+                      <Typography variant="body2">
+                        <strong>Error Response Note:</strong>
+                        <br />• This is for a single error response
+                        <br />• Use "Error Responses" below for multiple scenarios
+                        <br />• The frontend will show this as "Error Response"
+                      </Typography>
+                    </Alert>
                   </Box>
                 </AccordionDetails>
               </Accordion>
@@ -976,15 +1049,15 @@ const AdminPanel = () => {
                     <Typography variant="body2" color="text.secondary">
                       Add cURL examples for different environments. The frontend will automatically use the appropriate one based on the selected environment.
                     </Typography>
-                    
-                    <TextField
+
+              <TextField
                       label="Base cURL Example (Default)"
-                      value={formData.curlExample}
-                      onChange={(e) => updateFormData('curlExample', e.target.value)}
-                      multiline
+                value={formData.curlExample}
+                onChange={(e) => updateFormData('curlExample', e.target.value)}
+                multiline
                       rows={3}
-                      fullWidth
-                      placeholder="curl --location 'https://api.example.com/endpoint' \--header 'Content-Type: application/json'"
+                fullWidth
+                placeholder="curl --location 'https://api.example.com/endpoint' \--header 'Content-Type: application/json'"
                       helperText="This will be used as the default and for environment switching"
                     />
                     
@@ -1071,6 +1144,51 @@ const AdminPanel = () => {
                 helperText="Validation rules and notes for this endpoint"
               />
 
+              <TextField
+                label="Important Notes (comma-separated)"
+                value={formData.importantNotes.join(', ')}
+                onChange={(e) => updateArrayField('importantNotes', e.target.value)}
+                multiline
+                rows={3}
+                fullWidth
+                placeholder="🔐 Security note, ⚠️ Warning, etc."
+                helperText="Important notes that will be displayed prominently in the frontend"
+              />
+
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>Headers (JSON Array)</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <TextField
+                    multiline
+                    rows={6}
+                    fullWidth
+                    value={JSON.stringify(formData.headers, null, 2)}
+                    onChange={(e) => updateJsonField('headers', e.target.value)}
+                    placeholder='[{"header": "Authorization", "value": "Bearer <token>", "required": true}]'
+                    helperText="Array of required headers with their values and required status"
+                  />
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>Additional Examples (JSON Array)</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <TextField
+                    multiline
+                    rows={8}
+                    fullWidth
+                    value={JSON.stringify(formData.additionalExamples, null, 2)}
+                    onChange={(e) => updateJsonField('additionalExamples', e.target.value)}
+                    placeholder='[{"title": "Example Title", "description": "Description", "curl": "curl command"}]'
+                    helperText="Additional cURL examples for different scenarios"
+                  />
+                </AccordionDetails>
+              </Accordion>
+
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>Field Table (JSON Array)</Typography>
@@ -1094,6 +1212,9 @@ const AdminPanel = () => {
                   <br />• Use JSON format for schemas and examples
                   <br />• Field table should be an array of objects with field, type, required, and description properties
                   <br />• Validation notes should be comma-separated
+                  <br />• Important notes support emojis and will be displayed prominently
+                  <br />• Headers should include all required headers for the API
+                  <br />• Additional examples provide extra cURL commands for different scenarios
                 </Typography>
               </Alert>
             </Box>

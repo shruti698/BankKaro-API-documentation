@@ -757,12 +757,7 @@ export const apiData = {
   "methods": [
     "POST"
   ],
-  "methodDescriptions": {
-    "POST": {
-      "title": "Generate Token",
-      "description": "Generate a partner-token (JWT) that is required for authorization in subsequent API calls"
-    }
-  },
+
   "description": "Generate a partner-token (JWT) that is required for authorization in subsequent API calls",
   "category": "Partner APIs",
   "purpose": "Used to generate a `partner-token` (JWT) that is required for authorization in subsequent API calls like `/partner-auth`, `/lead-details`, etc.",
@@ -955,14 +950,14 @@ export const apiData = {
         "type": "object",
         "properties": {
           "bank_data": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
                   "type": "integer"
-                },
-                "name": {
+            },
+            "name": {
                   "type": "string"
                 },
                 "criff_bank_name": {
@@ -978,11 +973,11 @@ export const apiData = {
                   "type": "boolean"
                 },
                 "createdAt": {
-                  "type": "string",
+              "type": "string",
                   "format": "date-time"
-                },
+            },
                 "updatedAt": {
-                  "type": "string",
+              "type": "string",
                   "format": "date-time"
                 }
               },
@@ -1026,7 +1021,7 @@ export const apiData = {
       "bank_data": [
         {
           "id": 3,
-          "name": "SBI",
+        "name": "SBI",
           "criff_bank_name": "STATE BANK OF INDIA",
           "max_card_limit_in_criff": 500000,
           "logo": "https://cdn.bankkaro.com/logos/sbi.svg",
@@ -1205,11 +1200,11 @@ export const apiData = {
         "type": "string"
       },
       "data": {
-        "type": "object",
-        "properties": {
-          "cards": {
-            "type": "array",
-            "items": {
+    "type": "object",
+    "properties": {
+      "cards": {
+        "type": "array",
+        "items": {
               "$ref": "#/$defs/card"
             }
           },
@@ -1253,12 +1248,12 @@ export const apiData = {
     ],
     "$defs": {
       "card": {
-        "type": "object",
-        "properties": {
-          "id": {
+          "type": "object",
+          "properties": {
+            "id": {
             "type": "integer"
-          },
-          "name": {
+            },
+            "name": {
             "type": "string"
           },
           "nick_name": {
@@ -1421,11 +1416,11 @@ export const apiData = {
             "type": "boolean"
           },
           "createdAt": {
-            "type": "string",
+              "type": "string",
             "format": "date-time"
-          },
+            },
           "updatedAt": {
-            "type": "string",
+              "type": "string",
             "format": "date-time"
           },
           "meta_title": {
@@ -1456,15 +1451,15 @@ export const apiData = {
                 },
                 "tag_id": {
                   "type": "integer"
-                }
-              }
             }
-          },
+          }
+        }
+      },
           "tags": {
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
+        "type": "object",
+        "properties": {
                 "id": {
                   "type": "integer"
                 },
@@ -1498,11 +1493,11 @@ export const apiData = {
                       "format": "date-time"
                     }
                   }
-                }
-              }
-            }
           }
-        },
+        }
+      }
+    }
+  },
         "required": [
           "id",
           "name",
@@ -1543,82 +1538,82 @@ export const apiData = {
     "data": {
       "cards": [
         {
-          "id": 27,
-          "name": "SBI Cashback Credit Card",
-          "nick_name": "SBI Cashback,Credit Card",
-          "product_type": "credit_card",
-          "card_type": "VISA,Mastercard",
-          "user_rating_count": 413,
-          "rating": 4,
-          "bank_id": 3,
-          "priority": 29,
-          "bk_commission": "2000",
-          "new_to_credit": true,
-          "existing_customer": false,
-          "commission_type": "Flat",
-          "commission": "1800",
-          "commission_percent": "90",
-          "sub_agent_commission": "0",
-          "seo_card_alias": "sbi-cashback-credit-card",
-          "card_alias": "sbi-cashback-credit-card",
-          "image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_SBI%20Cashback.png1732257446742",
-          "card_bg_image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Mockup-24.webp1736921642945",
-          "card_bg_gradient": "radial-gradient(99.6% 170.48% at 50% -70.48%, #B79DE8 0%, #1B1B1B 100%)",
-          "other_images": "",
-          "age_criteria": "21-60",
-          "age_criteria_comment": "While the bank permits a minimum age of 18 and a maximum age of 70 for eligibility, our experts advice believe that higher chances of approval for the people falling in the age group of 21-60",
-          "age_self_emp": "25-60",
-          "age_self_emp_comment": "",
-          "min_age": 21,
-          "max_age": 60,
-          "crif": "720",
-          "crif_comment": "",
-          "income": "20000",
-          "income_comment": "",
-          "crif_self_emp": "720",
-          "crif_self_emp_comment": "",
-          "income_salaried": "4",
-          "income_self_emp": "4",
-          "income_self_emp_comment": "Banks asks for an annual income of Rs 4 LPA for business owners but BankKaro suggests a salary of 4.8 LPA for a better approval rate",
-          "joining_fee_text": "999",
-          "joining_fee_offset": "No joining fee offset",
-          "joining_fee_comment": "While the card is not free for first year with an average spend of just Rs 20,000 per month you can save upto Rs 12,000 which can easily cover your joining fee",
-          "annual_fee_text": "999",
-          "annual_fee_waiver": "Annual fee can be waived off if you spend Rs 2 lakh annually on your card",
-          "annual_fee_comment": "Annual fee can be waived off if you spend Rs 2 lakh annually on your card. Which comes to roughly 17k per month. Also compared to similar cards in category like Axis Flipkart card which gives annual fee waiver at Rs 3.5 Lakh this is a much better deal",
-          "annual_saving": "60000",
-          "annual_saving_comment": "",
-          "reward_conversion_rate": "1 reward point = ₹0.25",
-          "redemption_options": "<p>The rewards you earn are auto adjusted within two working days of your next month's statement.&nbsp;</p>",
-          "redemption_catalogue": "N/A",
-          "exclusion_earnings": "Rent payment, Fuel, Insurance, EMI Transactions, Cash Withdrawals, Jewellery, School & Educational Services, Government related transactions, Wallet transactions - Load money, Fees, GST charges, All Reversals, Gambling, Tolls, Security Broker Services, Charity, Railways, Utility Bill Payments, Balance Transfer, Financial Charges (Late Fee, dishonored cheque charges, transaction charges & etc), Payments made using standard instructions",
-          "exclusion_spends": "Rent payment, Fuel, Insurance, EMI Transactions, Cash Withdrawals, Jewellery, School & Educational Services, Government related transactions, Wallet transactions - Load money, Fees, GST charges, All Reversals, Gambling, Tolls, Security Broker Services, Charity, Railways, Utility Bill Payments, Balance Transfer, Financial Charges (Late Fee, dishonored cheque charges, transaction charges & etc), Payments made using standard instructions",
-          "network_url": "https://secure.traqkarr.com/click?pid=10&offer_id=1049&sub2=",
-          "employment_type": "both",
+        "id": 27,
+        "name": "SBI Cashback Credit Card",
+        "nick_name": "SBI Cashback,Credit Card",
+        "product_type": "credit_card",
+        "card_type": "VISA,Mastercard",
+        "user_rating_count": 413,
+        "rating": 4,
+        "bank_id": 3,
+        "priority": 29,
+        "bk_commission": "2000",
+        "new_to_credit": true,
+        "existing_customer": false,
+        "commission_type": "Flat",
+        "commission": "1800",
+        "commission_percent": "90",
+        "sub_agent_commission": "0",
+        "seo_card_alias": "sbi-cashback-credit-card",
+        "card_alias": "sbi-cashback-credit-card",
+        "image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_SBI%20Cashback.png1732257446742",
+        "card_bg_image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Mockup-24.webp1736921642945",
+        "card_bg_gradient": "radial-gradient(99.6% 170.48% at 50% -70.48%, #B79DE8 0%, #1B1B1B 100%)",
+        "other_images": "",
+        "age_criteria": "21-60",
+        "age_criteria_comment": "While the bank permits a minimum age of 18 and a maximum age of 70 for eligibility, our experts advice believe that higher chances of approval for the people falling in the age group of 21-60",
+        "age_self_emp": "25-60",
+        "age_self_emp_comment": "",
+        "min_age": 21,
+        "max_age": 60,
+        "crif": "720",
+        "crif_comment": "",
+        "income": "20000",
+        "income_comment": "",
+        "crif_self_emp": "720",
+        "crif_self_emp_comment": "",
+        "income_salaried": "4",
+        "income_self_emp": "4",
+        "income_self_emp_comment": "Banks asks for an annual income of Rs 4 LPA for business owners but BankKaro suggests a salary of 4.8 LPA for a better approval rate",
+        "joining_fee_text": "999",
+        "joining_fee_offset": "No joining fee offset",
+        "joining_fee_comment": "While the card is not free for first year with an average spend of just Rs 20,000 per month you can save upto Rs 12,000 which can easily cover your joining fee",
+        "annual_fee_text": "999",
+        "annual_fee_waiver": "Annual fee can be waived off if you spend Rs 2 lakh annually on your card",
+        "annual_fee_comment": "Annual fee can be waived off if you spend Rs 2 lakh annually on your card. Which comes to roughly 17k per month. Also compared to similar cards in category like Axis Flipkart card which gives annual fee waiver at Rs 3.5 Lakh this is a much better deal",
+        "annual_saving": "60000",
+        "annual_saving_comment": "",
+        "reward_conversion_rate": "1 reward point = ₹0.25",
+        "redemption_options": "<p>The rewards you earn are auto adjusted within two working days of your next month's statement.&nbsp;</p>",
+        "redemption_catalogue": "N/A",
+        "exclusion_earnings": "Rent payment, Fuel, Insurance, EMI Transactions, Cash Withdrawals, Jewellery, School & Educational Services, Government related transactions, Wallet transactions - Load money, Fees, GST charges, All Reversals, Gambling, Tolls, Security Broker Services, Charity, Railways, Utility Bill Payments, Balance Transfer, Financial Charges (Late Fee, dishonored cheque charges, transaction charges & etc), Payments made using standard instructions",
+        "exclusion_spends": "Rent payment, Fuel, Insurance, EMI Transactions, Cash Withdrawals, Jewellery, School & Educational Services, Government related transactions, Wallet transactions - Load money, Fees, GST charges, All Reversals, Gambling, Tolls, Security Broker Services, Charity, Railways, Utility Bill Payments, Balance Transfer, Financial Charges (Late Fee, dishonored cheque charges, transaction charges & etc), Payments made using standard instructions",
+        "network_url": "https://secure.traqkarr.com/click?pid=10&offer_id=1049&sub2=",
+        "employment_type": "both",
           "tnc": "The bank may offer a different card variant based on your eligibility. Please carefully read the features of the card offered before submitting your application || A minimum transaction of Rs.100 within 30 days is required to activate the card, otherwise, you won’t be eligible for the Rewards",
-          "status": true,
-          "redirectionFlag": true,
-          "createdAt": "2024-02-13T17:09:06.000Z",
-          "updatedAt": "2025-03-18T12:08:10.000Z",
-          "meta_title": "",
-          "meta_description": "",
-          "product_usps": [
-            {
-              "header": "5% Cashback ",
-              "description": "on all online spends including Amazon, Flipkart, Myntra, Ajio, Makemytrip",
-              "priority": 1,
-              "tag_id": 0
-            },
-            {
-              "header": "Flat 1%",
-              "description": "cashback on all offline spends",
-              "priority": 2,
-              "tag_id": 0
-            }
-          ],
-          "tags": [
-            {
-              "id": 2,
+        "status": true,
+        "redirectionFlag": true,
+        "createdAt": "2024-02-13T17:09:06.000Z",
+        "updatedAt": "2025-03-18T12:08:10.000Z",
+        "meta_title": "",
+        "meta_description": "",
+        "product_usps": [
+          {
+            "header": "5% Cashback ",
+            "description": "on all online spends including Amazon, Flipkart, Myntra, Ajio, Makemytrip",
+            "priority": 1,
+            "tag_id": 0
+          },
+          {
+            "header": "Flat 1%",
+            "description": "cashback on all offline spends",
+            "priority": 2,
+            "tag_id": 0
+          }
+        ],
+        "tags": [
+          {
+            "id": 2,
               "name": "Shopping",
               "bk_product_tags": {
                 "id": 1444,
@@ -2160,7 +2155,7 @@ export const apiData = {
         "meta_title": "ICICI Platinum Chip Credit Card",
         "meta_description": "ICICI Platinum Chip card overview, fees & rewards",
         "banks": {
-          "id": 5,
+            "id": 5,
           "name": "ICICI Bank"
         },
         "product_usps": [
@@ -2429,98 +2424,98 @@ export const apiData = {
         "type": "string"
       },
       "data": {
-        "type": "object",
-        "properties": {
-          "success": {
+    "type": "object",
+    "properties": {
+      "success": {
             "type": "boolean"
-          },
-          "message": {
+      },
+      "message": {
             "type": "string"
-          },
-          "savings": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "card_name": {
+      },
+      "savings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "card_name": {
                   "type": "string"
-                },
-                "seo_card_alias": {
+            },
+            "seo_card_alias": {
                   "type": "string"
-                },
-                "cg_network_url": {
+            },
+            "cg_network_url": {
                   "type": [
                     "string",
                     "null"
                   ]
-                },
-                "ck_store_url": {
+            },
+            "ck_store_url": {
                   "type": [
                     "string",
                     "null"
                   ]
-                },
-                "ck_store_url_2": {
+            },
+            "ck_store_url_2": {
                   "type": [
                     "string",
                     "null"
                   ]
-                },
-                "id": {
+            },
+            "id": {
                   "type": "integer"
-                },
-                "joining_fees": {
+            },
+            "joining_fees": {
                   "type": "string"
-                },
-                "total_savings": {
+            },
+            "total_savings": {
                   "type": [
                     "number",
                     "null"
                   ]
-                },
-                "total_savings_yearly": {
+            },
+            "total_savings_yearly": {
                   "type": [
                     "number",
                     "null"
                   ]
-                },
-                "total_extra_benefits": {
+            },
+            "total_extra_benefits": {
                   "type": "integer"
-                },
-                "max_potential_savings": {
+            },
+            "max_potential_savings": {
                   "type": "integer"
-                },
-                "redemption_options": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
+            },
+            "redemption_options": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
                         "type": "integer"
-                      },
-                      "card_id": {
+                  },
+                  "card_id": {
                         "type": "integer"
-                      },
-                      "method": {
+                  },
+                  "method": {
                         "type": "string"
-                      },
-                      "brand": {
+                  },
+                  "brand": {
                         "type": "string"
-                      },
-                      "min_points": {
+                  },
+                  "min_points": {
                         "type": "integer"
-                      },
-                      "max_points": {
+                  },
+                  "max_points": {
                         "type": "integer"
-                      },
-                      "conversion_rate": {
+                  },
+                  "conversion_rate": {
                         "type": "number"
-                      },
-                      "note": {
+                  },
+                  "note": {
                         "type": "string"
                       },
                       "createdAt": {
-                        "type": "string",
+                    "type": "string",
                         "format": "date-time"
                       },
                       "updatedAt": {
@@ -2549,13 +2544,13 @@ export const apiData = {
                       },
                       "note": {
                         "type": "string"
-                      },
-                      "createdAt": {
-                        "type": "string",
+                  },
+                  "createdAt": {
+                    "type": "string",
                         "format": "date-time"
-                      },
-                      "updatedAt": {
-                        "type": "string",
+                  },
+                  "updatedAt": {
+                    "type": "string",
                         "format": "date-time"
                       }
                     }
@@ -2975,42 +2970,42 @@ export const apiData = {
     "status": "success",
     "message": "",
     "data": {
-      "success": true,
-      "message": "Savings calculated successfully",
-      "savings": [
-        {
-          "card_name": "HDFC Diners Club Black Metal Edition",
-          "seo_card_alias": "hdfc-diners-club-black-metal-credit-card",
-          "cg_network_url": null,
-          "ck_store_url": "cashkaro://stores/hdfc-credit-card-offers",
-          "ck_store_url_2": "cashkaro://stores/hdfc-credit-card-offers",
-          "id": 114,
-          "joining_fees": "10000",
-          "total_savings": 6253,
-          "total_savings_yearly": 75036,
-          "total_extra_benefits": 0,
-          "max_potential_savings": 1884000,
-          "redemption_options": [
-            {
-              "id": 422,
-              "card_id": 114,
-              "method": "Airmiles",
-              "brand": "Air Canada Aeroplan",
-              "min_points": 2000,
-              "max_points": 0,
-              "conversion_rate": 0.65,
-              "note": "",
-              "createdAt": "2025-06-26T11:21:42.000Z",
-              "updatedAt": "2025-06-26T11:21:42.000Z"
+    "success": true,
+    "message": "Savings calculated successfully",
+    "savings": [
+      {
+        "card_name": "HDFC Diners Club Black Metal Edition",
+        "seo_card_alias": "hdfc-diners-club-black-metal-credit-card",
+        "cg_network_url": null,
+        "ck_store_url": "cashkaro://stores/hdfc-credit-card-offers",
+        "ck_store_url_2": "cashkaro://stores/hdfc-credit-card-offers",
+        "id": 114,
+        "joining_fees": "10000",
+        "total_savings": 6253,
+        "total_savings_yearly": 75036,
+        "total_extra_benefits": 0,
+        "max_potential_savings": 1884000,
+        "redemption_options": [
+          {
+            "id": 422,
+            "card_id": 114,
+            "method": "Airmiles",
+            "brand": "Air Canada Aeroplan",
+            "min_points": 2000,
+            "max_points": 0,
+            "conversion_rate": 0.65,
+            "note": "",
+            "createdAt": "2025-06-26T11:21:42.000Z",
+            "updatedAt": "2025-06-26T11:21:42.000Z"
             }
           ],
           "brand_options": [
-            {
+          {
               "id": 166,
-              "card_id": 114,
+            "card_id": 114,
               "spend_key": "hotels_annual",
               "brand": "Smart buy - Product/Voucher",
-              "note": "",
+            "note": "",
               "createdAt": "2025-06-26T11:05:31.000Z",
               "updatedAt": "2025-06-26T11:05:31.000Z"
             }
