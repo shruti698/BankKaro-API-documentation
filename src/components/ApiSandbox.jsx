@@ -555,19 +555,15 @@ const ApiSandbox = ({ api }) => {
             )}
             {partnerToken && (
               <Alert severity="success" sx={{ mt: 2 }}>
-                {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? (
-                  <>
-                    <strong>🔄 Mock Token Generated:</strong> Using mock partner token for local development. 
-                    <br />
-                    <small>In production, this will use real API calls via serverless function.</small>
+                {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? (     
+                  <>  
+                    <strong>🔄 Mock Token Generated:</strong> Using mock partner token for local development.   
                   </>
                 ) : (
                   <>
-                    <strong>✅ Token fetched successfully!</strong> This will be used for Card Genius API calls.
-                    <br />
-                    <small>API calls are made server-side via Vercel serverless function to avoid CORS issues.</small>
+                    ✅ Token fetched successfully! This will be used for Card Genius API calls.
                   </>
-                )}
+                )}    
               </Alert>
             )}
             <Alert severity="info" sx={{ mt: 2 }}>

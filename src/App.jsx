@@ -160,7 +160,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <Box sx={{ display: 'flex', height: '100vh' }}>
+        <Box sx={{ display: 'flex', height: '100vh', justifyContent: 'center' }}>
           <Routes>
             <Route path="/admin/*" element={<ProtectedAdminRoute />} />
             <Route path="/*" element={

@@ -157,7 +157,7 @@ const Home = () => {
       description: 'Specialized APIs for education loan products and student financial services.',
       features: ['Education Loans', 'Student Services', 'Institution Integration', 'Scholarship Matching'],
       apiCount: 0,
-      cta: 'Coming Soon',
+      cta: 'Explore APIs',
       onClick: () => navigate('/educationgenius'),
       theme: productThemes['Education Genius'],
       comingSoon: true
@@ -190,7 +190,9 @@ const Home = () => {
           py: 10,
           mb: 8,
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          mx: { xs: 2, sm: 4, md: 6, lg: 8 }, // Fixed gutter space
+          borderRadius: 2
         }}
       >
         <Box
@@ -231,7 +233,14 @@ const Home = () => {
               sx={{ background: '#fff', color: '#764ba2', fontWeight: 'bold', px: 4, boxShadow: 2, mt: 2 }}
               onClick={() => {
                 const el = document.getElementById('products-section');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                if (el) {
+                  const headerHeight = 64; // Height of the fixed header
+                  const elementPosition = el.offsetTop - headerHeight - 20; // 20px extra padding
+                  window.scrollTo({
+                    top: elementPosition,
+                    behavior: 'smooth'
+                  });
+                }
               }}
             >
               Get Started
@@ -255,89 +264,114 @@ const Home = () => {
       </Paper>
 
       {/* Product Cards Section */}
-      <Container maxWidth="md" id="products-section" sx={{ mb: 10 }}>
+      <Container maxWidth="md" id="products-section" sx={{ 
+        mb: 10,
+        px: { xs: 2, sm: 4, md: 6, lg: 8 } // Fixed gutter space
+      }}>
         <Stack spacing={4}>
           {products.map((product) => (
-            <Card
+            <Box
               key={product.key}
+              onClick={product.comingSoon ? undefined : product.onClick}
               sx={{
-                background: product.theme.bg,
-                border: product.featured ? `2px solid ${product.theme.color}` : 'none',
-                boxShadow: product.featured ? 6 : 2,
-                borderRadius: 4,
-                position: 'relative',
-                overflow: 'visible',
-                minHeight: 220,
-                transition: 'box-shadow 0.2s',
+                cursor: product.comingSoon ? 'default' : 'pointer',
+                transition: 'transform 0.2s ease-in-out',
                 '&:hover': {
-                  boxShadow: 10
+                  transform: product.comingSoon ? 'none' : 'translateY(-4px)'
                 }
               }}
             >
-              {product.featured && (
-                <Chip
-                  icon={<StarIcon sx={{ color: product.theme.color }} />}
-                  label="Featured"
-                  sx={{ position: 'absolute', top: 18, right: 18, fontWeight: 'bold', background: '#fff', color: product.theme.color, zIndex: 2 }}
-                />
-              )}
-              {product.comingSoon && (
-                <Chip
-                  label="Coming Soon"
-                  color="warning"
-                  sx={{ position: 'absolute', top: 18, right: 18, fontWeight: 'bold', zIndex: 2 }}
-                />
-              )}
-              <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 4, py: 4 }}>
-                <Avatar sx={{ bgcolor: product.theme.color, width: 72, height: 72, fontSize: 40 }}>
-                  {product.theme.icon}
-                </Avatar>
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, color: product.theme.color }}>
-                    {product.name}
-                  </Typography>
-                  <Typography variant="body1" sx={{ mb: 2, color: '#444' }}>
-                    {product.description}
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                    {product.features.map((feature, idx) => (
-                      <Chip key={idx} label={feature} size="small" sx={{ background: product.theme.color, color: '#fff', fontWeight: 500 }} />
-                    ))}
-                  </Box>
+              <Card
+                sx={{
+                  background: product.theme.bg,
+                  border: product.featured ? `2px solid ${product.theme.color}` : 'none',
+                  boxShadow: product.featured ? 6 : 2,
+                  borderRadius: 4,
+                  position: 'relative',
+                  overflow: 'visible',
+                  minHeight: 220,
+                  transition: 'box-shadow 0.2s',
+                  '&:hover': {
+                    boxShadow: product.comingSoon ? 2 : 10
+                  }
+                }}
+              >
+                {product.featured && (
                   <Chip
-                    label={`${product.apiCount} APIs`}
-                    color="primary"
-                    variant="outlined"
-                    sx={{ fontWeight: 'bold', mr: 2 }}
+                    icon={<StarIcon sx={{ color: product.theme.color }} />}
+                    label="Featured"
+                    sx={{ position: 'absolute', top: 18, right: 18, fontWeight: 'bold', background: '#fff', color: product.theme.color, zIndex: 2 }}
                   />
-                </Box>
-                <CardActions sx={{ alignSelf: 'flex-start' }}>
-                  <Button
-                    variant="contained"
-                    endIcon={<ArrowForwardIcon />}
-                    sx={{
-                      background: product.theme.color,
-                      color: '#fff',
-                      fontWeight: 'bold',
-                      px: 3,
-                      boxShadow: 2,
-                      '&:hover': { background: product.theme.color, opacity: 0.9 }
-                    }}
-                    onClick={product.onClick}
-                    disabled={product.comingSoon}
-                  >
-                    {product.cta}
-                  </Button>
-                </CardActions>
-              </CardContent>
-            </Card>
+                )}
+                {product.comingSoon && (
+                  <Chip
+                    label="Coming Soon"
+                    color="warning"
+                    sx={{ position: 'absolute', top: 18, right: 18, fontWeight: 'bold', zIndex: 2 }}
+                  />
+                )}
+                <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 4, py: 4 }}>
+                  <Avatar sx={{ bgcolor: product.theme.color, width: 72, height: 72, fontSize: 40 }}>
+                    {product.theme.icon}
+                  </Avatar>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, color: product.theme.color }}>
+                      {product.name}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 2, color: '#444' }}>
+                      {product.description}
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                      {product.features.map((feature, idx) => (
+                        <Chip key={idx} label={feature} size="small" sx={{ background: product.theme.color, color: '#fff', fontWeight: 500 }} />
+                      ))}
+                    </Box>
+                    <Chip
+                      label={`${product.apiCount} APIs`}
+                      color="primary"
+                      variant="outlined"
+                      sx={{ fontWeight: 'bold', mr: 2 }}
+                    />
+                  </Box>
+                  <CardActions sx={{ alignSelf: 'flex-start' }}>
+                    <Button
+                      variant="contained"
+                      endIcon={<ArrowForwardIcon />}
+                      sx={{
+                        background: product.theme.color,
+                        color: '#fff',
+                        fontWeight: 'bold',
+                        px: 3,
+                        boxShadow: 2,
+                        '&:hover': { background: product.theme.color, opacity: 0.9 }
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent card click when button is clicked
+                        if (!product.comingSoon) {
+                          product.onClick();
+                        }
+                      }}
+                      disabled={product.comingSoon}
+                    >
+                      {product.cta}
+                    </Button>
+                  </CardActions>
+                </CardContent>
+              </Card>
+            </Box>
           ))}
         </Stack>
       </Container>
 
       {/* Value Proposition Section */}
-      <Paper elevation={0} sx={{ py: 8, backgroundColor: '#f1f5f9', mb: 0 }}>
-        <Container maxWidth="lg">
+      <Paper elevation={0} sx={{ 
+        py: 8, 
+        backgroundColor: '#f1f5f9', 
+        mb: 0,
+        mx: { xs: 2, sm: 4, md: 6, lg: 8 }, // Fixed gutter space
+        borderRadius: 2
+      }}>
+        <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
           <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
             Why Choose BankKaro APIs?
           </Typography>
@@ -386,8 +420,18 @@ const Home = () => {
       </Paper>
 
       {/* Final CTA Section */}
-      <Paper elevation={0} sx={{ py: 8, background: 'linear-gradient(90deg, #667eea 0%, #8b5cf6 100%)', color: '#fff', mt: 0 }}>
-        <Container maxWidth="md" sx={{ textAlign: 'center' }}>
+      <Paper elevation={0} sx={{ 
+        py: 8, 
+        background: 'linear-gradient(90deg, #667eea 0%, #8b5cf6 100%)', 
+        color: '#fff', 
+        mt: 0,
+        mx: { xs: 2, sm: 4, md: 6, lg: 8 }, // Fixed gutter space
+        borderRadius: 2
+      }}>
+        <Container maxWidth="md" sx={{ 
+          textAlign: 'center',
+          px: { xs: 2, sm: 4, md: 6, lg: 8 } // Fixed gutter space
+        }}>
           <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
             Ready to build with BankKaro APIs?
           </Typography>

@@ -91,7 +91,7 @@ const AdminPanel = () => {
           return {
             endpoint,
             name: data.name,
-            endpoint: data.endpoint,
+            endpointPath: data.endpoint,
             description: data.description || '',
             category: data.category || '',
           products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
@@ -124,9 +124,9 @@ const AdminPanel = () => {
   const handleOpenDialog = (endpoint = null) => {
     if (endpoint) {
       setEditingEndpoint(endpoint);
-      setFormData({
-        name: endpoint.name,
-        endpoint: endpoint.endpoint,
+              setFormData({
+          name: endpoint.name,
+          endpoint: endpoint.endpointPath,
         description: endpoint.description || '',
         category: endpoint.category || '',
         products: Array.isArray(endpoint.products) ? endpoint.products : 
