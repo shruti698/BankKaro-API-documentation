@@ -56,8 +56,10 @@ const ApiSandbox = ({ api }) => {
     setTokenError(null);
     
     try {
-      // Directly call the UAT API since CORS is allowed
-      const response = await fetch('https://uat-platform.bankkaro.com/partner/token', {
+      // Direct call to UAT API
+      const url = 'https://uat-platform.bankkaro.com/partner/token';
+      console.log('Calling:', url);
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
