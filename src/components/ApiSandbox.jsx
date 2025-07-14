@@ -205,103 +205,42 @@ const ApiSandbox = ({ api }) => {
     setResponse(null);
 
     try {
-      const baseUrl = getEnvironmentUrl(selectedEnvironment, api.endpoint?.startsWith('v1-'));
-      const url = `${baseUrl}${api.endpoint}`;
-      
-      // Use partner token for Card Genius APIs, fallback to sandbox token
-      const isCardGeniusApi = api.endpoint?.startsWith('/cardgenius') || api.endpoint?.startsWith('v1-');
-      const authToken = isCardGeniusApi && partnerToken ? partnerToken : 'sandbox_token_12345';
-      
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
-      };
+      // Determine the correct base URL and endpoint
+      let url = '';
+      let headers = { 'Content-Type': 'application/json' };
+      let body = selectedMethod !== 'GET' ? JSON.stringify(requestData) : undefined;
 
-      const options = {
+      // Use the correct UAT API base for CardGenius and partner endpoints
+      if (api.endpoint.startsWith('/partner/token')) {
+        url = `https://uat-platform.bankkaro.com/partner/token`;
+        // Only Content-Type header, no Authorization or partner-token
+        headers = { 'Content-Type': 'application/json' };
+      } else if (api.endpoint.startsWith('/partner/cardgenius/')) {
+        url = `https://uat-platform.bankkaro.com${api.endpoint}`;
+        // Use partner-token header for CardGenius endpoints
+        if (partnerToken) headers['partner-token'] = partnerToken;
+      } else {
+        // Default: use UAT base for any other endpoints
+        url = `https://uat-platform.bankkaro.com${api.endpoint}`;
+      }
+
+      // Log the actual request for verification
+      console.log('Calling:', url, 'Method:', selectedMethod, 'Headers:', headers, 'Body:', body);
+
+      const response = await fetch(url, {
         method: selectedMethod,
         headers,
-        ...(selectedMethod !== 'GET' && { body: JSON.stringify(requestData) })
-      };
-
-      // PRODUCTION ONLY: Use Vercel serverless function to avoid CORS issues
-      console.log('🚀 Production API Call Debug Info:', {
-        apiEndpoint: api.endpoint,
-        selectedMethod,
-        selectedEnvironment,
-        baseUrl,
-        fullUrl: url,
-        authToken: authToken ? '***' + authToken.slice(-4) : 'none',
-        requestData,
-        headers: options.headers
+        body
       });
 
-      try {
-        // FIXED: Use correct proxy URL structure
-        const proxyUrl = `/api/proxy${api.endpoint}`;
-        console.log('🔗 Proxy URL:', proxyUrl);
-        
-        const proxyResponse = await fetch(proxyUrl, {
-          method: selectedMethod,
-          headers: options.headers,
-          body: selectedMethod !== 'GET' ? JSON.stringify(requestData) : undefined
-        });
-        
-        console.log('📡 Proxy Response Status:', proxyResponse.status, proxyResponse.statusText);
-        console.log('📡 Proxy Response Headers:', Object.fromEntries(proxyResponse.headers.entries()));
-        
-        const proxyData = await proxyResponse.json();
-        console.log('📡 Proxy Response Data:', proxyData);
-        
-        if (proxyResponse.status >= 200 && proxyResponse.status < 300) {
-          setResponse({
-            status: proxyResponse.status,
-            statusText: proxyResponse.statusText,
-            headers: Object.fromEntries(proxyResponse.headers.entries()),
-            data: proxyData
-          });
-          console.log('✅ API Call Successful');
-        } else {
-          const errorMsg = `HTTP ${proxyResponse.status}: ${proxyData?.message || proxyData?.error || 'Unknown error'}`;
-          console.error('❌ API Call Failed:', errorMsg, proxyData);
-          throw new Error(errorMsg);
-        }
-      } catch (apiError) {
-        console.error('💥 Proxy Call Failed:', {
-          error: apiError.message,
-          stack: apiError.stack,
-          apiEndpoint: api.endpoint,
-          method: selectedMethod,
-          environment: selectedEnvironment
-        });
-        
-        // Fallback to mock server with detailed error info
-        console.log('🔄 Falling back to mock server...');
-        const mockResponse = await mockApiServer.makeRequest(url, options);
-        const mockData = await mockResponse.json();
-
-        setResponse({
-          status: mockResponse.status,
-          statusText: mockResponse.statusText,
-          headers: Object.fromEntries(mockResponse.headers.entries()),
-          data: mockData
-        });
-        
-        // Show detailed error for debugging
-        const debugInfo = {
-          originalError: apiError.message,
-          apiEndpoint: api.endpoint,
-          method: selectedMethod,
-          environment: selectedEnvironment,
-          proxyUrl: `/api/proxy${api.endpoint}`,
-          fullUrl: url,
-          timestamp: new Date().toISOString()
-        };
-        
-        setError(`⚠️ API Error: ${apiError.message}. Using mock data. Debug: ${JSON.stringify(debugInfo, null, 2)}`);
-        console.error('🔍 Debug Info for Production Fix:', debugInfo);
-      }
+      const data = await response.json();
+      setResponse({
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+        data
+      });
     } catch (err) {
-      console.error('💥 General Error:', err);
       setError('Error making API call: ' + err.message);
     } finally {
       setLoading(false);
