@@ -70,7 +70,8 @@ const ApiSandbox = ({ api }) => {
       console.log('🔑 Fetching partner token...');
       
       // FIXED: Use correct proxy URL structure with proper endpoint
-      const proxyUrl = '/api/proxy/partner/api/partner-token';
+      // UAT API uses /partner/token, not /partner/api/partner-token
+      const proxyUrl = '/api/proxy/partner/token';
       
       console.log('🔗 Partner Token Proxy URL:', proxyUrl);
       

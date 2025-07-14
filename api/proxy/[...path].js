@@ -31,17 +31,29 @@ export default async function handler(req, res) {
   });
   
   // Map different API endpoints to their respective base URLs
-  if (pathString.startsWith('partner/')) {
-    // Partner APIs
+  if (pathString === 'partner/token') {
+    // Special case: Partner token endpoint - UAT uses /partner/token
+    targetUrl = `https://uat-platform.bankkaro.com/partner/token`;
+  } else if (pathString === 'partner/api/partner-token') {
+    // Special case: Partner token endpoint - UAT uses /partner/token, not /partner/api/partner-token
+    targetUrl = `https://uat-platform.bankkaro.com/partner/token`;
+  } else if (pathString.startsWith('partner/api/')) {
+    // Partner APIs (e.g., /partner/api/partner-auth, /partner/api/lead-details)
+    targetUrl = `https://uat-platform.bankkaro.com/${pathString}`;
+  } else if (pathString.startsWith('partner/cardgenius/')) {
+    // Partner Card Genius APIs (e.g., /partner/cardgenius/banks, /partner/cardgenius/cards)
+    targetUrl = `https://uat-platform.bankkaro.com/${pathString}`;
+  } else if (pathString.startsWith('sp/api/cardgenius/')) {
+    // SP Card Genius APIs (e.g., /sp/api/cardgenius/initialize-bundle)
     targetUrl = `https://uat-platform.bankkaro.com/${pathString}`;
   } else if (pathString.startsWith('cardgenius/')) {
-    // Card Genius APIs
-    targetUrl = `https://uat-platform.bankkaro.com/${pathString}`;
+    // Direct Card Genius APIs (e.g., /cardgenius/initial-data, /cardgenius/categories)
+    targetUrl = `https://api.bankkaro.com/${pathString}`;
   } else if (pathString.startsWith('v1/')) {
-    // V1 APIs
+    // V1 APIs (e.g., /v1/redemptions/calculate, /v1/cards/omni)
     targetUrl = `https://api.bankkaro.com/${pathString}`;
   } else {
-    // Default to UAT platform
+    // Default to UAT platform for any other endpoints
     targetUrl = `https://uat-platform.bankkaro.com/${pathString}`;
   }
 
