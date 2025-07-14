@@ -14,12 +14,21 @@ export default async function handler(req, res) {
   const { path } = req.query;
   
   if (!path || path.length === 0) {
+    console.error('❌ Proxy Error: No path provided');
     return res.status(400).json({ error: 'No path provided' });
   }
 
   // Determine target URL based on path
   let targetUrl;
   const pathString = path.join('/');
+  
+  console.log('🔍 Proxy Debug Info:', {
+    method: req.method,
+    path: pathString,
+    headers: req.headers,
+    body: req.body,
+    timestamp: new Date().toISOString()
+  });
   
   // Map different API endpoints to their respective base URLs
   if (pathString.startsWith('partner/')) {
@@ -36,6 +45,8 @@ export default async function handler(req, res) {
     targetUrl = `https://uat-platform.bankkaro.com/${pathString}`;
   }
 
+  console.log('🎯 Target URL:', targetUrl);
+
   try {
     // Prepare headers for the target API
     const headers = {
@@ -45,13 +56,23 @@ export default async function handler(req, res) {
     // Forward relevant headers
     if (req.headers.authorization) {
       headers['Authorization'] = req.headers.authorization;
+      console.log('🔑 Forwarding Authorization header');
     }
     if (req.headers['partner-token']) {
       headers['partner-token'] = req.headers['partner-token'];
+      console.log('🔑 Forwarding partner-token header');
     }
     if (req.headers['x-api-key']) {
       headers['x-api-key'] = req.headers['x-api-key'];
+      console.log('🔑 Forwarding x-api-key header');
     }
+
+    console.log('📤 Request Details:', {
+      method: req.method,
+      targetUrl,
+      headers,
+      body: req.body
+    });
 
     // Make the request to the target API
     const response = await fetch(targetUrl, {
@@ -60,8 +81,21 @@ export default async function handler(req, res) {
       body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined,
     });
 
+    console.log('📥 Response Details:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries())
+    });
+
     // Get the response data
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+      console.log('📥 Response Data:', data);
+    } catch (jsonError) {
+      console.error('❌ JSON Parse Error:', jsonError);
+      data = { error: 'Invalid JSON response', rawResponse: await response.text() };
+    }
 
     // Set CORS headers for the response
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -70,8 +104,17 @@ export default async function handler(req, res) {
 
     // Return the response with the same status code
     res.status(response.status).json(data);
+    
+    console.log('✅ Proxy request completed successfully');
   } catch (error) {
-    console.error('Proxy error:', error);
+    console.error('💥 Proxy Error:', {
+      error: error.message,
+      stack: error.stack,
+      targetUrl,
+      method: req.method,
+      path: pathString,
+      timestamp: new Date().toISOString()
+    });
     
     // Set CORS headers even for errors
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -81,7 +124,12 @@ export default async function handler(req, res) {
     res.status(500).json({ 
       error: 'Proxy request failed', 
       message: error.message,
-      targetUrl 
+      targetUrl,
+      debugInfo: {
+        path: pathString,
+        method: req.method,
+        timestamp: new Date().toISOString()
+      }
     });
   }
 } 

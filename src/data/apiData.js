@@ -842,7 +842,110 @@ export const apiData = {
       }
     ],
     "products": [
-      "Loan Genius",
+      "Loan Genius"
+    ],
+    "sampleResponses": [
+      {
+        "status": "success",
+        "message": "",
+        "data": {
+          "jwttoken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.******",
+          "expiresAt": "2025-07-08T12:50:24.634Z"
+        }
+      }
+    ],
+    "errorResponses": []
+  },
+  "cardgenius-partner-token": {
+    "name": "Partner Token Generation",
+    "endpoint": "/partner/api/partner-token",
+    "methods": [
+      "POST"
+    ],
+    "description": "Generate a partner-token (JWT) that is required for authorization in subsequent Card Genius API calls",
+    "category": "Partner APIs",
+    "purpose": "Used to generate a `partner-token` (JWT) that is required for authorization in subsequent Card Genius API calls like `/cardgenius/initial-data`, `/cardgenius/cards`, etc.",
+    "requestSchema": {
+      "type": "object",
+      "required": [
+        "x-api-key"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "x-api-key": {
+          "type": "string",
+          "description": "Secret API key issued by BankKaro (environment-specific)",
+          "minLength": 5
+        }
+      }
+    },
+    "responseSchema": {
+      "type": "object",
+      "required": [
+        "status",
+        "message",
+        "data"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "success",
+            "error"
+          ],
+          "description": "Overall operation status"
+        },
+        "message": {
+          "type": "string",
+          "description": "Optional human-readable message"
+        },
+        "data": {
+          "type": "object",
+          "required": [
+            "jwttoken",
+            "expiresAt"
+          ],
+          "properties": {
+            "jwttoken": {
+              "type": "string",
+              "description": "Bearer token (JWT) to be supplied in the Authorization header"
+            },
+            "expiresAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO-8601 expiry timestamp (UTC)"
+            }
+          }
+        }
+      }
+    },
+    "sampleRequest": {
+      "x-api-key": "test"
+    },
+    "curlExample": "curl --location 'https://api.bankkaro.com/partner/api/partner-token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"test\"\n}'",
+    "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"test\"\n}'",
+    "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"YOUR_PROD_KEY\"\n}'",
+    "validationNotes": [
+      "x-api-key must be a valid API key provided by BankKaro",
+      "This API must only be called from the server-side to prevent leaking the x-api-key",
+      "Do not expose this API in frontend JavaScript or browser tools",
+      "The jwttoken is time-bound and should be refreshed before expiry"
+    ],
+    "importantNotes": [
+      "🔐 This API must only be called from the server-side to prevent leaking the x-api-key.",
+      "⚠️ Do not expose this API in frontend JavaScript or browser tools.",
+      "⏱ The jwttoken is time-bound and should be refreshed before expiry.",
+      "📎 To use it in subsequent requests, include in headers: Authorization: Bearer <jwttoken>"
+    ],
+    "fieldTable": [
+      {
+        "field": "x-api-key",
+        "type": "string",
+        "required": "Yes",
+        "description": "Unique key provided by BankKaro (staging/prod specific). Must be kept secret on the backend."
+      }
+    ],
+    "products": [
       "Card Genius"
     ],
     "sampleResponses": [

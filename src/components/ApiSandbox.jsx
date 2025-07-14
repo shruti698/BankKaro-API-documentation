@@ -67,42 +67,47 @@ const ApiSandbox = ({ api }) => {
         return;
       }
       
-      const baseUrl = getEnvironmentUrl(selectedEnvironment, false);
-      const targetUrl = `${baseUrl}/partner/token`;
+      console.log('🔑 Fetching partner token...');
+      
+      // FIXED: Use correct proxy URL structure
+      const proxyUrl = '/api/proxy/partner/token';
+      
+      console.log('🔗 Partner Token Proxy URL:', proxyUrl);
       
       // Use Vercel serverless function to avoid CORS issues
-      const response = await fetch('/api/proxy', {
+      const response = await fetch(proxyUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          targetUrl,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: {
-            'x-api-key': 'test'
-          }
+          'x-api-key': 'test'
         })
       });
       
-      const proxyResponse = await response.json();
+      console.log('📡 Partner Token Response Status:', response.status, response.statusText);
       
-      if (proxyResponse.status >= 200 && proxyResponse.status < 300) {
-        const data = proxyResponse.data;
+      const proxyResponse = await response.json();
+      console.log('📡 Partner Token Response Data:', proxyResponse);
+      
+      if (response.status >= 200 && response.status < 300) {
+        const data = proxyResponse;
         if (data.status === 'success' && data.data?.jwttoken) {
           setPartnerToken(data.data.jwttoken);
           setTokenError(null);
+          console.log('✅ Partner token fetched successfully');
         } else {
-          setTokenError('Failed to get partner token: ' + (data.message || 'Unknown error'));
+          const errorMsg = 'Failed to get partner token: ' + (data.message || 'Unknown error');
+          setTokenError(errorMsg);
+          console.error('❌ Partner token error:', errorMsg, data);
         }
       } else {
-        setTokenError('Failed to get partner token: ' + (proxyResponse.data?.message || 'HTTP ' + proxyResponse.status));
+        const errorMsg = 'Failed to get partner token: ' + (proxyResponse.message || 'HTTP ' + response.status);
+        setTokenError(errorMsg);
+        console.error('❌ Partner token HTTP error:', errorMsg, proxyResponse);
       }
     } catch (err) {
-      console.error('Error fetching partner token:', err);
+      console.error('💥 Partner token fetch error:', err);
       setTokenError('Error fetching partner token: ' + err.message);
     } finally {
       setTokenLoading(false);
@@ -135,22 +140,22 @@ const ApiSandbox = ({ api }) => {
 
   const getTestDataOptions = (field) => {
     try {
-      if (field.toLowerCase().includes('card')) {
+      if (field.toLowerCase().includes('card') && testData.cards && testData.cards.length > 0) {
         return testData.cards.map(card => ({
           value: card.id,
           label: `${card.name} (${card.bank})`
         }));
-      } else if (field.toLowerCase().includes('bank')) {
+      } else if (field.toLowerCase().includes('bank') && testData.banks && testData.banks.length > 0) {
         return testData.banks.map(bank => ({
           value: bank.id,
           label: `${bank.name} (${bank.type})`
         }));
-      } else if (field.toLowerCase().includes('user') || field.toLowerCase().includes('mobile')) {
+      } else if ((field.toLowerCase().includes('user') || field.toLowerCase().includes('mobile')) && testData.users && testData.users.length > 0) {
         return testData.users.map(user => ({
           value: user.mobile,
           label: `${user.name} (${user.mobile})`
         }));
-      } else if (field.toLowerCase().includes('loan')) {
+      } else if (field.toLowerCase().includes('loan') && testData.loans && testData.loans.length > 0) {
         return testData.loans.map(loan => ({
           value: loan.id,
           label: `${loan.type} - ${loan.amount}`
@@ -181,13 +186,13 @@ const ApiSandbox = ({ api }) => {
         
         // Replace placeholder values with real test data
         if (typeof value === 'string') {
-          if (value.includes('card')) {
+          if (value.includes('card') && testData.cards.length > 0) {
             initialData[key] = testData.cards[0].id;
-          } else if (value.includes('bank')) {
+          } else if (value.includes('bank') && testData.banks.length > 0) {
             initialData[key] = testData.banks[0].id;
-          } else if (value.includes('user') || value.includes('mobile')) {
+          } else if ((value.includes('user') || value.includes('mobile')) && testData.users.length > 0) {
             initialData[key] = testData.users[0].mobile;
-          } else if (value.includes('loan')) {
+          } else if (value.includes('loan') && testData.loans.length > 0) {
             initialData[key] = testData.loans[0].id;
           } else {
             initialData[key] = value;
@@ -234,74 +239,59 @@ const ApiSandbox = ({ api }) => {
         ...(selectedMethod !== 'GET' && { body: JSON.stringify(requestData) })
       };
 
-      // For local development, use mock server to avoid CORS issues
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        console.log('🔄 Local development detected - using mock server to avoid CORS issues');
-        
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // Use mock server for local development
-        const mockResponse = await mockApiServer.makeRequest(url, options);
-        const mockData = await mockResponse.json();
+      // PRODUCTION ONLY: Use Vercel serverless function to avoid CORS issues
+      console.log('🚀 Production API Call Debug Info:', {
+        apiEndpoint: api.endpoint,
+        selectedMethod,
+        selectedEnvironment,
+        baseUrl,
+        fullUrl: url,
+        authToken: authToken ? '***' + authToken.slice(-4) : 'none',
+        requestData,
+        headers: options.headers
+      });
 
-        setResponse({
-          status: mockResponse.status,
-          statusText: mockResponse.statusText,
-          headers: Object.fromEntries(mockResponse.headers.entries()),
-          data: mockData
+      try {
+        // FIXED: Use correct proxy URL structure
+        const proxyUrl = `/api/proxy${api.endpoint}`;
+        console.log('🔗 Proxy URL:', proxyUrl);
+        
+        const proxyResponse = await fetch(proxyUrl, {
+          method: selectedMethod,
+          headers: options.headers,
+          body: selectedMethod !== 'GET' ? JSON.stringify(requestData) : undefined
         });
-        return;
-      }
-
-      // For production deployment, use Vercel serverless function to avoid CORS issues
-      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        try {
-          // Use Vercel serverless function to make API calls server-side
-          const proxyResponse = await fetch('/api/proxy', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              targetUrl: url,
-              method: selectedMethod,
-              headers: options.headers,
-              body: selectedMethod !== 'GET' ? requestData : undefined
-            })
-          });
-          
-          const proxyData = await proxyResponse.json();
-          
-          if (proxyData.status >= 200 && proxyData.status < 300) {
-            setResponse({
-              status: proxyData.status,
-              statusText: proxyData.statusText,
-              headers: proxyData.headers,
-              data: proxyData.data
-            });
-          } else {
-            throw new Error(`HTTP ${proxyData.status}: ${proxyData.data?.message || 'Unknown error'}`);
-          }
-        } catch (apiError) {
-          console.warn('Serverless function failed, falling back to mock server:', apiError.message);
-          
-          // Fallback to mock server
-          const mockResponse = await mockApiServer.makeRequest(url, options);
-          const mockData = await mockResponse.json();
-
+        
+        console.log('📡 Proxy Response Status:', proxyResponse.status, proxyResponse.statusText);
+        console.log('📡 Proxy Response Headers:', Object.fromEntries(proxyResponse.headers.entries()));
+        
+        const proxyData = await proxyResponse.json();
+        console.log('📡 Proxy Response Data:', proxyData);
+        
+        if (proxyResponse.status >= 200 && proxyResponse.status < 300) {
           setResponse({
-            status: mockResponse.status,
-            statusText: mockResponse.statusText,
-            headers: Object.fromEntries(mockResponse.headers.entries()),
-            data: mockData
+            status: proxyResponse.status,
+            statusText: proxyResponse.statusText,
+            headers: Object.fromEntries(proxyResponse.headers.entries()),
+            data: proxyData
           });
-          
-          // Show warning about API failure
-          setError('⚠️ API Error: Serverless function failed. Using mock data instead. Error: ' + apiError.message);
+          console.log('✅ API Call Successful');
+        } else {
+          const errorMsg = `HTTP ${proxyResponse.status}: ${proxyData?.message || proxyData?.error || 'Unknown error'}`;
+          console.error('❌ API Call Failed:', errorMsg, proxyData);
+          throw new Error(errorMsg);
         }
-      } else {
-        // Local development - use mock server
+      } catch (apiError) {
+        console.error('💥 Proxy Call Failed:', {
+          error: apiError.message,
+          stack: apiError.stack,
+          apiEndpoint: api.endpoint,
+          method: selectedMethod,
+          environment: selectedEnvironment
+        });
+        
+        // Fallback to mock server with detailed error info
+        console.log('🔄 Falling back to mock server...');
         const mockResponse = await mockApiServer.makeRequest(url, options);
         const mockData = await mockResponse.json();
 
@@ -311,8 +301,23 @@ const ApiSandbox = ({ api }) => {
           headers: Object.fromEntries(mockResponse.headers.entries()),
           data: mockData
         });
+        
+        // Show detailed error for debugging
+        const debugInfo = {
+          originalError: apiError.message,
+          apiEndpoint: api.endpoint,
+          method: selectedMethod,
+          environment: selectedEnvironment,
+          proxyUrl: `/api/proxy${api.endpoint}`,
+          fullUrl: url,
+          timestamp: new Date().toISOString()
+        };
+        
+        setError(`⚠️ API Error: ${apiError.message}. Using mock data. Debug: ${JSON.stringify(debugInfo, null, 2)}`);
+        console.error('🔍 Debug Info for Production Fix:', debugInfo);
       }
     } catch (err) {
+      console.error('💥 General Error:', err);
       setError('Error making API call: ' + err.message);
     } finally {
       setLoading(false);

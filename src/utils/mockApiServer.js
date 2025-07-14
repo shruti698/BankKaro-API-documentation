@@ -225,6 +225,145 @@ const mockResponses = {
         data: null
       }
     }
+  },
+
+  // Card Genius APIs
+  '/cardgenius/initial-data': {
+    GET: {
+      success: {
+        status: 'success',
+        message: '',
+        data: {
+          bank_data: [
+            {
+              id: 1,
+              name: 'Axis Bank',
+              criff_bank_name: 'AXISBANK',
+              logo: 'https://example.com/axis.png'
+            },
+            {
+              id: 3,
+              name: 'SBI',
+              criff_bank_name: 'SBIBANK',
+              logo: 'https://example.com/sbi.png'
+            }
+          ],
+          tag_data: [
+            {
+              id: 2,
+              name: 'Fuel',
+              seo_alias: 'fuel',
+              tag_genius_fields: [
+                {
+                  label: 'Monthly Fuel Spend',
+                  key: 'monthly_fuel_spend',
+                  value: '0'
+                }
+              ]
+            }
+          ],
+          card_data: [
+            {
+              id: 27,
+              name: 'SBI Cashback Credit Card',
+              card_alias: 'sbi-cashback-credit-card',
+              product_type: 'credit_card',
+              card_type: 'VISA,Mastercard',
+              bank_id: 3,
+              priority: 29,
+              status: true
+            }
+          ]
+        }
+      }
+    }
+  },
+
+  '/cardgenius/banks': {
+    GET: {
+      success: {
+        status: 'success',
+        message: '',
+        data: {
+          bank_data: [
+            {
+              id: 3,
+              name: 'SBI',
+              criff_bank_name: 'STATE BANK OF INDIA',
+              max_card_limit_in_criff: 500000,
+              logo: 'https://cdn.bankkaro.com/logos/sbi.svg',
+              status: true,
+              createdAt: '2024-11-15T09:12:44.000Z',
+              updatedAt: '2025-06-15T14:10:09.000Z'
+            }
+          ]
+        }
+      }
+    }
+  },
+
+  '/cardgenius/cards': {
+    GET: {
+      success: {
+        status: 'success',
+        message: 'Cards generated successfully',
+        data: {
+          cards: [
+            {
+              id: 27,
+              name: 'SBI Cashback Credit Card',
+              card_alias: 'sbi-cashback-credit-card',
+              bank_id: 3,
+              status: true
+            }
+          ],
+          filteredCards: [],
+          tag_slug: false,
+          card_slug: true,
+          tag: {},
+          card_details: {},
+          tag_genius_data: {}
+        }
+      }
+    }
+  },
+
+  '/cardgenius/cards/calculate': {
+    POST: {
+      success: {
+        status: 'success',
+        message: '',
+        data: {
+          success: true,
+          message: 'Savings calculated successfully',
+          savings: [
+            {
+              card_name: 'HDFC Diners Club Black Metal Edition',
+              id: 114,
+              total_savings: 6253,
+              total_savings_yearly: 75036
+            }
+          ]
+        }
+      }
+    }
+  },
+
+  '/cardgenius/eligibility': {
+    POST: {
+      success: {
+        status: 'success',
+        message: '',
+        data: [
+          {
+            card_alias: 'icici-platinum-chip-credit-card',
+            id: 54,
+            seo_card_alias: 'icici-platinum-chip-credit-card',
+            eligible: true
+          }
+        ]
+      }
+    }
   }
 };
 
@@ -241,12 +380,38 @@ class MockApiServer {
     // Find the endpoint in mock responses
     const endpointData = mockResponses[endpoint];
     if (!endpointData) {
-      throw new Error(`Endpoint ${endpoint} not found`);
+      // Return a generic success response for undefined endpoints
+      return {
+        status: 200,
+        data: {
+          status: 'success',
+          message: `Mock response for ${endpoint}`,
+          data: {
+            endpoint,
+            method,
+            requestData,
+            timestamp: new Date().toISOString()
+          }
+        }
+      };
     }
 
     const methodData = endpointData[method];
     if (!methodData) {
-      throw new Error(`Method ${method} not supported for ${endpoint}`);
+      // Return a generic success response for undefined methods
+      return {
+        status: 200,
+        data: {
+          status: 'success',
+          message: `Mock response for ${method} ${endpoint}`,
+          data: {
+            endpoint,
+            method,
+            requestData,
+            timestamp: new Date().toISOString()
+          }
+        }
+      };
     }
 
     // Simulate success/error based on request data
