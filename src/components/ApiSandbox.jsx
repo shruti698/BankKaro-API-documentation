@@ -69,8 +69,8 @@ const ApiSandbox = ({ api }) => {
       
       console.log('🔑 Fetching partner token...');
       
-      // FIXED: Use correct proxy URL structure
-      const proxyUrl = '/api/proxy/partner/token';
+      // FIXED: Use correct proxy URL structure with proper endpoint
+      const proxyUrl = '/api/proxy/partner/api/partner-token';
       
       console.log('🔗 Partner Token Proxy URL:', proxyUrl);
       
