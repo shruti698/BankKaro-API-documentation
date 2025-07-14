@@ -754,7 +754,7 @@ export const apiData = {
   },
   "partner-token": {
     "name": "Partner Token Generation",
-    "endpoint": "/partner/api/partner-token",
+    "endpoint": "/partner/token",
     "methods": [
       "POST"
     ],
@@ -858,7 +858,7 @@ export const apiData = {
   },
   "cardgenius-partner-token": {
     "name": "Partner Token Generation",
-    "endpoint": "/partner/api/partner-token",
+    "endpoint": "/partner/token",
     "methods": [
       "POST"
     ],
@@ -1758,7 +1758,7 @@ export const apiData = {
             "exclusion_spends": "Rent payment, Fuel, Insurance, EMI Transactions, Cash Withdrawals, Jewellery, School & Educational Services, Government related transactions, Wallet transactions - Load money, Fees, GST charges, All Reversals, Gambling, Tolls, Security Broker Services, Charity, Railways, Utility Bill Payments, Balance Transfer, Financial Charges (Late Fee, dishonored cheque charges, transaction charges & etc), Payments made using standard instructions",
             "network_url": "https://secure.traqkarr.com/click?pid=10&offer_id=1049&sub2=",
             "employment_type": "both",
-            "tnc": "The bank may offer a different card variant based on your eligibility. Please carefully read the features of the card offered before submitting your application || A minimum transaction of Rs.100 within 30 days is required to activate the card, otherwise, you won’t be eligible for the Rewards",
+            "tnc": "The bank may offer a different card variant based on your eligibility. Please carefully read the features of the card offered before submitting your application || A minimum transaction of Rs.100 within 30 days is required to activate the card, otherwise, you won't be eligible for the Rewards",
             "status": true,
             "redirectionFlag": true,
             "createdAt": "2024-02-13T17:09:06.000Z",
