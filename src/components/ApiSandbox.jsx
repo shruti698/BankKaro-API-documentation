@@ -56,27 +56,8 @@ const ApiSandbox = ({ api }) => {
     setTokenError(null);
     
     try {
-      // For local development, use mock token to avoid CORS issues
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock successful response
-        setPartnerToken('mock_partner_token_for_local_development');
-        setTokenError(null);
-        return;
-      }
-      
-      console.log('🔑 Fetching partner token...');
-      
-      // FIXED: Use correct proxy URL structure with proper endpoint
-      // UAT API uses /partner/token, not /partner/api/partner-token
-      const proxyUrl = '/api/proxy/partner/token';
-      
-      console.log('🔗 Partner Token Proxy URL:', proxyUrl);
-      
-      // Use Vercel serverless function to avoid CORS issues
-      const response = await fetch(proxyUrl, {
+      // Directly call the UAT API since CORS is allowed
+      const response = await fetch('https://uat-platform.bankkaro.com/partner/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
