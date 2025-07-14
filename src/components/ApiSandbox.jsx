@@ -205,19 +205,31 @@ const ApiSandbox = ({ api }) => {
     setResponse(null);
 
     try {
-      // Determine the correct base URL and endpoint
       let url = '';
       let headers = { 'Content-Type': 'application/json' };
       let body = selectedMethod !== 'GET' ? JSON.stringify(requestData) : undefined;
 
-      // Use the correct UAT API base for CardGenius and partner endpoints
-      if (api.endpoint.startsWith('/partner/token')) {
-        url = `https://uat-platform.bankkaro.com/partner/token`;
-        // Only Content-Type header, no Authorization or partner-token
+      // Direct mapping for CardGenius and partner endpoints based on provided cURL
+      if (api.endpoint === '/partner/token') {
+        url = 'https://uat-platform.bankkaro.com/partner/token';
         headers = { 'Content-Type': 'application/json' };
-      } else if (api.endpoint.startsWith('/partner/cardgenius/')) {
+      } else if (api.endpoint === '/partner/cardgenius/cards') {
+        url = 'https://uat-platform.bankkaro.com/partner/cardgenius/cards';
+        if (partnerToken) headers['partner-token'] = partnerToken;
+      } else if (api.endpoint === '/partner/cardgenius/bank') {
+        url = 'https://uat-platform.bankkaro.com/partner/cardgenius/bank';
+        if (partnerToken) headers['partner-token'] = partnerToken;
+      } else if (api.endpoint.startsWith('/partner/cardgenius/cards/')) {
         url = `https://uat-platform.bankkaro.com${api.endpoint}`;
-        // Use partner-token header for CardGenius endpoints
+        if (partnerToken) headers['partner-token'] = partnerToken;
+      } else if (api.endpoint === '/partner/cardgenius/bank-tags') {
+        url = 'https://uat-platform.bankkaro.com/partner/cardgenius/bank-tags';
+        if (partnerToken) headers['partner-token'] = partnerToken;
+      } else if (api.endpoint === '/partner/cardgenius/calculate') {
+        url = 'https://uat-platform.bankkaro.com/partner/cardgenius/calculate';
+        if (partnerToken) headers['partner-token'] = partnerToken;
+      } else if (api.endpoint === '/partner/cardgenius/init-bundle') {
+        url = 'https://uat-platform.bankkaro.com/partner/cardgenius/init-bundle';
         if (partnerToken) headers['partner-token'] = partnerToken;
       } else {
         // Default: use UAT base for any other endpoints
