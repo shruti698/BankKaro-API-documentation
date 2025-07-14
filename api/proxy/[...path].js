@@ -3,13 +3,13 @@
 
 export default async function handler(req, res) {
   // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
+  // if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, partner-token');
-    res.status(200).end();
-    return;
-  }
+    // res.status(200).end();
+    // return;
+  // }
 
   const { path } = req.query;
   
