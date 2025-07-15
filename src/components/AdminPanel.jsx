@@ -87,30 +87,44 @@ const AdminPanel = () => {
   const fetchEndpoints = async () => {
     try {
       // Use static data from apiData.js
-        const staticEndpoints = Object.entries(apiData).map(([endpoint, data]) => {
-          return {
-            endpoint,
-            name: data.name,
-            endpointPath: data.endpoint,
-            description: data.description || '',
-            category: data.category || '',
-          products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
-            purpose: data.purpose || '',
-            methods: data.methods || [],
-            status: data.status || 'live',
-            requestSchema: data.requestSchema || {},
-            responseSchema: data.responseSchema || {},
-            sampleRequest: data.sampleRequest || {},
-            sampleResponse: data.sampleResponse || {},
-            sampleResponses: data.sampleResponses || [],
-            errorResponse: data.errorResponse || {},
-            errorResponses: data.errorResponses || [],
-          curlExample: data.curlExample || '',
-          curlExampleStaging: data.curlExampleStaging || '',
-          curlExampleProduction: data.curlExampleProduction || '',
-            validationNotes: data.validationNotes || [],
-            fieldTable: data.fieldTable || []
-          };
+        const staticEndpoints = Object.entries(apiData)
+          .sort((a, b) => {
+            // Sort by rank first, then FIFO for equal ranks
+            const rankA = a[1].rank || 999; // Default high rank for unranked items
+            const rankB = b[1].rank || 999;
+            
+            if (rankA !== rankB) {
+              return rankA - rankB; // Lower rank numbers appear first
+            }
+            
+            // If ranks are equal, maintain FIFO order (return 0)
+            return 0;
+          })
+          .map(([endpoint, data]) => {
+                      return {
+              endpoint,
+              name: data.name,
+              endpointPath: data.endpoint,
+              description: data.description || '',
+              category: data.category || '',
+            products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
+              purpose: data.purpose || '',
+              methods: data.methods || [],
+              status: data.status || 'live',
+              rank: data.rank || 999,
+              requestSchema: data.requestSchema || {},
+              responseSchema: data.responseSchema || {},
+              sampleRequest: data.sampleRequest || {},
+              sampleResponse: data.sampleResponse || {},
+              sampleResponses: data.sampleResponses || [],
+              errorResponse: data.errorResponse || {},
+              errorResponses: data.errorResponses || [],
+            curlExample: data.curlExample || '',
+            curlExampleStaging: data.curlExampleStaging || '',
+            curlExampleProduction: data.curlExampleProduction || '',
+              validationNotes: data.validationNotes || [],
+              fieldTable: data.fieldTable || []
+            };
         });
       
         setEndpoints(staticEndpoints);
@@ -134,6 +148,7 @@ const AdminPanel = () => {
         purpose: endpoint.purpose || '',
         methods: endpoint.methods || [],
         status: endpoint.status || 'live',
+        rank: endpoint.rank || 999,
         requestSchema: endpoint.requestSchema || {},
         responseSchema: endpoint.responseSchema || {},
         sampleRequest: endpoint.sampleRequest || {},
@@ -160,6 +175,8 @@ const AdminPanel = () => {
         products: ['Loan Genius'],
         purpose: '',
         methods: [],
+        status: 'live',
+        rank: 999,
         requestSchema: {},
         responseSchema: {},
         sampleRequest: {},
@@ -188,9 +205,6 @@ const AdminPanel = () => {
 
   const saveToApiData = async (updatedEndpoints) => {
     try {
-      // For local development, save directly to apiData.js file
-      const apiDataContent = `export const apiData = ${JSON.stringify(updatedEndpoints, null, 2)};\n\nexport const cardGeniusApiData = {\n  // Card Genius specific data\n};\n\nexport const projects = {\n  // Project data\n};`;
-      
       // Save to local file system using the local server
       const response = await fetch('http://localhost:3001/api/save-api-data', {
         method: 'POST',
@@ -198,8 +212,8 @@ const AdminPanel = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          content: apiDataContent,
-          filename: 'src/data/apiData.js'
+          updatedEndpoints: updatedEndpoints,
+          mode: 'local'
         })
       });
       
@@ -243,6 +257,7 @@ const AdminPanel = () => {
           purpose: formData.purpose,
           methods: formData.methods,
           status: formData.status,
+          rank: formData.rank,
           requestSchema: formData.requestSchema,
           responseSchema: formData.responseSchema,
           sampleRequest: formData.sampleRequest,
@@ -270,6 +285,7 @@ const AdminPanel = () => {
           purpose: formData.purpose,
           methods: formData.methods,
           status: formData.status,
+          rank: formData.rank,
           requestSchema: formData.requestSchema,
           responseSchema: formData.responseSchema,
           sampleRequest: formData.sampleRequest,
@@ -487,6 +503,7 @@ const AdminPanel = () => {
               <TableCell>Category</TableCell>
               <TableCell>Methods</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>Rank</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -521,6 +538,9 @@ const AdminPanel = () => {
                       variant="filled"
                     />
                   )}
+                </TableCell>
+                <TableCell>
+                  {endpoint.rank !== 999 ? endpoint.rank : '-'}
                 </TableCell>
                 <TableCell>
                   <IconButton onClick={() => handleOpenDialog(endpoint)}>
@@ -634,6 +654,15 @@ const AdminPanel = () => {
                 <FormHelperText>Current status of this API endpoint</FormHelperText>
               </FormControl>
               
+              <TextField
+                label="Rank"
+                type="number"
+                value={formData.rank === 999 ? '' : formData.rank}
+                onChange={(e) => updateFormData('rank', e.target.value ? parseInt(e.target.value) : 999)}
+                fullWidth
+                helperText="Display order (lower numbers appear first). Leave empty for unranked."
+                inputProps={{ min: 1 }}
+              />
 
             </Box>
           )}

@@ -11,10 +11,18 @@ const app = express();
 const PORT = 3001;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+
+// Import the API data
+import { apiData } from './src/data/apiData.js';
+
+// API endpoint to serve the API data
+app.get('/endpoints', (req, res) => {
+  res.json(apiData);
+});
 
 // API endpoint to update apiData.js
-app.post('/api/update-api-data', (req, res) => {
+app.post('/api/save-api-data', (req, res) => {
   try {
     const { updatedEndpoints, mode = 'local' } = req.body;
 
@@ -80,7 +88,7 @@ app.get('/api/status', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 Development server running on http://localhost:${PORT}`);
-  console.log(`📝 API endpoint: http://localhost:${PORT}/api/update-api-data`);
+  console.log(`📝 API endpoint: http://localhost:${PORT}/api/save-api-data`);
   console.log(`💡 Use this for local development with file writing capabilities`);
   console.log(`📋 This server only handles API calls - use 'npm run dev' for the frontend`);
 }); 

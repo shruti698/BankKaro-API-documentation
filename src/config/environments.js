@@ -24,7 +24,7 @@ export const getEnvironmentUrl = (environment, isCardGenius) => {
 export const getApiBaseUrl = () => {
   // Check if we're in development (localhost) or production
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return 'http://localhost:4000';
+    return 'http://localhost:3001';
   }
   
   // For production deployment, return null to use static data
