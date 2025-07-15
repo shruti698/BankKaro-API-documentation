@@ -64,7 +64,20 @@ const Home = () => {
         
         // If no API URL is configured, use static data directly
         if (!API_BASE_URL) {
-          const staticEndpoints = Object.entries(apiData).map(([id, data]) => ({
+          const staticEndpoints = Object.entries(apiData)
+            .sort((a, b) => {
+              // Sort by rank first, then FIFO for equal ranks
+              const rankA = a[1].rank || 999; // Default high rank for unranked items
+              const rankB = b[1].rank || 999;
+              
+              if (rankA !== rankB) {
+                return rankA - rankB; // Lower rank numbers appear first
+              }
+              
+              // If ranks are equal, maintain FIFO order (return 0)
+              return 0;
+            })
+            .map(([id, data]) => ({
             id,
             name: data.name,
             endpoint: data.endpoint,
@@ -87,7 +100,20 @@ const Home = () => {
       } catch (err) {
         console.warn('API not available, falling back to static data:', err.message);
         // Fallback to static data if API is not available
-        const staticEndpoints = Object.entries(apiData).map(([id, data]) => ({
+        const staticEndpoints = Object.entries(apiData)
+          .sort((a, b) => {
+            // Sort by rank first, then FIFO for equal ranks
+            const rankA = a[1].rank || 999; // Default high rank for unranked items
+            const rankB = b[1].rank || 999;
+            
+            if (rankA !== rankB) {
+              return rankA - rankB; // Lower rank numbers appear first
+            }
+            
+            // If ranks are equal, maintain FIFO order (return 0)
+            return 0;
+          })
+          .map(([id, data]) => ({
           id,
           name: data.name,
           endpoint: data.endpoint,
