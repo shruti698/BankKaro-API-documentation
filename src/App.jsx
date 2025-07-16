@@ -10,6 +10,7 @@ import EducationGeniusDashboard from './components/EducationGeniusDashboard';
 import ComingSoon from './components/ComingSoon';
 import Home from './components/Home';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
+import MaintenancePage from './components/MaintenancePage';
 
 const theme = createTheme({
   palette: {
@@ -156,6 +157,9 @@ const theme = createTheme({
 });
 
 function App() {
+  // Set this to true when you want to show maintenance page
+  const isMaintenanceMode = true;
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -164,16 +168,20 @@ function App() {
           <Routes>
             <Route path="/admin/*" element={<ProtectedAdminRoute />} />
             <Route path="/*" element={
-              <Layout>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/loangenius" element={<Navigate to="/docs/partner-auth" replace />} />
-                  <Route path="/cardgenius" element={<Navigate to="/docs/initial-data" replace />} />
-                  <Route path="/educationgenius" element={<EducationGeniusDashboard />} />
-                  <Route path="/docs/:endpoint" element={<ApiDocumentation />} />
-                  <Route path="/coming-soon" element={<ComingSoon />} />
-                </Routes>
-              </Layout>
+              isMaintenanceMode ? (
+                <MaintenancePage />
+              ) : (
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/loangenius" element={<Navigate to="/docs/partner-auth" replace />} />
+                    <Route path="/cardgenius" element={<Navigate to="/docs/initial-data" replace />} />
+                    <Route path="/educationgenius" element={<EducationGeniusDashboard />} />
+                    <Route path="/docs/:endpoint" element={<ApiDocumentation />} />
+                    <Route path="/coming-soon" element={<ComingSoon />} />
+                  </Routes>
+                </Layout>
+              )
             } />
           </Routes>
         </Box>

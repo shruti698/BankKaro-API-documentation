@@ -71,6 +71,8 @@ const ApiDocumentation = () => {
       try {
         setLoading(true);
         
+
+        
         // If no API URL is configured, use static data directly
         if (!API_BASE_URL) {
           const foundApi = apiData[endpoint];
@@ -83,12 +85,15 @@ const ApiDocumentation = () => {
           return;
         }
         
+
         const response = await fetch(`${API_BASE_URL}/endpoints`);
         if (!response.ok) {
           throw new Error('Failed to fetch API data');
         }
-        const endpoints = await response.json();
-        const foundApi = endpoints.find(ep => ep.id === endpoint);
+        const endpointsData = await response.json();
+
+        const foundApi = endpointsData[endpoint];
+
         
         if (foundApi) {
           setApi(foundApi);
@@ -237,24 +242,29 @@ const ApiDocumentation = () => {
     );
   };
 
-  const renderCurlExample = (curlExample, environment = 'staging') => {
-    if (!curlExample) return null;
-    
-    // Use environment-specific cURL if available, otherwise fall back to the default
-    let curlToUse = curlExample;
-    
-    if (environment === 'staging' && currentApiData.curlExampleStaging) {
-      curlToUse = currentApiData.curlExampleStaging;
-    } else if (environment === 'production' && currentApiData.curlExampleProduction) {
-      curlToUse = currentApiData.curlExampleProduction;
-    } else {
-      // Fall back to the default cURL and replace the URL
-      const baseUrl = getEnvironmentUrl(environment, endpoint.startsWith('v1-'));
-      curlToUse = curlExample.replace(
-        /https:\/\/[^/]+/,
-        baseUrl
-      );
-    }
+      const renderCurlExample = (curlExample, environment = 'staging') => {
+      if (!curlExample) return null;
+      
+
+      
+      // Use environment-specific cURL if available, otherwise fall back to the default
+      let curlToUse = curlExample;
+      
+      if ((environment === 'staging' || environment === 'uat') && currentApiData.curlExampleStaging) {
+        curlToUse = currentApiData.curlExampleStaging;
+
+      } else if (environment === 'production' && currentApiData.curlExampleProduction) {
+        curlToUse = currentApiData.curlExampleProduction;
+
+      } else {
+        // Fall back to the default cURL and replace the URL
+        const baseUrl = getEnvironmentUrl(environment, endpoint.startsWith('v1-'));
+        curlToUse = curlExample.replace(
+          /https:\/\/[^/]+/,
+          baseUrl
+        );
+
+      }
 
     const copyToClipboard = async () => {
       try {

@@ -58,8 +58,11 @@ const Layout = ({ children }) => {
       try {
         setLoading(true);
         
+
+        
         // If no API URL is configured, use static data directly
         if (!API_BASE_URL) {
+
           const staticEndpoints = Object.entries(apiData)
             .sort((a, b) => {
               // Sort by rank first, then FIFO for equal ranks
@@ -87,12 +90,41 @@ const Layout = ({ children }) => {
           return;
         }
         
+
         const response = await fetch(`${API_BASE_URL}/endpoints`);
         if (!response.ok) {
           throw new Error('Failed to fetch endpoints');
         }
         const data = await response.json();
-        setEndpoints(data);
+
+        
+        // Convert object to array format
+        const endpointsArray = Object.entries(data)
+          .sort((a, b) => {
+            // Sort by rank first, then FIFO for equal ranks
+            const rankA = a[1].rank || 999; // Default high rank for unranked items
+            const rankB = b[1].rank || 999;
+            
+            if (rankA !== rankB) {
+              return rankA - rankB; // Lower rank numbers appear first
+            }
+            
+            // If ranks are equal, maintain FIFO order (return 0)
+            return 0;
+          })
+          .map(([id, endpointData]) => ({
+            id,
+            name: endpointData.name,
+            endpoint: endpointData.endpoint,
+            description: endpointData.description,
+            category: endpointData.category,
+            products: endpointData.products || (endpointData.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
+            methods: endpointData.methods,
+            purpose: endpointData.purpose
+          }));
+        
+
+        setEndpoints(endpointsArray);
       } catch (err) {
         console.warn('API not available, falling back to static data:', err.message);
         // Fallback to static data if API is not available
@@ -135,6 +167,16 @@ const Layout = ({ children }) => {
       'Card Genius': [],
       'Education Genius': []
     };
+
+    // Debug logging
+    console.log('Layout - endpoints type:', typeof endpoints);
+    console.log('Layout - endpoints:', endpoints);
+    
+    // Ensure endpoints is an array
+    if (!Array.isArray(endpoints)) {
+      console.warn('Layout - endpoints is not an array, using empty array');
+      return organized;
+    }
 
     endpoints.forEach(endpoint => {
       const products = endpoint.products || [endpoint.product];

@@ -64,11 +64,15 @@ const Home = () => {
         
         // If no API URL is configured, use static data directly
         if (!API_BASE_URL) {
+          console.log('Home - Using static data, apiData keys:', Object.keys(apiData));
+          
           const staticEndpoints = Object.entries(apiData)
             .sort((a, b) => {
               // Sort by rank first, then FIFO for equal ranks
               const rankA = a[1].rank || 999; // Default high rank for unranked items
               const rankB = b[1].rank || 999;
+              
+              console.log(`Comparing ${a[0]} (rank: ${rankA}) vs ${b[0]} (rank: ${rankB})`);
               
               if (rankA !== rankB) {
                 return rankA - rankB; // Lower rank numbers appear first
@@ -87,6 +91,7 @@ const Home = () => {
             methods: data.methods,
             purpose: data.purpose
           }));
+          console.log('Home - Setting endpoints:', staticEndpoints);
           setEndpoints(staticEndpoints);
           return;
         }
@@ -96,15 +101,48 @@ const Home = () => {
           throw new Error('Failed to fetch endpoints');
         }
         const data = await response.json();
-        setEndpoints(data);
+        
+        // Convert object to array format
+        const endpointsArray = Object.entries(data)
+          .sort((a, b) => {
+            // Sort by rank first, then FIFO for equal ranks
+            const rankA = a[1].rank || 999; // Default high rank for unranked items
+            const rankB = b[1].rank || 999;
+            
+            console.log(`API - Comparing ${a[0]} (rank: ${rankA}) vs ${b[0]} (rank: ${rankB})`);
+            
+            if (rankA !== rankB) {
+              return rankA - rankB; // Lower rank numbers appear first
+            }
+            
+            // If ranks are equal, maintain FIFO order (return 0)
+            return 0;
+          })
+          .map(([id, endpointData]) => ({
+            id,
+            name: endpointData.name,
+            endpoint: endpointData.endpoint,
+            description: endpointData.description,
+            category: endpointData.category,
+            products: endpointData.products || (endpointData.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
+            methods: endpointData.methods,
+            purpose: endpointData.purpose
+          }));
+        
+        console.log('Home - API setting endpoints:', endpointsArray);
+        setEndpoints(endpointsArray);
       } catch (err) {
         console.warn('API not available, falling back to static data:', err.message);
         // Fallback to static data if API is not available
+        console.log('Home - Fallback to static data, apiData keys:', Object.keys(apiData));
+        
         const staticEndpoints = Object.entries(apiData)
           .sort((a, b) => {
             // Sort by rank first, then FIFO for equal ranks
             const rankA = a[1].rank || 999; // Default high rank for unranked items
             const rankB = b[1].rank || 999;
+            
+            console.log(`Fallback - Comparing ${a[0]} (rank: ${rankA}) vs ${b[0]} (rank: ${rankB})`);
             
             if (rankA !== rankB) {
               return rankA - rankB; // Lower rank numbers appear first
@@ -122,8 +160,9 @@ const Home = () => {
           products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
           methods: data.methods,
           purpose: data.purpose
-        }));
-        setEndpoints(staticEndpoints);
+                  }));
+          console.log('Home - Fallback setting endpoints:', staticEndpoints);
+          setEndpoints(staticEndpoints);
       } finally {
         setLoading(false);
       }
@@ -137,17 +176,33 @@ const Home = () => {
       'Card Genius': [],
       'Education Genius': []
     };
+    
+    // Debug logging
+    console.log('endpoints type:', typeof endpoints);
+    console.log('endpoints:', endpoints);
+    
+    // Ensure endpoints is an array
+    if (!Array.isArray(endpoints)) {
+      console.warn('endpoints is not an array, using empty array');
+      return organized;
+    }
+    
     endpoints.forEach(endpoint => {
       const products = endpoint.products || [endpoint.product];
+      console.log(`Endpoint ${endpoint.id} has products:`, products);
       products.forEach(product => {
         if (organized[product]) {
           organized[product].push(endpoint);
+          console.log(`Added ${endpoint.id} to ${product}`);
+      } else {
+        console.log(`Product ${product} not found in organized object`);
       }
       });
     });
     return organized;
   };
   const organizedApis = organizeEndpointsByProduct();
+  console.log('Home - organizedApis:', organizedApis);
 
   const products = [
     {
@@ -159,7 +214,13 @@ const Home = () => {
       cta: 'Explore APIs',
       onClick: () => {
         const first = organizedApis['Card Genius'][0];
-        if (first) navigate(`/docs/${first.id}`);
+        if (first) {
+          navigate(`/docs/${first.id}`);
+        } else {
+          // Fallback to a default endpoint if none are available
+          console.log('No Card Genius endpoints available, navigating to default');
+          navigate('/docs/partner-auth');
+        }
       },
       theme: productThemes['Card Genius'],
       featured: true
@@ -173,7 +234,13 @@ const Home = () => {
       cta: 'Explore APIs',
       onClick: () => {
         const first = organizedApis['Loan Genius'][0];
-        if (first) navigate(`/docs/${first.id}`);
+        if (first) {
+          navigate(`/docs/${first.id}`);
+        } else {
+          // Fallback to a default endpoint if none are available
+          console.log('No Loan Genius endpoints available, navigating to default');
+          navigate('/docs/partner-auth');
+        }
       },
       theme: productThemes['Loan Genius']
     },
