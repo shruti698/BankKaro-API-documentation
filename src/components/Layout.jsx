@@ -36,6 +36,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getApiBaseUrl } from '../config/environments';
 import Logo from './Logo';
+import { apiData } from '../data/apiData';
 
 const API_BASE_URL = getApiBaseUrl();
 const drawerWidth = 280;
@@ -53,22 +54,27 @@ const Layout = ({ children }) => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
-  // Fetch endpoints from admin API
+  // Fetch endpoints from admin API or use static data
   useEffect(() => {
     const fetchEndpoints = async () => {
       try {
         setLoading(true);
         
+        let data;
+        
         if (!API_BASE_URL) {
-          setError('API server not configured. Please start the local server.');
-          return;
+          // Use static data in production
+          console.log('Layout - Using static data from apiData.js');
+          data = apiData;
+        } else {
+          // Use local server in development
+          console.log('Layout - Fetching from local server:', API_BASE_URL);
+          const response = await fetch(`${API_BASE_URL}/endpoints`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch endpoints from server');
+          }
+          data = await response.json();
         }
-
-        const response = await fetch(`${API_BASE_URL}/endpoints`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch endpoints from server');
-        }
-        const data = await response.json();
 
         // Convert object to array format
         const endpointsArray = Object.entries(data)
@@ -95,13 +101,15 @@ const Layout = ({ children }) => {
             purpose: endpointData.purpose
           }));
 
-        console.log('Layout - Server endpoints array:', endpointsArray.map(ep => ep.id));
-        console.log('Layout - First few endpoint details:', endpointsArray.slice(0, 3).map(ep => ({ id: ep.id, name: ep.name, endpoint: ep.endpoint })));
-        console.log('Layout - All endpoint IDs:', endpointsArray.map(ep => ep.id));
+        console.log('Layout - Endpoints array:', endpointsArray.map(ep => ep.id));
         setEndpoints(endpointsArray);
       } catch (err) {
         console.error('Failed to fetch endpoints:', err.message);
-        setError('Failed to load endpoints from server. Please ensure the local server is running.');
+        if (!API_BASE_URL) {
+          setError('Failed to load static data. Please check the configuration.');
+        } else {
+          setError('Failed to load endpoints from server. Please ensure the local server is running.');
+        }
       } finally {
         setLoading(false);
       }

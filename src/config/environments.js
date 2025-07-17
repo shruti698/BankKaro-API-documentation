@@ -22,6 +22,10 @@ export const getEnvironmentUrl = (environment, isCardGenius) => {
 
 // API Base URL configuration
 export const getApiBaseUrl = () => {
-  // Always use local server for consistency with admin panel
-  return 'http://localhost:3001';
+  // In production, return null to use static data
+  // In development, use local server
+  if (import.meta.env.PROD) {
+    return null; // Use static data in production
+  }
+  return 'http://localhost:3001'; // Use local server in development
 };

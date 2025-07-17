@@ -28,6 +28,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { getApiBaseUrl } from '../config/environments';
+import { apiData } from '../data/apiData';
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -61,16 +62,21 @@ const Home = () => {
       try {
         setLoading(true);
         
-        if (!API_BASE_URL) {
-          setError('API server not configured. Please start the local server.');
-          return;
-        }
+        let data;
         
-        const response = await fetch(`${API_BASE_URL}/endpoints`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch endpoints from server');
+        if (!API_BASE_URL) {
+          // Use static data in production
+          console.log('Home - Using static data from apiData.js');
+          data = apiData;
+        } else {
+          // Use local server in development
+          console.log('Home - Fetching from local server:', API_BASE_URL);
+          const response = await fetch(`${API_BASE_URL}/endpoints`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch endpoints from server');
+          }
+          data = await response.json();
         }
-        const data = await response.json();
         
         // Convert object to array format
         const endpointsArray = Object.entries(data)
@@ -100,7 +106,11 @@ const Home = () => {
         setEndpoints(endpointsArray);
       } catch (err) {
         console.error('Failed to fetch endpoints:', err.message);
-        setError('Failed to load endpoints from server. Please ensure the local server is running.');
+        if (!API_BASE_URL) {
+          setError('Failed to load static data. Please check the configuration.');
+        } else {
+          setError('Failed to load endpoints from server. Please ensure the local server is running.');
+        }
       } finally {
         setLoading(false);
       }
