@@ -130,7 +130,6 @@ const CardStatus = () => {
 
   const filteredCards = cardData.filter(card =>
     card.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    card.bank.toLowerCase().includes(searchTerm.toLowerCase()) ||
     card.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -182,7 +181,7 @@ const CardStatus = () => {
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Search by card name, bank, or status..."
+          placeholder="Search by card name or status..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{
@@ -233,18 +232,7 @@ const CardStatus = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="info.main" sx={{ fontWeight: 'bold' }}>
-                {new Set(filteredCards.map(card => card.bank)).size}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Partner Banks
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+
       </Grid>
 
       {/* Cards Table */}
@@ -255,9 +243,6 @@ const CardStatus = () => {
               <TableRow>
                 <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f8fafc' }}>
                   Credit Card
-                </TableCell>
-                <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f8fafc' }}>
-                  Bank/Issuer
                 </TableCell>
                 <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f8fafc' }}>
                   Status
@@ -276,11 +261,6 @@ const CardStatus = () => {
                   <TableCell>
                     <Typography variant="body1" sx={{ fontWeight: 500 }}>
                       {card.name}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {card.bank}
                     </Typography>
                   </TableCell>
                   <TableCell>

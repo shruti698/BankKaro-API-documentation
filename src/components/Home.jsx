@@ -232,12 +232,31 @@ const Home = () => {
         />
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
           <Box sx={{ textAlign: 'center', maxWidth: 900, mx: 'auto' }}>
-            <Typography 
-              variant="h1" 
-              sx={{ fontWeight: 'bold', mb: 3, fontSize: { xs: '2.5rem', md: '3.5rem' }, lineHeight: 1.2 }}
-            >
-              BankKaro API Hub
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, mb: 3 }}>
+              <Typography 
+                variant="h1" 
+                sx={{ fontWeight: 'bold', fontSize: { xs: '2.5rem', md: '3.5rem' }, lineHeight: 1.2 }}
+              >
+                BankKaro API Hub
+              </Typography>
+              <Box
+                sx={{
+                  px: 2,
+                  py: 0.5,
+                  backgroundColor: '#fbbf24',
+                  color: '#92400e',
+                  borderRadius: '16px',
+                  fontSize: '0.8rem',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  alignSelf: 'flex-start',
+                  mt: 1
+                }}
+              >
+                Beta
+              </Box>
+            </Box>
             <Typography 
               variant="h4" 
               sx={{ mb: 4, opacity: 0.9, fontSize: { xs: '1.25rem', md: '1.5rem' }, fontWeight: 300 }}

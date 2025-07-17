@@ -444,9 +444,26 @@ const AdminPanel = () => {
   return (
     <Box sx={{ p: 3, maxWidth: 1400, mx: 'auto' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1">
-          API Documentation Admin
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="h4" component="h1">
+            API Documentation Admin
+          </Typography>
+          <Box
+            sx={{
+              px: 1.5,
+              py: 0.25,
+              backgroundColor: '#fbbf24',
+              color: '#92400e',
+              borderRadius: '12px',
+              fontSize: '0.7rem',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}
+          >
+            Beta
+          </Box>
+        </Box>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
           <FormControlLabel
             control={

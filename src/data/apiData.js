@@ -882,6 +882,10 @@ export const apiData = {
       }
     }
   },
+  "sampleRequest": {
+    "points": 35000,
+    "preferred_redemption_types": ["cash", "amazon_voucher", "air_miles"]
+  },
   "sampleResponse": {
     "best_option": {
       "type": "cash",
@@ -908,8 +912,52 @@ export const apiData = {
     ]
   },
   "curlExample": "curl --location 'https://api.bankkaro.com/v1/cards/redemptions/calculate' \\\n--header 'Authorization: Bearer <jwt>' \\\n--header 'Content-Type: application/json' \\\n--data '{\"points\": 35000}'",
-  "responseSchema": {},
-  "sampleRequest": {},
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "best_option": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of redemption (cash, amazon_voucher, air_miles, etc.)"
+          },
+          "conversion_rate": {
+            "type": "number",
+            "description": "Points to INR conversion rate"
+          },
+          "estimated_value_inr": {
+            "type": "number",
+            "description": "Estimated value in INR"
+          },
+          "redeem_url": {
+            "type": "string",
+            "description": "URL to redeem points"
+          }
+        }
+      },
+      "options": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Redemption type"
+            },
+            "conversion_rate": {
+              "type": "number",
+              "description": "Conversion rate"
+            },
+            "estimated_value_inr": {
+              "type": "number",
+              "description": "Estimated value in INR"
+            }
+          }
+        }
+      }
+    }
+  },
   "errorResponse": {},
   "validationNotes": [],
   "fieldTable": []
@@ -935,7 +983,39 @@ export const apiData = {
   },
   "curlExample": "curl --location 'https://api.bankkaro.com/v1/cards/sbi-cashback-credit-card/offers' \\\n--header 'Authorization: Bearer <jwt>'",
   "requestSchema": {},
-  "responseSchema": {},
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "offers": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "merchant": {
+              "type": "string",
+              "description": "Merchant name"
+            },
+            "headline": {
+              "type": "string",
+              "description": "Offer headline"
+            },
+            "valid_till": {
+              "type": "string",
+              "description": "Offer validity date"
+            },
+            "discount_percentage": {
+              "type": "number",
+              "description": "Discount percentage"
+            },
+            "terms": {
+              "type": "string",
+              "description": "Offer terms and conditions"
+            }
+          }
+        }
+      }
+    }
+  },
   "sampleRequest": {},
   "errorResponse": {},
   "validationNotes": [],
@@ -962,7 +1042,52 @@ export const apiData = {
   },
   "curlExample": "curl --location 'https://api.bankkaro.com/v1/cards/sbi-cashback-credit-card/lounges' \\\n--header 'Authorization: Bearer <jwt>'",
   "requestSchema": {},
-  "responseSchema": {},
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "domestic_lounges_per_quarter": {
+        "type": "integer",
+        "description": "Number of domestic lounge visits per quarter"
+      },
+      "international_lounges_per_year": {
+        "type": "integer",
+        "description": "Number of international lounge visits per year"
+      },
+      "railway_lounges_per_quarter": {
+        "type": "integer",
+        "description": "Number of railway lounge visits per quarter"
+      },
+      "lounge_networks": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "List of lounge networks (e.g., Priority Pass, DreamFolks)"
+      },
+      "terms": {
+        "type": "string",
+        "description": "Terms and conditions for lounge access"
+      },
+      "airports": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "terminal": {
+              "type": "string"
+            },
+            "lounge_name": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "List of available airport lounges"
+      }
+    }
+  },
   "sampleRequest": {},
   "errorResponse": {},
   "validationNotes": [],
@@ -978,19 +1103,205 @@ export const apiData = {
   "description": "A single endpoint to get nested data from multiple modules.",
   "category": "Card APIs",
   "purpose": "Enable low-development integrations by fetching multiple data types in one API call.",
-  "sampleResponse": {
-    "banks": [],
-    "categories": [],
-    "cards": [],
-    "recommendations": [],
-    "offers": [],
-    "lounges": [],
-    "redemptions": {}
+  "sampleRequest": {
+    "include_banks": true,
+    "include_categories": true,
+    "include_cards": true,
+    "include_recommendations": true,
+    "include_offers": true,
+    "include_lounges": true,
+    "include_redemptions": true
   },
-  "curlExample": "curl --location 'https://api.bankkaro.com/v1/cards/omni' \\\n--header 'Authorization: Bearer <jwt>' \\\n--header 'Content-Type: application/json' \\\n--data '{}'",
-  "requestSchema": {},
-  "responseSchema": {},
-  "sampleRequest": {},
+  "sampleResponse": {
+    "banks": [
+      {
+        "id": 1,
+        "name": "Axis Bank",
+        "logo": "https://example.com/axis.png"
+      }
+    ],
+    "categories": [
+      {
+        "id": 1,
+        "name": "Fuel",
+        "seo_alias": "fuel"
+      }
+    ],
+    "cards": [
+      {
+        "id": 27,
+        "name": "SBI Cashback Credit Card",
+        "card_alias": "sbi-cashback-credit-card"
+      }
+    ],
+    "recommendations": [
+      {
+        "card_id": 27,
+        "reason": "Best for online shopping"
+      }
+    ],
+    "offers": [
+      {
+        "merchant": "Swiggy",
+        "headline": "15% off Tue",
+        "valid_till": "2025-12-31"
+      }
+    ],
+    "lounges": {
+      "domestic_lounges_per_quarter": 4,
+      "international_lounges_per_year": 2
+    },
+    "redemptions": {
+      "available_points": 5000,
+      "redemption_options": ["cash", "vouchers"]
+    }
+  },
+  "curlExample": "curl --location 'https://api.bankkaro.com/v1/cards/omni' \\\n--header 'Authorization: Bearer <jwt>' \\\n--header 'Content-Type: application/json' \\\n--data '{\"include_banks\": true, \"include_categories\": true}'",
+  "requestSchema": {
+    "type": "object",
+    "properties": {
+      "include_banks": {
+        "type": "boolean",
+        "description": "Include bank data in response"
+      },
+      "include_categories": {
+        "type": "boolean",
+        "description": "Include category data in response"
+      },
+      "include_cards": {
+        "type": "boolean",
+        "description": "Include card data in response"
+      },
+      "include_recommendations": {
+        "type": "boolean",
+        "description": "Include recommendations in response"
+      },
+      "include_offers": {
+        "type": "boolean",
+        "description": "Include offers in response"
+      },
+      "include_lounges": {
+        "type": "boolean",
+        "description": "Include lounge data in response"
+      },
+      "include_redemptions": {
+        "type": "boolean",
+        "description": "Include redemption data in response"
+      }
+    }
+  },
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "banks": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "logo": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "categories": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "seo_alias": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "cards": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "card_alias": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "recommendations": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "card_id": {
+              "type": "integer"
+            },
+            "reason": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "offers": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "merchant": {
+              "type": "string"
+            },
+            "headline": {
+              "type": "string"
+            },
+            "valid_till": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "lounges": {
+        "type": "object",
+        "properties": {
+          "domestic_lounges_per_quarter": {
+            "type": "integer"
+          },
+          "international_lounges_per_year": {
+            "type": "integer"
+          }
+        }
+      },
+      "redemptions": {
+        "type": "object",
+        "properties": {
+          "available_points": {
+            "type": "integer"
+          },
+          "redemption_options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
   "errorResponse": {},
   "validationNotes": [],
   "fieldTable": []
@@ -1021,14 +1332,33 @@ export const apiData = {
       }
     }
   },
+  "sampleRequest": {
+    "url": "https://partner.com/hook",
+    "events": ["application.approved", "reward.posted", "card.activated"]
+  },
   "sampleResponse": {
     "success": true,
     "message": "Webhook subscription created successfully.",
     "webhook_id": "wh_1a2b3c4d5e"
   },
   "curlExample": "curl --location 'https://api.bankkaro.com/v1/webhooks' \\\n--header 'Authorization: Bearer <jwt>' \\\n--header 'Content-Type: application/json' \\\n--data '{\"url\": \"https://partner.com/hook\", \"events\": [\"application.approved\", \"reward.posted\"]}'",
-  "responseSchema": {},
-  "sampleRequest": {},
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "type": "boolean",
+        "description": "Whether the webhook subscription was created successfully"
+      },
+      "message": {
+        "type": "string",
+        "description": "Success or error message"
+      },
+      "webhook_id": {
+        "type": "string",
+        "description": "Unique identifier for the webhook subscription"
+      }
+    }
+  },
   "errorResponse": {},
   "validationNotes": [],
   "fieldTable": []
@@ -1488,7 +1818,7 @@ export const apiData = {
   "purpose": "Retrieve a filtered list of credit cards that match user-supplied preferences and eligibility.",
   "requestSchema": {
     "type": "object",
-    "description": "Generate a list of credit cards that match user-supplied preferences and eligibility.",
+    "description": "Generate a filtered list of credit cards based on user preferences and eligibility criteria.",
     "properties": {
       "slug": {
         "type": "string",
@@ -1499,46 +1829,51 @@ export const apiData = {
         "items": {
           "type": "integer"
         },
-        "description": "Restrict results to these bank IDs."
+        "description": "Restrict results to these bank IDs. Can be obtained from the banks endpoint."
       },
       "card_networks": {
         "type": "array",
         "items": {
-          "type": "string"
+          "type": "string",
+          "enum": ["VISA", "Mastercard", "RuPay", "AmericanExpress"]
         },
-        "description": "Restrict results to these card networks (Visa, RuPay, etc.)."
+        "description": "Restrict results to these card networks. Available options: VISA, Mastercard, RuPay, AmericanExpress."
       },
       "annualFees": {
         "type": "string",
-        "description": "Annual-fee filter (empty string means no filter)."
+        "description": "Annual fee range filter (e.g., \"0-15000\", \"0-5000\"). Empty string means no filter."
       },
       "credit_score": {
-        "type": "string",
-        "description": "Credit-score filter; pass empty string when not required."
+        "type": "integer",
+        "description": "Credit score filter. Available options: 600 (Below 600), 650 (Upto 650), 750 (Upto 750), 800 (Upto 800)."
       },
       "sort_by": {
         "type": "string",
-        "description": "Sort key (priority, savings, etc.)."
+        "enum": ["recommended", "annual_savings", "annual_fees"],
+        "description": "Sort order for results. Options: recommended (default), annual_savings (highest savings first), annual_fees (lowest fees first)."
       },
       "free_cards": {
-        "type": "string",
-        "description": "\"1\" to return only lifetime-free cards; empty string disables the filter."
+        "type": "boolean",
+        "description": "Filter for lifetime-free cards only. true for free cards only, false or omit for all cards."
       },
       "eligiblityPayload": {
         "type": "object",
         "properties": {
           "pincode": {
-            "type": "string"
+            "type": "string",
+            "description": "User's pincode for location-based eligibility"
           },
           "inhandIncome": {
-            "type": "string"
+            "type": "string",
+            "description": "User's monthly in-hand income"
           },
           "empStatus": {
             "type": "string",
             "enum": [
               "salaried",
               "self-employed"
-            ]
+            ],
+            "description": "Employment status of the user"
           }
         },
         "required": [
@@ -1551,7 +1886,8 @@ export const apiData = {
         "type": "object",
         "properties": {
           "tag_id": {
-            "type": "string"
+            "type": "string",
+            "description": "Tag ID for specific card category filtering"
           },
           "fuel": {
             "type": "string",
@@ -1648,12 +1984,12 @@ export const apiData = {
   },
   "sampleRequest": {
     "slug": "best-fuel-credit-card",
-    "banks_ids": [],
-    "card_networks": [],
-    "annualFees": "",
-    "credit_score": "",
-    "sort_by": "",
-    "free_cards": "",
+    "banks_ids": [1, 2, 3],
+    "card_networks": ["VISA", "Mastercard", "RuPay"],
+    "annualFees": "0-15000",
+    "credit_score": 750,
+    "sort_by": "recommended",
+    "free_cards": true,
     "eligiblityPayload": {
       "pincode": "110001",
       "inhandIncome": "50000",
@@ -1661,7 +1997,7 @@ export const apiData = {
     },
     "cardGeniusPayload": {
       "tag_id": "1",
-      "fuel": "100"
+      "fuel": "5000"
     }
   },
   "sampleResponse": {
@@ -1685,13 +2021,92 @@ export const apiData = {
       "tag_genius_data": {}
     }
   },
-  "curlExample": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,11],\n    \"card_networks\": [\"VISA\",\"Mastercard\"],\n    \"annualFees\": \"0-999\",\n    \"credit_score\": \"700-800\",\n    \"sort_by\": \"annual_savings\",\n    \"free_cards\": \"true\",\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"100\"\n    }\n  }'\n",
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,11],\n    \"card_networks\": [\"VISA\",\"Mastercard\"],\n    \"annualFees\": \"0-999\",\n    \"credit_score\": \"700-800\",\n    \"sort_by\": \"annual_savings\",\n    \"free_cards\": \"true\",\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"100\"\n    }\n  }'\n",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: <your_partner_token>' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,7],\n    \"card_networks\": [\"VISA\",\"Mastercard\"],\n    \"annualFees\": \"0-999\",\n    \"credit_score\": \"700-800\",\n    \"sort_by\": \"annual_savings\",\n    \"free_cards\": \"true\",\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"2\",\n      \"fuel\": \"3000\"\n    }\n  }'\n",
+  "curlExample": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,11],\n    \"card_networks\": [\"VISA\",\"Mastercard\",\"RuPay\"],\n    \"annualFees\": \"0-15000\",\n    \"credit_score\": 750,\n    \"sort_by\": \"recommended\",\n    \"free_cards\": true,\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"5000\"\n    }\n  }'\n",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,11],\n    \"card_networks\": [\"VISA\",\"Mastercard\",\"RuPay\"],\n    \"annualFees\": \"0-15000\",\n    \"credit_score\": 750,\n    \"sort_by\": \"annual_savings\",\n    \"free_cards\": true,\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"5000\"\n    }\n  }'\n",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: <your_partner_token>' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,7],\n    \"card_networks\": [\"VISA\",\"Mastercard\",\"RuPay\"],\n    \"annualFees\": \"0-15000\",\n    \"credit_score\": 750,\n    \"sort_by\": \"annual_fees\",\n    \"free_cards\": true,\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"2\",\n      \"fuel\": \"3000\"\n    }\n  }'\n",
   "status": "live",
   "rank": 6.5,
-  "validationNotes": [],
-  "fieldTable": [],
+  "validationNotes": [
+    "credit_score must be one of: 600, 650, 750, 800",
+    "sort_by must be one of: recommended, annual_savings, annual_fees",
+    "card_networks must be one or more of: VISA, Mastercard, RuPay, AmericanExpress",
+    "annualFees should be in format 'min-max' (e.g., '0-15000')",
+    "free_cards should be boolean (true/false) or omitted"
+  ],
+  "fieldTable": [
+    {
+      "field": "slug",
+      "type": "string",
+      "required": "No",
+      "description": "Card category slug (e.g., 'best-fuel-credit-card'). Optional for unfiltered catalogue."
+    },
+    {
+      "field": "banks_ids",
+      "type": "array[integer]",
+      "required": "No",
+      "description": "Array of bank IDs to filter results. Can be obtained from the banks endpoint."
+    },
+    {
+      "field": "card_networks",
+      "type": "array[string]",
+      "required": "No",
+      "description": "Card networks to filter by. Options: VISA, Mastercard, RuPay, AmericanExpress."
+    },
+    {
+      "field": "annualFees",
+      "type": "string",
+      "required": "No",
+      "description": "Annual fee range filter (e.g., '0-15000', '0-5000'). Empty for no filter."
+    },
+    {
+      "field": "credit_score",
+      "type": "integer",
+      "required": "No",
+      "description": "Credit score filter. Options: 600 (Below 600), 650 (Upto 650), 750 (Upto 750), 800 (Upto 800)."
+    },
+    {
+      "field": "sort_by",
+      "type": "string",
+      "required": "No",
+      "description": "Sort order. Options: recommended (default), annual_savings, annual_fees."
+    },
+    {
+      "field": "free_cards",
+      "type": "boolean",
+      "required": "No",
+      "description": "Filter for lifetime-free cards only. true for free cards, false/omit for all cards."
+    },
+    {
+      "field": "eligiblityPayload.pincode",
+      "type": "string",
+      "required": "Yes",
+      "description": "User's 6-digit pincode for location-based eligibility."
+    },
+    {
+      "field": "eligiblityPayload.inhandIncome",
+      "type": "string",
+      "required": "Yes",
+      "description": "User's monthly in-hand income in INR."
+    },
+    {
+      "field": "eligiblityPayload.empStatus",
+      "type": "string",
+      "required": "Yes",
+      "description": "Employment status. Options: salaried, self-employed."
+    },
+    {
+      "field": "cardGeniusPayload.tag_id",
+      "type": "string",
+      "required": "No",
+      "description": "Tag ID for specific card category filtering."
+    },
+    {
+      "field": "cardGeniusPayload.fuel",
+      "type": "string",
+      "required": "No",
+      "description": "Monthly fuel spend in INR (example field)."
+    }
+  ],
   "products": [
     "Card Genius"
   ],
@@ -2742,7 +3157,24 @@ export const apiData = {
     "rent": 0,
     "school_fees": 30000
   },
-  "sampleResponse": {},
+  "sampleResponse": {
+    "status": "success",
+    "message": "",
+    "data": {
+      "success": true,
+      "message": "Savings calculated successfully",
+      "savings": [
+        {
+          "card_name": "HDFC Diners Club Black Metal Edition",
+          "seo_card_alias": "hdfc-diners-club-black-metal-credit-card",
+          "total_savings": 6253,
+          "total_savings_yearly": 75036,
+          "joining_fees": "10000",
+          "roi": 65036
+        }
+      ]
+    }
+  },
   "sampleResponses": {
     "status": "success",
     "message": "",

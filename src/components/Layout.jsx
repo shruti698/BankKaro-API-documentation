@@ -35,6 +35,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getApiBaseUrl } from '../config/environments';
+import Logo from './Logo';
 
 const API_BASE_URL = getApiBaseUrl();
 const drawerWidth = 280;
@@ -434,13 +435,32 @@ const Layout = ({ children }) => {
             <MenuIcon />
           </IconButton>
           
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-            {location.pathname !== '/' ? (
-              selectedProject === 'bankkaro' ? 'Loan Genius' : selectedProject === 'cardGenius' ? 'Card Genius' : 'Education Genius'
-            ) : (
-              'BankKaro API Docs'
-            )}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+            <Logo size="medium" />
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold', ml: 2 }}>
+              {location.pathname !== '/' ? (
+                selectedProject === 'bankkaro' ? 'Loan Genius' : selectedProject === 'cardGenius' ? 'Card Genius' : 'Education Genius'
+              ) : (
+                'BankKaro API Docs'
+              )}
+            </Typography>
+            <Box
+              sx={{
+                ml: 1,
+                px: 1,
+                py: 0.25,
+                backgroundColor: '#fbbf24',
+                color: '#92400e',
+                borderRadius: '12px',
+                fontSize: '0.7rem',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}
+            >
+              Beta
+            </Box>
+          </Box>
 
           {/* Admin Link */}
           <Button
