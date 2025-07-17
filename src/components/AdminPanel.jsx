@@ -38,7 +38,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   Code as CodeIcon,
   Description as DescriptionIcon,
-  Settings as SettingsIcon,
+
   Save as SaveIcon,
   GitHub as GitHubIcon,
   FormatIndentIncrease as FormatIcon
@@ -68,16 +68,12 @@ const AdminPanel = () => {
     sampleRequest: {},
     sampleResponse: {},
     sampleResponses: [],
-    errorResponse: {},
     errorResponses: [],
     curlExample: '',
     curlExampleStaging: '',
     curlExampleProduction: '',
     validationNotes: [],
-    fieldTable: [],
-    importantNotes: [],
-    headers: [],
-    additionalExamples: []
+    fieldTable: []
   });
 
   useEffect(() => {
@@ -117,7 +113,6 @@ const AdminPanel = () => {
               sampleRequest: data.sampleRequest || {},
               sampleResponse: data.sampleResponse || {},
               sampleResponses: data.sampleResponses || [],
-              errorResponse: data.errorResponse || {},
               errorResponses: data.errorResponses || [],
             curlExample: data.curlExample || '',
             curlExampleStaging: data.curlExampleStaging || '',
@@ -154,16 +149,12 @@ const AdminPanel = () => {
         sampleRequest: endpoint.sampleRequest || {},
         sampleResponse: endpoint.sampleResponse || {},
         sampleResponses: endpoint.sampleResponses || [],
-        errorResponse: endpoint.errorResponse || {},
         errorResponses: endpoint.errorResponses || [],
         curlExample: endpoint.curlExample || '',
         curlExampleStaging: endpoint.curlExampleStaging || '',
         curlExampleProduction: endpoint.curlExampleProduction || '',
         validationNotes: endpoint.validationNotes || [],
-        fieldTable: endpoint.fieldTable || [],
-        importantNotes: endpoint.importantNotes || [],
-        headers: endpoint.headers || [],
-        additionalExamples: endpoint.additionalExamples || []
+        fieldTable: endpoint.fieldTable || []
       });
     } else {
       setEditingEndpoint(null);
@@ -182,16 +173,12 @@ const AdminPanel = () => {
         sampleRequest: {},
         sampleResponse: {},
         sampleResponses: [],
-        errorResponse: {},
         errorResponses: [],
         curlExample: '',
         curlExampleStaging: '',
         curlExampleProduction: '',
         validationNotes: [],
-        fieldTable: [],
-        importantNotes: [],
-        headers: [],
-        additionalExamples: []
+        fieldTable: []
       });
     }
     setOpenDialog(true);
@@ -248,7 +235,6 @@ const AdminPanel = () => {
         }
         
         updatedEndpoints[newKey] = {
-          ...apiData[oldKey],
           name: formData.name,
           endpoint: formData.endpoint,
           description: formData.description,
@@ -263,7 +249,6 @@ const AdminPanel = () => {
           sampleRequest: formData.sampleRequest,
           sampleResponse: formData.sampleResponse,
           sampleResponses: formData.sampleResponses,
-          errorResponse: formData.errorResponse,
           errorResponses: formData.errorResponses,
           curlExample: formData.curlExample,
           curlExampleStaging: formData.curlExampleStaging,
@@ -291,7 +276,6 @@ const AdminPanel = () => {
           sampleRequest: formData.sampleRequest,
           sampleResponse: formData.sampleResponse,
           sampleResponses: formData.sampleResponses,
-          errorResponse: formData.errorResponse,
           errorResponses: formData.errorResponses,
           curlExample: formData.curlExample,
           curlExampleStaging: formData.curlExampleStaging,
@@ -565,7 +549,7 @@ const AdminPanel = () => {
             <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
               <Tab icon={<DescriptionIcon />} label="Basic Info" />
               <Tab icon={<CodeIcon />} label="Schemas & Examples" />
-              <Tab icon={<SettingsIcon />} label="Advanced" />
+
             </Tabs>
           </Box>
 
@@ -883,7 +867,8 @@ const AdminPanel = () => {
                 </AccordionDetails>
               </Accordion>
 
-              <Accordion>
+              {/* Error Response - Hidden for now */}
+              {/* <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>Error Response (JSON)</Typography>
                 </AccordionSummary>
@@ -937,7 +922,7 @@ const AdminPanel = () => {
                     </Alert>
                   </Box>
                 </AccordionDetails>
-              </Accordion>
+              </Accordion> */}
 
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -1013,7 +998,8 @@ const AdminPanel = () => {
                 </AccordionDetails>
               </Accordion>
 
-              <Accordion>
+              {/* Error Responses - Hidden for now */}
+              {/* <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>Error Responses (JSON Array)</Typography>
                 </AccordionSummary>
@@ -1081,7 +1067,7 @@ const AdminPanel = () => {
                     </Alert>
                   </Box>
                 </AccordionDetails>
-              </Accordion>
+              </Accordion> */}
 
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -1174,94 +1160,7 @@ const AdminPanel = () => {
             </Box>
           )}
 
-          {activeTab === 2 && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <TextField
-                label="Validation Notes (comma-separated)"
-                value={formData.validationNotes.join(', ')}
-                onChange={(e) => updateArrayField('validationNotes', e.target.value)}
-                multiline
-                rows={3}
-                fullWidth
-                placeholder="Field must be valid email, Required field, etc."
-                helperText="Validation rules and notes for this endpoint"
-              />
 
-              <TextField
-                label="Important Notes (comma-separated)"
-                value={formData.importantNotes.join(', ')}
-                onChange={(e) => updateArrayField('importantNotes', e.target.value)}
-                multiline
-                rows={3}
-                fullWidth
-                placeholder="🔐 Security note, ⚠️ Warning, etc."
-                helperText="Important notes that will be displayed prominently in the frontend"
-              />
-
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>Headers (JSON Array)</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <TextField
-                    multiline
-                    rows={6}
-                    fullWidth
-                    value={JSON.stringify(formData.headers, null, 2)}
-                    onChange={(e) => updateJsonField('headers', e.target.value)}
-                    placeholder='[{"header": "Authorization", "value": "Bearer <token>", "required": true}]'
-                    helperText="Array of required headers with their values and required status"
-                  />
-                </AccordionDetails>
-              </Accordion>
-
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>Additional Examples (JSON Array)</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <TextField
-                    multiline
-                    rows={8}
-                    fullWidth
-                    value={JSON.stringify(formData.additionalExamples, null, 2)}
-                    onChange={(e) => updateJsonField('additionalExamples', e.target.value)}
-                    placeholder='[{"title": "Example Title", "description": "Description", "curl": "curl command"}]'
-                    helperText="Additional cURL examples for different scenarios"
-                  />
-                </AccordionDetails>
-              </Accordion>
-
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>Field Table (JSON Array)</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <TextField
-                    multiline
-                    rows={8}
-                    fullWidth
-                    value={JSON.stringify(formData.fieldTable, null, 2)}
-                    onChange={(e) => updateJsonField('fieldTable', e.target.value)}
-                    placeholder='[{"field": "name", "type": "string", "required": "Yes", "description": "..."}]'
-                    helperText="Array of field definitions with type, required status, and descriptions"
-                  />
-                </AccordionDetails>
-              </Accordion>
-
-              <Alert severity="info">
-                <Typography variant="body2">
-                  <strong>Tips:</strong>
-                  <br />• Use JSON format for schemas and examples
-                  <br />• Field table should be an array of objects with field, type, required, and description properties
-                  <br />• Validation notes should be comma-separated
-                  <br />• Important notes support emojis and will be displayed prominently
-                  <br />• Headers should include all required headers for the API
-                  <br />• Additional examples provide extra cURL commands for different scenarios
-                </Typography>
-              </Alert>
-            </Box>
-          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>

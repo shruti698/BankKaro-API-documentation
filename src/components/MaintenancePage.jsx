@@ -284,35 +284,10 @@ const MaintenancePage = () => {
                 background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
               }}
             >
-              <Typography variant="h6" gutterBottom>
-                Stay Updated
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              <Typography variant="body2" color="text.secondary">
                 We're working hard to bring you the best API documentation experience.
                 Check back soon for the enhanced version!
               </Typography>
-              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<NotificationsIcon />}
-                  sx={{ borderRadius: 2 }}
-                >
-                  Get Notified
-                </Button>
-                <Button
-                  variant="contained"
-                  startIcon={<CodeIcon />}
-                  sx={{
-                    borderRadius: 2,
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    '&:hover': {
-                      background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)'
-                    }
-                  }}
-                >
-                  View Status
-                </Button>
-              </Box>
             </Box>
           </Paper>
         </Fade>

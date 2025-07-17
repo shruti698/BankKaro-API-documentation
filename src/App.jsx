@@ -9,6 +9,7 @@ import CardGeniusDashboard from './components/CardGeniusDashboard';
 import EducationGeniusDashboard from './components/EducationGeniusDashboard';
 import ComingSoon from './components/ComingSoon';
 import Home from './components/Home';
+import CardStatus from './components/CardStatus';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import MaintenancePage from './components/MaintenancePage';
 
@@ -158,7 +159,7 @@ const theme = createTheme({
 
 function App() {
   // Set this to true when you want to show maintenance page
-  const isMaintenanceMode = true;
+  const isMaintenanceMode = false;
 
   return (
     <ThemeProvider theme={theme}>
@@ -167,21 +168,44 @@ function App() {
         <Box sx={{ display: 'flex', height: '100vh', justifyContent: 'center' }}>
           <Routes>
             <Route path="/admin/*" element={<ProtectedAdminRoute />} />
-            <Route path="/*" element={
+            <Route path="/" element={
               isMaintenanceMode ? (
                 <MaintenancePage />
               ) : (
                 <Layout>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/loangenius" element={<Navigate to="/docs/partner-auth" replace />} />
-                    <Route path="/cardgenius" element={<Navigate to="/docs/initial-data" replace />} />
-                    <Route path="/educationgenius" element={<EducationGeniusDashboard />} />
-                    <Route path="/docs/:endpoint" element={<ApiDocumentation />} />
-                    <Route path="/coming-soon" element={<ComingSoon />} />
-                  </Routes>
+                  <Home />
                 </Layout>
               )
+            } />
+            <Route path="/loangenius" element={
+              <Layout>
+                <Navigate to="/docs/partner-auth" replace />
+              </Layout>
+            } />
+            <Route path="/cardgenius" element={
+              <Layout>
+                <Navigate to="/docs/initial-data" replace />
+              </Layout>
+            } />
+            <Route path="/educationgenius" element={
+              <Layout>
+                <EducationGeniusDashboard />
+              </Layout>
+            } />
+            <Route path="/docs/*" element={
+              <Layout>
+                <ApiDocumentation />
+              </Layout>
+            } />
+            <Route path="/card-status" element={
+              <Layout>
+                <CardStatus />
+              </Layout>
+            } />
+            <Route path="/coming-soon" element={
+              <Layout>
+                <ComingSoon />
+              </Layout>
             } />
           </Routes>
         </Box>

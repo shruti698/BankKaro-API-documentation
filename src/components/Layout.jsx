@@ -30,11 +30,11 @@ import {
   Business as BusinessIcon,
   School as SchoolIcon,
   Home as HomeIcon,
+  CreditCard as CreditCardIcon,
   AdminPanelSettings as AdminIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getApiBaseUrl } from '../config/environments';
-import { apiData } from '../data/apiData';
 
 const API_BASE_URL = getApiBaseUrl();
 const drawerWidth = 280;
@@ -58,46 +58,17 @@ const Layout = ({ children }) => {
       try {
         setLoading(true);
         
-
-        
-        // If no API URL is configured, use static data directly
         if (!API_BASE_URL) {
-
-          const staticEndpoints = Object.entries(apiData)
-            .sort((a, b) => {
-              // Sort by rank first, then FIFO for equal ranks
-              const rankA = a[1].rank || 999; // Default high rank for unranked items
-              const rankB = b[1].rank || 999;
-              
-              if (rankA !== rankB) {
-                return rankA - rankB; // Lower rank numbers appear first
-              }
-              
-              // If ranks are equal, maintain FIFO order (return 0)
-              return 0;
-            })
-            .map(([id, data]) => ({
-            id,
-            name: data.name,
-            endpoint: data.endpoint,
-            description: data.description,
-            category: data.category,
-            products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
-            methods: data.methods,
-            purpose: data.purpose
-          }));
-          setEndpoints(staticEndpoints);
+          setError('API server not configured. Please start the local server.');
           return;
         }
-        
 
         const response = await fetch(`${API_BASE_URL}/endpoints`);
         if (!response.ok) {
-          throw new Error('Failed to fetch endpoints');
+          throw new Error('Failed to fetch endpoints from server');
         }
         const data = await response.json();
 
-        
         // Convert object to array format
         const endpointsArray = Object.entries(data)
           .sort((a, b) => {
@@ -122,36 +93,14 @@ const Layout = ({ children }) => {
             methods: endpointData.methods,
             purpose: endpointData.purpose
           }));
-        
 
+        console.log('Layout - Server endpoints array:', endpointsArray.map(ep => ep.id));
+        console.log('Layout - First few endpoint details:', endpointsArray.slice(0, 3).map(ep => ({ id: ep.id, name: ep.name, endpoint: ep.endpoint })));
+        console.log('Layout - All endpoint IDs:', endpointsArray.map(ep => ep.id));
         setEndpoints(endpointsArray);
       } catch (err) {
-        console.warn('API not available, falling back to static data:', err.message);
-        // Fallback to static data if API is not available
-        const staticEndpoints = Object.entries(apiData)
-          .sort((a, b) => {
-            // Sort by rank first, then FIFO for equal ranks
-            const rankA = a[1].rank || 999; // Default high rank for unranked items
-            const rankB = b[1].rank || 999;
-            
-            if (rankA !== rankB) {
-              return rankA - rankB; // Lower rank numbers appear first
-            }
-            
-            // If ranks are equal, maintain FIFO order (return 0)
-            return 0;
-          })
-          .map(([id, data]) => ({
-          id,
-          name: data.name,
-          endpoint: data.endpoint,
-          description: data.description,
-          category: data.category,
-          products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
-          methods: data.methods,
-          purpose: data.purpose
-        }));
-        setEndpoints(staticEndpoints);
+        console.error('Failed to fetch endpoints:', err.message);
+        setError('Failed to load endpoints from server. Please ensure the local server is running.');
       } finally {
         setLoading(false);
       }
@@ -168,9 +117,7 @@ const Layout = ({ children }) => {
       'Education Genius': []
     };
 
-    // Debug logging
-    console.log('Layout - endpoints type:', typeof endpoints);
-    console.log('Layout - endpoints:', endpoints);
+
     
     // Ensure endpoints is an array
     if (!Array.isArray(endpoints)) {
@@ -183,7 +130,7 @@ const Layout = ({ children }) => {
       products.forEach(product => {
         if (organized[product]) {
           organized[product].push(endpoint);
-      }
+        }
       });
     });
 
@@ -248,7 +195,11 @@ const Layout = ({ children }) => {
   };
 
   const handleApiSelect = (endpoint) => {
-    navigate(`/docs/${endpoint}`);
+    console.log('Layout - handleApiSelect called with endpoint:', endpoint);
+    // Remove leading slash to avoid double slash in URL
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+    console.log('Layout - Navigating to:', `/docs/${cleanEndpoint}`);
+    navigate(`/docs/${cleanEndpoint}`);
     if (isMobile) {
       setMobileOpen(false);
     }
@@ -336,6 +287,42 @@ const Layout = ({ children }) => {
           </ListItemButton>
         </ListItem>
 
+        {/* Card Status */}
+        <ListItem disablePadding>
+          <ListItemButton
+            selected={location.pathname === '/card-status'}
+            onClick={() => navigate('/card-status')}
+            sx={{
+              mx: 2,
+              my: 0.5,
+              borderRadius: 2,
+              '&.Mui-selected': {
+                backgroundColor: theme.palette.primary.light,
+                color: theme.palette.primary.contrastText,
+                '&:hover': {
+                  backgroundColor: theme.palette.primary.light,
+                },
+              },
+              '&:hover': {
+                backgroundColor: '#f1f5f9',
+              },
+            }}
+          >
+            <ListItemIcon>
+              <CreditCardIcon 
+                color={location.pathname === '/card-status' ? 'inherit' : 'primary'} 
+              />
+            </ListItemIcon>
+            <ListItemText 
+              primary="Card Status"
+              primaryTypographyProps={{
+                fontSize: '0.95rem',
+                fontWeight: location.pathname === '/card-status' ? 'bold' : 500
+              }}
+            />
+          </ListItemButton>
+        </ListItem>
+
         <Divider sx={{ my: 1 }} />
 
         {/* Product Selection - Only show when not on home page */}
@@ -372,7 +359,10 @@ const Layout = ({ children }) => {
             ) : currentApis.length > 0 ? (
               <>
                 {currentApis.map((api) => {
-                  const isSelected = location.pathname === `/docs/${api.id}`;
+                  const cleanEndpoint = api.id.startsWith('/') ? api.id.substring(1) : api.id;
+                  const decodedPathname = decodeURIComponent(location.pathname);
+                  const isSelected = decodedPathname === `/docs/${cleanEndpoint}`;
+                  console.log('Layout - Rendering API item:', api.id, 'cleanEndpoint:', cleanEndpoint, 'isSelected:', isSelected);
                   return (
                     <ListItem key={api.id} disablePadding>
                       <ListItemButton
@@ -550,11 +540,11 @@ const Layout = ({ children }) => {
         sx={{
           flexGrow: 1,
           p: isHomePage ? 0 : 3,
-         // width: { md: isHomePage ? '100%' : `calc(100% - ${drawerWidth}px)` },
+          width: { md: isHomePage ? '100%' : `calc(100% - ${drawerWidth}px)` },
           mt: { xs: 7, md: 8 },
           ...(isHomePage && {
-       //     maxWidth: 1200,
-           // mx: 'auto'
+            maxWidth: 1200,
+            mx: 'auto'
           })
         }}
       >

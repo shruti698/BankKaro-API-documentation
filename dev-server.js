@@ -13,12 +13,48 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-// Import the API data
-import { apiData } from './src/data/apiData.js';
+// Import the API data dynamically to ensure we get the latest version
+import { apiData as importedApiData } from './src/data/apiData.js';
+
+// Log what was imported
+console.log('🔧 Server startup: Imported endpoints count:', Object.keys(importedApiData).length);
+console.log('🔧 Server startup: First few keys:', Object.keys(importedApiData).slice(0, 5));
+
+// Store the data in a variable that we can update
+let apiData = { ...importedApiData };
+
+// Function to reload data from file
+const reloadApiData = async () => {
+  try {
+    // Re-import the data
+    const { apiData: freshData } = await import('./src/data/apiData.js');
+    apiData = { ...freshData };
+    
+    console.log('🔄 Reloaded API data, count:', Object.keys(apiData).length);
+    return true;
+  } catch (error) {
+    console.error('❌ Error reloading API data:', error);
+    return false;
+  }
+};
 
 // API endpoint to serve the API data
 app.get('/endpoints', (req, res) => {
+  console.log('📡 Server: Serving endpoints, count:', Object.keys(apiData).length);
+  console.log('📡 Server: Endpoint keys:', Object.keys(apiData));
   res.json(apiData);
+});
+
+
+
+// API endpoint to reload data from file
+app.get('/reload', async (req, res) => {
+  const success = await reloadApiData();
+  res.json({ 
+    success, 
+    message: success ? 'Data reloaded successfully' : 'Failed to reload data',
+    endpointCount: Object.keys(apiData).length
+  });
 });
 
 // API endpoint to update apiData.js

@@ -22,16 +22,6 @@ export const getEnvironmentUrl = (environment, isCardGenius) => {
 
 // API Base URL configuration
 export const getApiBaseUrl = () => {
-  // Check if we're in development (localhost) or production
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    // Always use backend API in development for consistency with admin panel
-    return 'http://localhost:3001';
-  }
-  
-  // For production deployment, return null to use static data
-  // This prevents CORS issues and allows the admin panel to work without a backend
-  return null;
-  
-  // TODO: If you have a proper admin API backend, you can uncomment and configure it here
-  // return 'https://your-admin-api.com';
+  // Always use local server for consistency with admin panel
+  return 'http://localhost:3001';
 };

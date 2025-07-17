@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -44,25 +44,29 @@ import {
   RocketLaunch as RocketLaunchIcon,
   Upload as UploadIcon,
   Download as DownloadIcon,
-  Build as BuildIcon,
+
   Science as ScienceIcon
 } from '@mui/icons-material';
 import { environments, getEnvironmentUrl, getApiBaseUrl } from '../config/environments';
-import { apiData } from '../data/apiData';
 import ApiSandbox from './ApiSandbox';
 
 const API_BASE_URL = getApiBaseUrl();
 
 const ApiDocumentation = () => {
-  const { endpoint } = useParams();
+  console.log('🚀 ApiDocumentation component is being rendered!');
+  const location = useLocation();
+  const endpoint = decodeURIComponent(location.pathname.replace('/docs/', ''));
+  console.log('🚀 ApiDocumentation - window.location.pathname:', window.location.pathname);
+  console.log('🚀 ApiDocumentation - extracted endpoint:', endpoint);
   const [api, setApi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  console.log('🔍 ApiDocumentation component rendered with endpoint:', endpoint);
   const [selectedMethod, setSelectedMethod] = useState('POST');
   const [selectedEnvironment, setSelectedEnvironment] = useState('uat');
   const [showSandbox, setShowSandbox] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
-    advanced: false,
     testing: false
   });
 
@@ -70,47 +74,40 @@ const ApiDocumentation = () => {
     const fetchApiData = async () => {
       try {
         setLoading(true);
+        console.log('ApiDocumentation - Fetching data for endpoint:', endpoint);
+        console.log('ApiDocumentation - Endpoint type:', typeof endpoint);
+        console.log('ApiDocumentation - Endpoint length:', endpoint ? endpoint.length : 'null');
+        console.log('ApiDocumentation - URL pathname:', window.location.pathname);
         
-
-        
-        // If no API URL is configured, use static data directly
         if (!API_BASE_URL) {
-          const foundApi = apiData[endpoint];
-          if (foundApi) {
-            setApi(foundApi);
-            setSelectedMethod(foundApi.methods[0] || 'POST');
-          } else {
-            setError('API endpoint not found');
-          }
+          setError('API server not configured. Please start the local server.');
           return;
         }
-        
 
         const response = await fetch(`${API_BASE_URL}/endpoints`);
         if (!response.ok) {
-          throw new Error('Failed to fetch API data');
+          throw new Error('Failed to fetch API data from server');
         }
         const endpointsData = await response.json();
+        console.log('ApiDocumentation - All endpoints keys:', Object.keys(endpointsData));
 
-        const foundApi = endpointsData[endpoint];
-
+        // Direct match - all keys are now normalized without leading slashes
+        let foundApi = endpointsData[endpoint];
+        console.log('ApiDocumentation - Direct match for:', endpoint, foundApi ? 'FOUND' : 'NOT FOUND');
+        
+        console.log('ApiDocumentation - Found API for endpoint:', endpoint, foundApi);
         
         if (foundApi) {
           setApi(foundApi);
           setSelectedMethod(foundApi.methods[0] || 'POST');
+          console.log('ApiDocumentation - Set API data:', foundApi);
         } else {
-          setError('API endpoint not found');
+          console.error('ApiDocumentation - API not found for endpoint:', endpoint);
+          setError('API endpoint not found in admin data');
         }
       } catch (err) {
-        console.warn('API not available, falling back to static data:', err.message);
-        // Fallback to static data if API is not available
-        const foundApi = apiData[endpoint];
-        if (foundApi) {
-          setApi(foundApi);
-          setSelectedMethod(foundApi.methods[0] || 'POST');
-        } else {
-          setError('API endpoint not found');
-        }
+        console.error('Failed to fetch API data:', err.message);
+        setError('Failed to load API data from server. Please ensure the local server is running.');
       } finally {
         setLoading(false);
       }
@@ -121,7 +118,9 @@ const ApiDocumentation = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh', flexDirection: 'column' }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>Loading API Documentation...</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Endpoint: {endpoint}</Typography>
         <CircularProgress />
       </Box>
     );
@@ -415,19 +414,7 @@ const ApiDocumentation = () => {
           >
             Response Details
           </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => {
-              toggleSection('advanced');
-              setTimeout(() => {
-                document.getElementById('advanced-info')?.scrollIntoView({ behavior: 'smooth' });
-              }, 100);
-            }}
-            startIcon={<BuildIcon />}
-          >
-            Advanced Info
-          </Button>
+
           <Button
             variant="outlined"
             size="small"
@@ -545,26 +532,7 @@ const ApiDocumentation = () => {
           )}
         </Box>
 
-        {/* Important Notes Alert */}
-        {api.importantNotes && Array.isArray(api.importantNotes) && (
-          <Alert 
-            severity="warning" 
-            icon={<SecurityIcon />}
-            sx={{ mb: 4, borderRadius: 2 }}
-          >
-            <AlertTitle sx={{ fontWeight: 'bold' }}>Important Security Notes</AlertTitle>
-            <List dense sx={{ py: 0 }}>
-              {api.importantNotes.map((note, index) => (
-                <ListItem key={index} sx={{ py: 0.5, px: 0 }}>
-                  <ListItemText 
-                    primary={note}
-                    primaryTypographyProps={{ variant: 'body2' }}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </Alert>
-        )}
+
 
         {/* Quick cURL Example */}
         {currentApiData.curlExample && (
@@ -632,7 +600,7 @@ const ApiDocumentation = () => {
         <Grid container spacing={4}>
           {/* Field Table */}
           {currentApiData.fieldTable && Array.isArray(currentApiData.fieldTable) && currentApiData.fieldTable.length > 0 && (
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Card sx={{ borderRadius: 2 }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -648,7 +616,7 @@ const ApiDocumentation = () => {
 
           {/* Headers Table */}
           {currentApiData.headers && Array.isArray(currentApiData.headers) && currentApiData.headers.length > 0 && (
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Card sx={{ borderRadius: 2 }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -693,7 +661,7 @@ const ApiDocumentation = () => {
           )}
 
           {/* Request Schema */}
-          <Grid item xs={12} md={6}>
+          <Grid xs={12} md={6}>
             <Card sx={{ borderRadius: 2, height: 'fit-content' }}>
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -718,7 +686,7 @@ const ApiDocumentation = () => {
           </Grid>
 
           {/* Sample Request */}
-          <Grid item xs={12} md={6}>
+          <Grid xs={12} md={6}>
             <Card sx={{ borderRadius: 2 }}>
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -758,7 +726,7 @@ const ApiDocumentation = () => {
 
           {/* Validation Notes */}
           {currentApiData.validationNotes && Array.isArray(currentApiData.validationNotes) && currentApiData.validationNotes.length > 0 && (
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <Card sx={{ borderRadius: 2 }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -811,7 +779,7 @@ const ApiDocumentation = () => {
         
         <Grid container spacing={4}>
           {/* Response Schema */}
-          <Grid item xs={12} md={6}>
+          <Grid xs={12} md={6}>
             <Card sx={{ borderRadius: 2, height: 'fit-content' }}>
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -836,7 +804,7 @@ const ApiDocumentation = () => {
         <Grid container spacing={4} sx={{ mt: 2 }}>
           {/* Success Response */}
           {currentApiData.sampleResponse && Object.keys(currentApiData.sampleResponse).length > 0 && (
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <Card sx={{ borderRadius: 2 }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -850,9 +818,9 @@ const ApiDocumentation = () => {
             </Grid>
           )}
 
-          {/* Error Response - Generic fallback */}
-          {currentApiData.errorResponse && Object.keys(currentApiData.errorResponse).length > 0 && !currentApiData.errorResponses && (
-            <Grid item xs={12} md={6}>
+          {/* Error Response - Hidden for now */}
+          {/* {currentApiData.errorResponse && Object.keys(currentApiData.errorResponse).length > 0 && !currentApiData.errorResponses && (
+            <Grid xs={12} md={6}>
               <Card sx={{ borderRadius: 2 }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -864,14 +832,12 @@ const ApiDocumentation = () => {
                 </CardContent>
               </Card>
             </Grid>
-          )}
+          )} */}
         </Grid>
 
         {/* Fallback when no response data is available */}
-        {(!currentApiData.sampleResponse || Object.keys(currentApiData.sampleResponse).length === 0) &&
-         (!currentApiData.errorResponse || Object.keys(currentApiData.errorResponse).length === 0) &&
-         (!currentApiData.errorResponses || currentApiData.errorResponses.length === 0) && (
-          <Grid item xs={12}>
+        {(!currentApiData.sampleResponse || Object.keys(currentApiData.sampleResponse).length === 0) && (
+          <Grid xs={12}>
             <Card sx={{ borderRadius: 2 }}>
               <CardContent sx={{ p: 3 }}>
                 <Alert severity="info" sx={{ borderRadius: 2 }}>
@@ -884,9 +850,9 @@ const ApiDocumentation = () => {
           </Grid>
         )}
 
-        {/* Error Responses - Specific for partner-token API */}
-        {currentApiData.errorResponses && Array.isArray(currentApiData.errorResponses) && currentApiData.errorResponses.length > 0 && (
-          <Grid item xs={12} sx={{ mt: 2 }}>
+        {/* Error Responses - Hidden for now */}
+        {/* {currentApiData.errorResponses && Array.isArray(currentApiData.errorResponses) && currentApiData.errorResponses.length > 0 && (
+          <Grid xs={12} sx={{ mt: 2 }}>
             <Card sx={{ borderRadius: 2 }}>
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -896,7 +862,7 @@ const ApiDocumentation = () => {
                 <Divider sx={{ mb: 3 }} />
                 <Grid container spacing={3}>
                   {currentApiData.errorResponses.map((error, index) => (
-                    <Grid item xs={12} md={6} key={index}>
+                    <Grid xs={12} md={6} key={index}>
                       <Paper 
                         elevation={0} 
                         sx={{ 
@@ -926,94 +892,10 @@ const ApiDocumentation = () => {
               </CardContent>
             </Card>
           </Grid>
-        )}
+        )} */}
       </Box>
 
-      {/* ===== ADVANCED INFORMATION SECTION ===== */}
-      <Box id="advanced-info" sx={{ mb: 6 }}>
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between', 
-          mb: 3,
-          p: 3,
-          backgroundColor: '#f1f5f9',
-          borderRadius: 2,
-          border: '1px solid #64748b'
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
-              🔧 Advanced Information
-            </Typography>
-            <Chip 
-              label="Optional" 
-              size="small" 
-              color="default" 
-              variant="outlined"
-            />
-          </Box>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => toggleSection('advanced')}
-            startIcon={expandedSections.advanced ? <ExpandMoreIcon /> : <ExpandMoreIcon sx={{ transform: 'rotate(-90deg)' }} />}
-          >
-            {expandedSections.advanced ? 'Collapse' : 'Expand'}
-          </Button>
-        </Box>
-        
-        {expandedSections.advanced && (
-          <>
-            {/* Additional Information */}
-            <Grid item xs={12}>
-              <Accordion sx={{ borderRadius: 2 }}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h6">General API Information</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
-                        Authentication
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                        All API requests require proper authentication. Use the Partner Authentication endpoint 
-                        to obtain access tokens before making other API calls.
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
-                        Rate Limiting
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                        API requests are limited to 100 requests per minute per partner. 
-                        Exceeding this limit will result in a 429 Too Many Requests response.
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
-                        Error Handling
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                        All errors return a consistent JSON format with error codes and descriptive messages. 
-                        Check the response status code and error details for troubleshooting.
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
-                        Base URL
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                        All API endpoints are relative to: <code>https://api.bankkaro.com</code>
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
-            </Grid>
-          </>
-        )}
-      </Box>
+
 
       {/* ===== TESTING & EXAMPLES SECTION ===== */}
       <Box id="testing-examples" sx={{ mb: 6 }}>
@@ -1078,7 +960,7 @@ const ApiDocumentation = () => {
 
             {/* Additional Examples */}
             {currentApiData.additionalExamples && Array.isArray(currentApiData.additionalExamples) && currentApiData.additionalExamples.length > 0 && (
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <Card sx={{ borderRadius: 2 }}>
                   <CardContent sx={{ p: 3 }}>
                     <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -1088,7 +970,7 @@ const ApiDocumentation = () => {
                     <Divider sx={{ mb: 3 }} />
                     <Grid container spacing={3}>
                       {currentApiData.additionalExamples.map((example, index) => (
-                        <Grid item xs={12} key={index}>
+                        <Grid xs={12} key={index}>
                           <Paper 
                             elevation={0} 
                             sx={{ 
@@ -1120,4 +1002,4 @@ const ApiDocumentation = () => {
   );
 };
 
-export default ApiDocumentation; 
+export default ApiDocumentation;

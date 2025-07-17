@@ -28,7 +28,6 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { getApiBaseUrl } from '../config/environments';
-import { apiData } from '../data/apiData';
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -62,43 +61,14 @@ const Home = () => {
       try {
         setLoading(true);
         
-        // If no API URL is configured, use static data directly
         if (!API_BASE_URL) {
-          console.log('Home - Using static data, apiData keys:', Object.keys(apiData));
-          
-          const staticEndpoints = Object.entries(apiData)
-            .sort((a, b) => {
-              // Sort by rank first, then FIFO for equal ranks
-              const rankA = a[1].rank || 999; // Default high rank for unranked items
-              const rankB = b[1].rank || 999;
-              
-              console.log(`Comparing ${a[0]} (rank: ${rankA}) vs ${b[0]} (rank: ${rankB})`);
-              
-              if (rankA !== rankB) {
-                return rankA - rankB; // Lower rank numbers appear first
-              }
-              
-              // If ranks are equal, maintain FIFO order (return 0)
-              return 0;
-            })
-            .map(([id, data]) => ({
-            id,
-            name: data.name,
-            endpoint: data.endpoint,
-            description: data.description,
-            category: data.category,
-            products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
-            methods: data.methods,
-            purpose: data.purpose
-          }));
-          console.log('Home - Setting endpoints:', staticEndpoints);
-          setEndpoints(staticEndpoints);
+          setError('API server not configured. Please start the local server.');
           return;
         }
         
         const response = await fetch(`${API_BASE_URL}/endpoints`);
         if (!response.ok) {
-          throw new Error('Failed to fetch endpoints');
+          throw new Error('Failed to fetch endpoints from server');
         }
         const data = await response.json();
         
@@ -108,8 +78,6 @@ const Home = () => {
             // Sort by rank first, then FIFO for equal ranks
             const rankA = a[1].rank || 999; // Default high rank for unranked items
             const rankB = b[1].rank || 999;
-            
-            console.log(`API - Comparing ${a[0]} (rank: ${rankA}) vs ${b[0]} (rank: ${rankB})`);
             
             if (rankA !== rankB) {
               return rankA - rankB; // Lower rank numbers appear first
@@ -129,40 +97,10 @@ const Home = () => {
             purpose: endpointData.purpose
           }));
         
-        console.log('Home - API setting endpoints:', endpointsArray);
         setEndpoints(endpointsArray);
       } catch (err) {
-        console.warn('API not available, falling back to static data:', err.message);
-        // Fallback to static data if API is not available
-        console.log('Home - Fallback to static data, apiData keys:', Object.keys(apiData));
-        
-        const staticEndpoints = Object.entries(apiData)
-          .sort((a, b) => {
-            // Sort by rank first, then FIFO for equal ranks
-            const rankA = a[1].rank || 999; // Default high rank for unranked items
-            const rankB = b[1].rank || 999;
-            
-            console.log(`Fallback - Comparing ${a[0]} (rank: ${rankA}) vs ${b[0]} (rank: ${rankB})`);
-            
-            if (rankA !== rankB) {
-              return rankA - rankB; // Lower rank numbers appear first
-            }
-            
-            // If ranks are equal, maintain FIFO order (return 0)
-            return 0;
-          })
-          .map(([id, data]) => ({
-          id,
-          name: data.name,
-          endpoint: data.endpoint,
-          description: data.description,
-          category: data.category,
-          products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
-          methods: data.methods,
-          purpose: data.purpose
-                  }));
-          console.log('Home - Fallback setting endpoints:', staticEndpoints);
-          setEndpoints(staticEndpoints);
+        console.error('Failed to fetch endpoints:', err.message);
+        setError('Failed to load endpoints from server. Please ensure the local server is running.');
       } finally {
         setLoading(false);
       }
@@ -177,9 +115,7 @@ const Home = () => {
       'Education Genius': []
     };
     
-    // Debug logging
-    console.log('endpoints type:', typeof endpoints);
-    console.log('endpoints:', endpoints);
+
     
     // Ensure endpoints is an array
     if (!Array.isArray(endpoints)) {
@@ -189,20 +125,15 @@ const Home = () => {
     
     endpoints.forEach(endpoint => {
       const products = endpoint.products || [endpoint.product];
-      console.log(`Endpoint ${endpoint.id} has products:`, products);
       products.forEach(product => {
         if (organized[product]) {
           organized[product].push(endpoint);
-          console.log(`Added ${endpoint.id} to ${product}`);
-      } else {
-        console.log(`Product ${product} not found in organized object`);
-      }
+        }
       });
     });
     return organized;
   };
   const organizedApis = organizeEndpointsByProduct();
-  console.log('Home - organizedApis:', organizedApis);
 
   const products = [
     {
