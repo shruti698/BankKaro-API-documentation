@@ -65,7 +65,7 @@ export const apiData = {
     "mobile": "9999999999",
     "otp": "123456"
   },
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/auth' \\\n--header 'partner-token: {{PARTNER_TOKEN}}' \\\n--header 'x-epoch: <your_epoch_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"mobile\": \"7028333370\",\n  \"otp\": \"661801\"\n}'",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/auth' \\\n--header 'partner-token: {{JWT_TOKEN}}' \\\n--header 'x-epoch: <your_epoch_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"mobile\": \"7028333370\",\n  \"otp\": \"661801\"\n}'",
   "validationNotes": [
     "mobile must be a valid 10-digit number",
     "otp must be exactly 6 digits",
@@ -678,7 +678,7 @@ export const apiData = {
   "sampleRequest": {
     "mobile": "7011048697"
   },
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/autoAuth' \\\n--header 'partner-token: {{PARTNER_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"mobile\": \"7028333370\"\n}'",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/autoAuth' \\\n--header 'partner-token: {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"mobile\": \"7028333370\"\n}'",
   "validationNotes": [
     "One of mobile or exit_id + vendor must be provided",
     "mobile must be a valid 10-digit number if provided",
@@ -738,12 +738,12 @@ export const apiData = {
     {
       "title": "Auto Auth using Exit ID (CashKaro)",
       "description": "Authenticate using CashKaro exit_id",
-      "curl": "curl --location 'https://uat-partner.bankkaro.com/partner/autoAuth' \\\n--header 'partner-token: {{PARTNER_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"exit_id\": \"CHKR20241125A336129939\",\n  \"vendor\": \"CK\"\n}'"
+      "curl": "curl --location 'https://uat-partner.bankkaro.com/partner/autoAuth' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"exit_id\": \"CHKR20241125A336129939\",\n  \"vendor\": \"CK\"\n}'"
     },
     {
       "title": "Auto Auth using Exit ID (ProfitShare)",
       "description": "Authenticate using ProfitShare exit_id",
-        "curl": "curl --location 'https://uat-partner.bankkaro.com/partner/autoAuth' \\\n--header 'partner-token: {{PARTNER_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"exit_id\": \"CHKR20241125A336129939\",\n  \"vendor\": \"CK\"\n}'"
+        "curl": "curl --location 'https://uat-partner.bankkaro.com/partner/autoAuth' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"exit_id\": \"CHKR20241125A336129939\",\n  \"vendor\": \"CK\"\n}'"
     }
   ],
   "products": [
@@ -1591,7 +1591,7 @@ export const apiData = {
       ]
     }
   },
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: <your_jwt_token>'",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: {{JWT_TOKEN}}'",
   "requestSchema": {},
   "sampleRequest": {},
   "errorResponse": {},
@@ -1768,7 +1768,7 @@ export const apiData = {
     ]
   },
   "sampleResponse": {},
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{PARTNER_TOKEN}}'\n",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
   "sampleRequest": {},
   "validationNotes": [],
   "fieldTable": [],
@@ -1798,8 +1798,8 @@ export const apiData = {
     }
   },
   "errorResponses": [],
-  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{PARTNER_TOKEN}}'\n",
-  "curlExampleProduction": "curl --location 'https://prod-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{PARTNER_TOKEN}}'\n",
+  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
+  "curlExampleProduction": "curl --location 'https://prod-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
   "status": "live",
   "rank": 6,
   "errorResponse": {},
@@ -2021,9 +2021,9 @@ export const apiData = {
       "tag_genius_data": {}
     }
   },
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{PARTNER_TOKEN}}' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [],\n    \"card_networks\": [],\n    \"annualFees\": \"\",\n    \"credit_score\": \"\",\n    \"sort_by\": \"\",\n    \"free_cards\": \"\",\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"100\"\n    }\n  }'\n",
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,11],\n    \"card_networks\": [\"VISA\",\"Mastercard\",\"RuPay\"],\n    \"annualFees\": \"0-15000\",\n    \"credit_score\": 750,\n    \"sort_by\": \"annual_savings\",\n    \"free_cards\": true,\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"5000\"\n    }\n  }'\n",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: <your_partner_token>' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,7],\n    \"card_networks\": [\"VISA\",\"Mastercard\",\"RuPay\"],\n    \"annualFees\": \"0-15000\",\n    \"credit_score\": 750,\n    \"sort_by\": \"annual_fees\",\n    \"free_cards\": true,\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"2\",\n      \"fuel\": \"3000\"\n    }\n  }'\n",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [],\n    \"card_networks\": [],\n    \"annualFees\": \"\",\n    \"credit_score\": \"\",\n    \"sort_by\": \"\",\n    \"free_cards\": \"\",\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"100\"\n    }\n  }'\n",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,11],\n    \"card_networks\": [\"VISA\",\"Mastercard\",\"RuPay\"],\n    \"annualFees\": \"0-15000\",\n    \"credit_score\": 750,\n    \"sort_by\": \"annual_savings\",\n    \"free_cards\": true,\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"5000\"\n    }\n  }'\n",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,7],\n    \"card_networks\": [\"VISA\",\"Mastercard\",\"RuPay\"],\n    \"annualFees\": \"0-15000\",\n    \"credit_score\": 750,\n    \"sort_by\": \"annual_fees\",\n    \"free_cards\": true,\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"2\",\n      \"fuel\": \"3000\"\n    }\n  }'\n",
   "status": "live",
   "rank": 6.5,
   "validationNotes": [
@@ -2361,7 +2361,7 @@ export const apiData = {
       "description": "The SEO‑friendly slug of the card (e.g. sbi-cashback-credit-card)."
     }
   ],
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{PARTNER_TOKEN}}'\n",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
   "requestSchema": {
     "type": "object",
     "properties": {
@@ -3275,9 +3275,9 @@ export const apiData = {
     }
   },
   "errorResponses": [],
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{PARTNER_TOKEN}}' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'",
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'",
   "validationNotes": [],
   "fieldTable": [
     {
@@ -3367,7 +3367,7 @@ export const apiData = {
     }
   },
   "sampleRequest": {},
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/logout' \\\n--header 'partner-token: {{PARTNER_TOKEN}}' \\\n--header 'Authorization: <your_auth_token>'",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/logout' \\\n--header 'partner-token: {{JWT_TOKEN}}' \\\n--header 'Authorization: <your_auth_token>'",
   "validationNotes": [
     "partner-token header is required",
     "Authorization header with user token is required"
