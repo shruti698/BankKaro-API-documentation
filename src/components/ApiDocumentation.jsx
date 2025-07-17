@@ -82,48 +82,46 @@ const ApiDocumentation = () => {
         
         let foundApi = null;
         
-        // If API_BASE_URL is null (production), use static data
+        // Always try static data first as fallback
+        const staticApi = apiData[endpoint];
+        console.log('ApiDocumentation - Static data available for:', endpoint, staticApi ? 'YES' : 'NO');
+        
+        // If API_BASE_URL is null (production), use static data only
         if (!API_BASE_URL) {
           console.log('ApiDocumentation - Using static data (production mode)');
-          foundApi = apiData[endpoint];
-          console.log('ApiDocumentation - Static data match for:', endpoint, foundApi ? 'FOUND' : 'NOT FOUND');
+          foundApi = staticApi;
         } else {
-          // Development mode - fetch from server
-          console.log('ApiDocumentation - Fetching from server (development mode)');
-          const response = await fetch(`${API_BASE_URL}/endpoints`);
-          if (!response.ok) {
-            throw new Error('Failed to fetch API data from server');
+          // Development mode - try server first, fallback to static data
+          console.log('ApiDocumentation - Trying server first (development mode)');
+          try {
+            const response = await fetch(`${API_BASE_URL}/endpoints`);
+            if (response.ok) {
+              const endpointsData = await response.json();
+              console.log('ApiDocumentation - Server data keys:', Object.keys(endpointsData));
+              foundApi = endpointsData[endpoint];
+              console.log('ApiDocumentation - Server data match for:', endpoint, foundApi ? 'FOUND' : 'NOT FOUND');
+            } else {
+              throw new Error('Server response not ok');
+            }
+          } catch (serverError) {
+            console.log('ApiDocumentation - Server failed, using static data:', serverError.message);
+            foundApi = staticApi;
           }
-          const endpointsData = await response.json();
-          console.log('ApiDocumentation - All endpoints keys:', Object.keys(endpointsData));
-
-          // Direct match - all keys are now normalized without leading slashes
-          foundApi = endpointsData[endpoint];
-          console.log('ApiDocumentation - Server data match for:', endpoint, foundApi ? 'FOUND' : 'NOT FOUND');
         }
         
-        console.log('ApiDocumentation - Found API for endpoint:', endpoint, foundApi);
+        console.log('ApiDocumentation - Final API data for endpoint:', endpoint, foundApi);
         
         if (foundApi) {
           setApi(foundApi);
           setSelectedMethod(foundApi.methods[0] || 'POST');
-          console.log('ApiDocumentation - Set API data:', foundApi);
+          console.log('ApiDocumentation - Set API data successfully');
         } else {
           console.error('ApiDocumentation - API not found for endpoint:', endpoint);
           setError('API endpoint not found in admin data');
         }
       } catch (err) {
         console.error('Failed to fetch API data:', err.message);
-        // Fallback to static data if server fails
-        console.log('ApiDocumentation - Server failed, falling back to static data');
-        const fallbackApi = apiData[endpoint];
-        if (fallbackApi) {
-          setApi(fallbackApi);
-          setSelectedMethod(fallbackApi.methods[0] || 'POST');
-          console.log('ApiDocumentation - Using fallback static data:', fallbackApi);
-        } else {
-          setError('API endpoint not found in admin data');
-        }
+        setError('Failed to load API data. Please try again.');
       } finally {
         setLoading(false);
       }

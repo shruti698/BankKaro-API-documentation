@@ -2868,7 +2868,7 @@ export const apiData = {
   "validationNotes": [],
   "fieldTable": []
 },
-  '/cardgenius/cards/calculate': {
+  'cardgenius/cards/calculate': {
   "name": "Card Genius Calculator",
   "endpoint": "/cardgenius/cards/calculate",
   "description": "Given a detailed spend profile, ranks cards by potential annual savings.",

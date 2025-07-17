@@ -328,7 +328,7 @@ const mockResponses = {
     }
   },
 
-  '/cardgenius/cards/calculate': {
+  'cardgenius/cards/calculate': {
     POST: {
       success: {
         status: 'success',
