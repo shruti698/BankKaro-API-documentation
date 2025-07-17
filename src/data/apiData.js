@@ -678,7 +678,7 @@ export const apiData = {
   "sampleRequest": {
     "mobile": "7011048697"
   },
-  "curlExample": "curl --location 'https://bk-api.bankkaro.com/partner/api/partner-autoAuth' \\\n--header 'Host: abc.example-partner.com' \\\n--header 'origin: abc.example-partner.com' \\\n--header 'partner-token: <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"mobile\": \"7011048697\"\n}'",
+  "curlExample": "curl --location 'https://uat-platform.bankkaro.com/partner/api/partner-autoAuth' \\\n--header 'Host: abc.example-partner.com' \\\n--header 'origin: abc.example-partner.com' \\\n--header 'partner-token: <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"mobile\": \"7011048697\"\n}'",
   "validationNotes": [
     "One of mobile or exit_id + vendor must be provided",
     "mobile must be a valid 10-digit number if provided",
@@ -738,12 +738,12 @@ export const apiData = {
     {
       "title": "Auto Auth using Exit ID (CashKaro)",
       "description": "Authenticate using CashKaro exit_id",
-      "curl": "curl --location 'https://bk-api.bankkaro.com/partner/api/partner-autoAuth' \\\n--header 'partner-token: <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"exit_id\": \"A VALID CHKR\",\n  \"vendor\": \"CK\"\n}'"
+      "curl": "curl --location 'https://uat-platform.bankkaro.com/partner/api/partner-autoAuth' \\\n--header 'partner-token: <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"exit_id\": \"A VALID CHKR\",\n  \"vendor\": \"CK\"\n}'"
     },
     {
       "title": "Auto Auth using Exit ID (ProfitShare)",
       "description": "Authenticate using ProfitShare exit_id",
-      "curl": "curl --location 'https://bk-api.bankkaro.com/partner/api/partner-autoAuth' \\\n--header 'partner-token: <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"exit_id\": \"A VALID PS exit\",\n  \"vendor\": \"PS\"\n}'"
+        "curl": "curl --location 'https://uat-platform.bankkaro.com/partner/api/partner-autoAuth' \\\n--header 'partner-token: <partner_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"exit_id\": \"A VALID PS exit\",\n  \"vendor\": \"PS\"\n}'"
     }
   ],
   "products": [
@@ -1475,7 +1475,7 @@ export const apiData = {
 },
   'cardgenius/initial-data': {
   "name": "Initialization Bundle",
-  "endpoint": "/cardgenius/initial-data",
+  "endpoint": "/partner/api/cg-initial-data",
   "methods": [
     "GET"
   ],
@@ -1591,7 +1591,7 @@ export const apiData = {
       ]
     }
   },
-  "curlExample": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: <your_jwt_token>'",
+  "curlExample": "curl --location 'https://uat-platform.bankkaro.com/partner/api/cg-initial-data' \\  \n--header 'partner-token: <your_jwt_token>'",
   "requestSchema": {},
   "sampleRequest": {},
   "errorResponse": {},
@@ -1669,8 +1669,8 @@ export const apiData = {
     }
   },
   "errorResponses": [],
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: <your_jwt_token>'\n",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: <your_jwt_token>'\n",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/api/cg-initial-data' \\  \n--header 'partner-token: <your_jwt_token>'\n",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/api/cg-initial-data' \\  \n--header 'partner-token: <your_jwt_token>'\n",
   "importantNotes": [],
   "headers": [],
   "additionalExamples": [],
@@ -2329,9 +2329,9 @@ export const apiData = {
     "alias is optional - if provided, checks eligibility for specific card only",
     "Response includes eligibility status and rejection reasons if applicable"
   ],
-  "curlExample": "curl --location 'https://bk-api.bankkaro.com/partner/api/cg-eligiblity' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"pincode\": \"110001\",\n  \"inhandIncome\": 50000,\n  \"empStatus\": \"salaried\"\n}'",
-  "curlExampleProd": "curl --location 'https://bk-api.bankkaro.com/partner/api/cg-eligiblity' \\\n--header 'Content-Type: application/json' \\\n--data '{\"pincode\":\"110001\",\"inhandIncome\":\"50000\",\"empStatus\":\"salaried\"}'",
-  "curlExampleStaging": "curl --location 'https://stg-api.bankkaro.com/partner/api/cg-eligiblity' \\\n--header 'Content-Type: application/json' \\\n--data '{\"alias\":\"sbi-cashback-credit-card\",\"pincode\":\"560001\",\"inhandIncome\":\"35000\",\"empStatus\":\"salaried\"}'",
+  "curlExample": "curl --location 'https://uat-platform.bankkaro.com/partner/api/cg-eligibility' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"pincode\": \"110001\",\n  \"inhandIncome\": 50000,\n  \"empStatus\": \"salaried\"\n}'",
+  "curlExampleProd": "curl --location 'https://prod-platform.bankkaro.com/partner/api/cg-eligibility' \\\n--header 'Content-Type: application/json' \\\n--data '{\"pincode\":\"110001\",\"inhandIncome\":\"50000\",\"empStatus\":\"salaried\"}'",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/api/cg-eligibility' \\\n--header 'Content-Type: application/json' \\\n--data '{\"alias\":\"sbi-cashback-credit-card\",\"pincode\":\"560001\",\"inhandIncome\":\"35000\",\"empStatus\":\"salaried\"}'",
   "products": [
     "Card Genius"
   ],
