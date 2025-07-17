@@ -48,6 +48,7 @@ import {
   Science as ScienceIcon
 } from '@mui/icons-material';
 import { environments, getEnvironmentUrl, getApiBaseUrl } from '../config/environments';
+import { apiData } from '../data/apiData';
 // import ApiSandbox from './ApiSandbox';
 
 const API_BASE_URL = getApiBaseUrl();
@@ -79,21 +80,27 @@ const ApiDocumentation = () => {
         console.log('ApiDocumentation - Endpoint length:', endpoint ? endpoint.length : 'null');
         console.log('ApiDocumentation - URL pathname:', window.location.pathname);
         
+        let foundApi = null;
+        
+        // If API_BASE_URL is null (production), use static data
         if (!API_BASE_URL) {
-          setError('API server not configured. Please start the local server.');
-          return;
-        }
+          console.log('ApiDocumentation - Using static data (production mode)');
+          foundApi = apiData[endpoint];
+          console.log('ApiDocumentation - Static data match for:', endpoint, foundApi ? 'FOUND' : 'NOT FOUND');
+        } else {
+          // Development mode - fetch from server
+          console.log('ApiDocumentation - Fetching from server (development mode)');
+          const response = await fetch(`${API_BASE_URL}/endpoints`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch API data from server');
+          }
+          const endpointsData = await response.json();
+          console.log('ApiDocumentation - All endpoints keys:', Object.keys(endpointsData));
 
-        const response = await fetch(`${API_BASE_URL}/endpoints`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch API data from server');
+          // Direct match - all keys are now normalized without leading slashes
+          foundApi = endpointsData[endpoint];
+          console.log('ApiDocumentation - Server data match for:', endpoint, foundApi ? 'FOUND' : 'NOT FOUND');
         }
-        const endpointsData = await response.json();
-        console.log('ApiDocumentation - All endpoints keys:', Object.keys(endpointsData));
-
-        // Direct match - all keys are now normalized without leading slashes
-        let foundApi = endpointsData[endpoint];
-        console.log('ApiDocumentation - Direct match for:', endpoint, foundApi ? 'FOUND' : 'NOT FOUND');
         
         console.log('ApiDocumentation - Found API for endpoint:', endpoint, foundApi);
         
@@ -107,7 +114,16 @@ const ApiDocumentation = () => {
         }
       } catch (err) {
         console.error('Failed to fetch API data:', err.message);
-        setError('Failed to load API data from server. Please ensure the local server is running.');
+        // Fallback to static data if server fails
+        console.log('ApiDocumentation - Server failed, falling back to static data');
+        const fallbackApi = apiData[endpoint];
+        if (fallbackApi) {
+          setApi(fallbackApi);
+          setSelectedMethod(fallbackApi.methods[0] || 'POST');
+          console.log('ApiDocumentation - Using fallback static data:', fallbackApi);
+        } else {
+          setError('API endpoint not found in admin data');
+        }
       } finally {
         setLoading(false);
       }
