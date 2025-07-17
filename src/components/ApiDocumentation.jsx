@@ -48,7 +48,7 @@ import {
   Science as ScienceIcon
 } from '@mui/icons-material';
 import { environments, getEnvironmentUrl, getApiBaseUrl } from '../config/environments';
-import ApiSandbox from './ApiSandbox';
+// import ApiSandbox from './ApiSandbox';
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -65,10 +65,10 @@ const ApiDocumentation = () => {
   console.log('🔍 ApiDocumentation component rendered with endpoint:', endpoint);
   const [selectedMethod, setSelectedMethod] = useState('POST');
   const [selectedEnvironment, setSelectedEnvironment] = useState('uat');
-  const [showSandbox, setShowSandbox] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({
-    testing: false
-  });
+  // const [showSandbox, setShowSandbox] = useState(false);
+  // const [expandedSections, setExpandedSections] = useState({
+  //   testing: false
+  // });
 
   useEffect(() => {
     const fetchApiData = async () => {
@@ -366,12 +366,12 @@ const ApiDocumentation = () => {
     setSelectedEnvironment(newValue);
   };
 
-  const toggleSection = (section) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
-  };
+  // const toggleSection = (section) => {
+  //   setExpandedSections(prev => ({
+  //     ...prev,
+  //     [section]: !prev[section]
+  //   }));
+  // };
 
   return (
     <Box sx={{ maxWidth: '100%' }}>
@@ -415,7 +415,8 @@ const ApiDocumentation = () => {
             Response Details
           </Button>
 
-          <Button
+          {/* Testing & Examples Button - Hidden for now */}
+          {/* <Button
             variant="outlined"
             size="small"
             onClick={() => {
@@ -427,7 +428,7 @@ const ApiDocumentation = () => {
             startIcon={<ScienceIcon />}
           >
             Testing & Examples
-          </Button>
+          </Button> */}
         </Box>
       </Box>
 
@@ -898,7 +899,8 @@ const ApiDocumentation = () => {
 
 
       {/* ===== TESTING & EXAMPLES SECTION ===== */}
-      <Box id="testing-examples" sx={{ mb: 6 }}>
+      {/* Hidden for now - will be added separately */}
+      {/* <Box id="testing-examples" sx={{ mb: 6 }}>
         <Box sx={{ 
           display: 'flex', 
           alignItems: 'center', 
@@ -932,7 +934,6 @@ const ApiDocumentation = () => {
         
         {expandedSections.testing && (
           <>
-            {/* Sandbox Toggle Button */}
             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
               <Button
                 variant={showSandbox ? "contained" : "outlined"}
@@ -951,14 +952,12 @@ const ApiDocumentation = () => {
               </Button>
             </Box>
 
-            {/* Sandbox Section */}
             {showSandbox && (
               <Box sx={{ mb: 4 }}>
                 <ApiSandbox api={api} />
               </Box>
             )}
 
-            {/* Additional Examples */}
             {currentApiData.additionalExamples && Array.isArray(currentApiData.additionalExamples) && currentApiData.additionalExamples.length > 0 && (
               <Grid xs={12}>
                 <Card sx={{ borderRadius: 2 }}>
@@ -997,7 +996,7 @@ const ApiDocumentation = () => {
             )}
           </>
         )}
-      </Box>
+      </Box> */}
     </Box>
   );
 };
