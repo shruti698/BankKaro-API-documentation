@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BankKaro Partner API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css" />
+    <style>
+        html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
+        *, *:before, *:after { box-sizing: inherit; }
+        body { margin:0; background: #fafafa; }
+        .swagger-ui .topbar { background-color: #2c3e50; }
+        .swagger-ui .topbar .download-url-wrapper .select-label { color: #fff; }
+        .swagger-ui .info .title { color: #2c3e50; }
+        .swagger-ui .scheme-container { background: #f8f9fa; margin: 0 0 20px; padding: 20px 0; box-shadow: 0 1px 2px 0 rgba(0,0,0,.15); }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            // Complete OpenAPI spec with all endpoints
+            const spec = {
+                "openapi": "3.0.0",
+                "info": {
+                    "title": "BankKaro Partner API",
+                    "description": "Complete API documentation for BankKaro Partner services including CardGenius, LoanGenius, and EducationGenius",
+                    "version": "1.0.0",
+                    "contact": {
+                        "name": "BankKaro API Support",
+                        "email": "support@bankkaro.com"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "https://uat-partner.bankkaro.com",
+                        "description": "UAT Environment"
+                    },
+                    {
+                        "url": "https://prod-partner.bankkaro.com",
+                        "description": "Production Environment"
+                    }
+                ],
+                "components": {
+                    "securitySchemes": {
+                        "partnerToken": {
+                            "type": "apiKey",
+                            "in": "header",
+                            "name": "partner-token",
+                            "description": "JWT token obtained from /partner/token endpoint"
+                        }
+                    },
+                    "responses": {
+                        "UnauthorizedError": {
+                            "description": "Access token is missing or invalid",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "object",
+                                        "properties": {
+                                            "status": { "type": "string", "example": "error" },
+                                            "message": { "type": "string", "example": "Unauthorized access" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{ "partnerToken": [] }],
+                "paths": {
+                    "/partner/health": {
+                        "get": {
+                            "tags": ["Partner APIs"],
+                            "summary": "Health Check",
+                            "description": "This provides a health check for the API ecosystem and sends in a message \"Up and Running\"",
+                            "operationId": "health-check",
+                            "responses": {
+                                "200": {
+                                    "description": "Health check status",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "message": { "type": "string", "example": "Up and Running" }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "/partner/token": {
+                        "post": {
+                            "tags": ["Partner APIs"],
+                            "summary": "Partner Token Generation",
+                            "description": "Generate a partner-token (JWT) that is required for authorization in subsequent API calls",
+                            "operationId": "partner-token",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "x-api-key": {
+                                                    "type": "string",
+                                                    "description": "Secret API key issued by BankKaro (environment-specific)"
+                                                }
+                                            },
+                                            "required": ["x-api-key"]
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Token generated successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": { "type": "string" },
+                                                    "message": { "type": "string" },
+                                                    "data": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "jwttoken": { "type": "string" },
+                                                            "expiresAt": { "type": "string", "format": "date-time" }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/partner/auth": {
+                        "post": {
+                            "tags": ["Partner APIs"],
+                            "summary": "Partner Authentication",
+                            "description": "Authenticate a partner and get access token",
+                            "operationId": "partner-auth",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "mobile": {
+                                                    "type": "string",
+                                                    "description": "Mobile number for authentication"
+                                                },
+                                                "otp": {
+                                                    "type": "string",
+                                                    "description": "One-time password for verification"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Successful response",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": { "type": "string" },
+                                                    "message": { "type": "string" },
+                                                    "data": { "type": "object" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/partner/autoAuth": {
+                        "post": {
+                            "tags": ["Partner APIs"],
+                            "summary": "Partner Auto Authentication",
+                            "description": "Auto-authenticate partners using mobile number or exit_id without UI",
+                            "operationId": "partner-auto-auth",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "mobile": {
+                                                    "type": "string",
+                                                    "description": "Mobile number to auto login user (if no exit_id used)"
+                                                },
+                                                "exit_id": {
+                                                    "type": "string",
+                                                    "description": "Used for login via CK or PS if mobile not provided"
+                                                },
+                                                "vendor": {
+                                                    "type": "string",
+                                                    "description": "Must be either CK or PS with valid exit_id"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Auto authentication successful",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": { "type": "string" },
+                                                    "message": { "type": "string" },
+                                                    "data": { "type": "object" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/partner/api/lead-details": {
+                        "get": {
+                            "tags": ["Partner APIs"],
+                            "summary": "Get Lead Details",
+                            "description": "Retrieve lead information by lead ID",
+                            "operationId": "get-lead-details",
+                            "parameters": [
+                                {
+                                    "name": "leadId",
+                                    "in": "query",
+                                    "required": true,
+                                    "schema": {
+                                        "type": "string"
+                                    },
+                                    "description": "Lead identifier to retrieve"
+                                }
+                            ],
+                            "responses": {
+                                "200": {
+                                    "description": "Lead details retrieved successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": { "type": "string" },
+                                                    "message": { "type": "string" },
+                                                    "data": { "type": "object" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        },
+                        "post": {
+                            "tags": ["Partner APIs"],
+                            "summary": "Create Lead Details",
+                            "description": "Create a new lead with customer and loan information",
+                            "operationId": "create-lead-details",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "customerName": {
+                                                    "type": "string",
+                                                    "description": "Full name of the customer"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "description": "Customer email address"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "description": "Customer phone number"
+                                                },
+                                                "loanAmount": {
+                                                    "type": "number",
+                                                    "description": "Requested loan amount"
+                                                },
+                                                "purpose": {
+                                                    "type": "string",
+                                                    "description": "Purpose of the loan"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Lead created successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": { "type": "string" },
+                                                    "message": { "type": "string" },
+                                                    "data": { "type": "object" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/partner/api/application": {
+                        "post": {
+                            "tags": ["Partner APIs"],
+                            "summary": "Loan Application",
+                            "description": "Submit a complete loan application",
+                            "operationId": "loan-application",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "leadId": {
+                                                    "type": "string",
+                                                    "description": "Lead identifier from lead-details"
+                                                },
+                                                "personalInfo": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "dateOfBirth": { "type": "string" },
+                                                        "panNumber": { "type": "string" },
+                                                        "aadharNumber": { "type": "string" }
+                                                    }
+                                                },
+                                                "employmentInfo": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "employmentType": { "type": "string" },
+                                                        "monthlyIncome": { "type": "number" },
+                                                        "companyName": { "type": "string" }
+                                                    }
+                                                },
+                                                "documents": {
+                                                    "type": "array",
+                                                    "items": { "type": "string" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Application submitted successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": { "type": "string" },
+                                                    "message": { "type": "string" },
+                                                    "data": { "type": "object" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/partner/cardgenius/init-bundle": {
+                        "get": {
+                            "tags": ["Card APIs"],
+                            "summary": "Initialization Bundle",
+                            "description": "Returns all static data required to initialize the CardGenius app",
+                            "operationId": "cardgenius-init-bundle",
+                            "responses": {
+                                "200": {
+                                    "description": "Initialization data retrieved successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": { "type": "string" },
+                                                    "message": { "type": "string" },
+                                                    "data": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "bank_data": { "type": "array" },
+                                                            "tag_data": { "type": "array" },
+                                                            "card_data": { "type": "array" }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/partner/cardgenius/cards": {
+                        "get": {
+                            "tags": ["Card APIs"],
+                            "summary": "Cards Catalog (GET)",
+                            "description": "Get a list of all available credit cards with no request parameters",
+                            "operationId": "cardgenius-cards-get",
+                            "responses": {
+                                "200": {
+                                    "description": "Cards retrieved successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": { "type": "string" },
+                                                    "message": { "type": "string" },
+                                                    "data": { "type": "object" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        },
+                        "post": {
+                            "tags": ["Card APIs"],
+                            "summary": "Cards Catalog (POST)",
+                            "description": "Get a filtered list of credit cards based on user preferences and eligibility criteria",
+                            "operationId": "cardgenius-cards-post",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "slug": { "type": "string" },
+                                                "banks_ids": { "type": "array", "items": { "type": "integer" } },
+                                                "card_networks": { "type": "array", "items": { "type": "string" } },
+                                                "annualFees": { "type": "string" },
+                                                "credit_score": { "type": "integer" },
+                                                "sort_by": { "type": "string" },
+                                                "free_cards": { "type": "boolean" },
+                                                "eligiblityPayload": { "type": "object" },
+                                                "cardGeniusPayload": { "type": "object" }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Filtered cards retrieved successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": { "type": "string" },
+                                                    "message": { "type": "string" },
+                                                    "data": { "type": "object" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/cardgenius/eligibility": {
+                        "post": {
+                            "tags": ["Card APIs"],
+                            "summary": "Eligibility",
+                            "description": "Check if a user qualifies for one or more cards based on pincode, in‑hand salary and employment type",
+                            "operationId": "cardgenius-eligibility",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "alias": { "type": "string" },
+                                                "pincode": { "type": "string" },
+                                                "inhandIncome": { "type": "integer" },
+                                                "empStatus": { "type": "string" }
+                                            },
+                                            "required": ["pincode", "inhandIncome", "empStatus"]
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Eligibility check completed",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": { "type": "string" },
+                                                    "message": { "type": "string" },
+                                                    "data": { "type": "array" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/cardgenius/cards/{card_slug}": {
+                        "get": {
+                            "tags": ["Card APIs"],
+                            "summary": "Card Detail",
+                            "description": "Fetch the full specification and meta‑data for a single credit card",
+                            "operationId": "cardgenius-card-detail",
+                            "parameters": [
+                                {
+                                    "name": "card_slug",
+                                    "in": "path",
+                                    "required": true,
+                                    "schema": {
+                                        "type": "string"
+                                    },
+                                    "description": "The SEO‑friendly slug of the card"
+                                }
+                            ],
+                            "responses": {
+                                "200": {
+                                    "description": "Card details retrieved successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": { "type": "string" },
+                                                    "message": { "type": "string" },
+                                                    "data": { "type": "object" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/cardgenius/cards/calculate": {
+                        "post": {
+                            "tags": ["Card APIs"],
+                            "summary": "Card Genius Calculator",
+                            "description": "Given a detailed spend profile, ranks cards by potential annual savings",
+                            "operationId": "cardgenius-calculate",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "amazon_spends": { "type": "number" },
+                                                "flipkart_spends": { "type": "number" },
+                                                "other_online_spends": { "type": "number" },
+                                                "other_offline_spends": { "type": "number" },
+                                                "grocery_spends_online": { "type": "number" },
+                                                "online_food_ordering": { "type": "number" },
+                                                "fuel": { "type": "number" },
+                                                "dining_or_going_out": { "type": "number" },
+                                                "flights_annual": { "type": "number" },
+                                                "hotels_annual": { "type": "number" },
+                                                "domestic_lounge_usage_quarterly": { "type": "number" },
+                                                "international_lounge_usage_quarterly": { "type": "number" },
+                                                "mobile_phone_bills": { "type": "number" },
+                                                "electricity_bills": { "type": "number" },
+                                                "water_bills": { "type": "number" },
+                                                "insurance_health_annual": { "type": "number" },
+                                                "insurance_car_or_bike_annual": { "type": "number" },
+                                                "rent": { "type": "number" },
+                                                "school_fees": { "type": "number" }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Savings calculated successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "status": { "type": "string" },
+                                                    "message": { "type": "string" },
+                                                    "data": { "type": "object" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/v1/redemptions/calculate": {
+                        "post": {
+                            "tags": ["Card APIs"],
+                            "summary": "Redemption Planner",
+                            "description": "Calculate the best way to redeem reward points",
+                            "operationId": "redemption-planner",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "points": { "type": "integer" },
+                                                "preferred_redemption_types": { "type": "array", "items": { "type": "string" } }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Redemption options calculated",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "best_option": { "type": "object" },
+                                                    "options": { "type": "array" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/v1/cards/{card_slug}/offers": {
+                        "get": {
+                            "tags": ["Card APIs"],
+                            "summary": "Instant Offers",
+                            "description": "Get live issuer–brand promotions for a specific card",
+                            "operationId": "instant-offers",
+                            "parameters": [
+                                {
+                                    "name": "card_slug",
+                                    "in": "path",
+                                    "required": true,
+                                    "schema": {
+                                        "type": "string"
+                                    },
+                                    "description": "Card slug"
+                                }
+                            ],
+                            "responses": {
+                                "200": {
+                                    "description": "Offers retrieved successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "offers": { "type": "array" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/v1/cards/{card_slug}/lounges": {
+                        "get": {
+                            "tags": ["Card APIs"],
+                            "summary": "Lounge Finder",
+                            "description": "Get airport and railway lounge access details for a specific card",
+                            "operationId": "lounge-finder",
+                            "parameters": [
+                                {
+                                    "name": "card_slug",
+                                    "in": "path",
+                                    "required": true,
+                                    "schema": {
+                                        "type": "string"
+                                    },
+                                    "description": "Card slug"
+                                }
+                            ],
+                            "responses": {
+                                "200": {
+                                    "description": "Lounge details retrieved successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "domestic_lounges_per_quarter": { "type": "integer" },
+                                                    "international_lounges_per_year": { "type": "integer" },
+                                                    "railway_lounges_per_quarter": { "type": "integer" },
+                                                    "lounge_networks": { "type": "array" },
+                                                    "terms": { "type": "string" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/v1/cards/omni": {
+                        "post": {
+                            "tags": ["Card APIs"],
+                            "summary": "Omni Endpoint",
+                            "description": "A single endpoint to get nested data from multiple modules",
+                            "operationId": "omni-endpoint",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "include_banks": { "type": "boolean" },
+                                                "include_categories": { "type": "boolean" },
+                                                "include_cards": { "type": "boolean" },
+                                                "include_recommendations": { "type": "boolean" },
+                                                "include_offers": { "type": "boolean" },
+                                                "include_lounges": { "type": "boolean" },
+                                                "include_redemptions": { "type": "boolean" }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Omni data retrieved successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "banks": { "type": "array" },
+                                                    "categories": { "type": "array" },
+                                                    "cards": { "type": "array" },
+                                                    "recommendations": { "type": "array" },
+                                                    "offers": { "type": "array" },
+                                                    "lounges": { "type": "object" },
+                                                    "redemptions": { "type": "object" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    },
+                    "/v1/webhooks": {
+                        "post": {
+                            "tags": ["Card APIs"],
+                            "summary": "Webhooks Subscription",
+                            "description": "Subscribe to webhook events for real-time notifications",
+                            "operationId": "webhooks-subscription",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "url": { "type": "string" },
+                                                "events": { "type": "array", "items": { "type": "string" } }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Webhook subscription created successfully",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "success": { "type": "boolean" },
+                                                    "message": { "type": "string" },
+                                                    "webhook_id": { "type": "string" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": { "$ref": "#/components/responses/UnauthorizedError" }
+                            }
+                        }
+                    }
+                }
+            };
+
+            const ui = SwaggerUIBundle({
+                spec: spec,
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+                plugins: [SwaggerUIBundle.plugins.DownloadUrl],
+                layout: "StandaloneLayout",
+                validatorUrl: null,
+                docExpansion: "list",
+                filter: true,
+                showRequestHeaders: true,
+                showCommonExtensions: true,
+                tryItOutEnabled: true,
+                requestInterceptor: function(request) {
+                    const token = localStorage.getItem('partner-token');
+                    if (token) {
+                        request.headers['partner-token'] = token;
+                    }
+                    return request;
+                },
+                onComplete: function() {
+                    const tokenInput = `
+                        <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                            <label for="token-input" style="font-weight: bold; margin-right: 10px;">Partner Token:</label>
+                            <input type="text" id="token-input" placeholder="Enter your JWT token" 
+                                   style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <button onclick="setToken()" style="margin-left: 10px; padding: 8px 15px; background: #2c3e50; color: white; border: none; border-radius: 4px; cursor: pointer;">Set Token</button>
+                            <button onclick="clearToken()" style="margin-left: 10px; padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Clear Token</button>
+                        </div>
+                    `;
+                    document.querySelector('.swagger-ui .scheme-container').insertAdjacentHTML('afterend', tokenInput);
+                    
+                    const savedToken = localStorage.getItem('partner-token');
+                    if (savedToken) {
+                        document.getElementById('token-input').value = savedToken;
+                    }
+                }
+            });
+        };
+
+        function setToken() {
+            const token = document.getElementById('token-input').value;
+            if (token) {
+                localStorage.setItem('partner-token', token);
+                alert('Token saved! It will be automatically included in API requests.');
+            }
+        }
+
+        function clearToken() {
+            localStorage.removeItem('partner-token');
+            document.getElementById('token-input').value = '';
+            alert('Token cleared!');
+        }
+    </script>
+</body>
+</html> 

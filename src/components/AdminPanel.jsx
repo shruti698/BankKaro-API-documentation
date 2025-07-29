@@ -82,7 +82,15 @@ const AdminPanel = () => {
 
   const fetchEndpoints = async () => {
     try {
-      // Use static data from apiData.js
+      // Try to fetch from database first, fallback to static data
+      const response = await fetch('/api/endpoints');
+      
+      if (response.ok) {
+        const endpoints = await response.json();
+        setEndpoints(endpoints);
+        console.log('✅ Fetched endpoints from database:', endpoints.length);
+      } else {
+        // Fallback to static data
         const staticEndpoints = Object.entries(apiData)
           .sort((a, b) => {
             // Sort by rank first, then FIFO for equal ranks
@@ -97,35 +105,49 @@ const AdminPanel = () => {
             return 0;
           })
           .map(([endpoint, data]) => {
-                      return {
-              endpoint,
+            return {
+              id: endpoint,
               name: data.name,
-              endpointPath: data.endpoint,
-              description: data.description || '',
-              category: data.category || '',
-            products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
-              purpose: data.purpose || '',
-              methods: data.methods || [],
-              status: data.status || 'live',
-              rank: data.rank || 999,
-              requestSchema: data.requestSchema || {},
-              responseSchema: data.responseSchema || {},
-              sampleRequest: data.sampleRequest || {},
-              sampleResponse: data.sampleResponse || {},
-              sampleResponses: data.sampleResponses || [],
-              errorResponses: data.errorResponses || [],
-            curlExample: data.curlExample || '',
-            curlExampleStaging: data.curlExampleStaging || '',
-            curlExampleProduction: data.curlExampleProduction || '',
-              validationNotes: data.validationNotes || [],
-              fieldTable: data.fieldTable || []
+              endpoint: data.endpoint,
+              description: data.description,
+              category: data.category,
+              products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
+              methods: data.methods,
+              purpose: data.purpose
             };
-        });
-      
+          });
+        
         setEndpoints(staticEndpoints);
-      setLoading(false);
+        console.log('✅ Fetched endpoints from static data:', staticEndpoints.length);
+      }
     } catch (error) {
       console.error('Error fetching endpoints:', error);
+      // Fallback to static data on error
+      const staticEndpoints = Object.entries(apiData)
+        .sort((a, b) => {
+          const rankA = a[1].rank || 999;
+          const rankB = b[1].rank || 999;
+          if (rankA !== rankB) {
+            return rankA - rankB;
+          }
+          return 0;
+        })
+        .map(([endpoint, data]) => {
+          return {
+            id: endpoint,
+            name: data.name,
+            endpoint: data.endpoint,
+            description: data.description,
+            category: data.category,
+            products: data.products || (data.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
+            methods: data.methods,
+            purpose: data.purpose
+          };
+        });
+      
+      setEndpoints(staticEndpoints);
+      console.log('✅ Fetched endpoints from static data (fallback):', staticEndpoints.length);
+    } finally {
       setLoading(false);
     }
   };
@@ -135,7 +157,7 @@ const AdminPanel = () => {
       setEditingEndpoint(endpoint);
               setFormData({
           name: endpoint.name,
-          endpoint: endpoint.endpointPath,
+          endpoint: endpoint.endpoint,
         description: endpoint.description || '',
         category: endpoint.category || '',
         products: Array.isArray(endpoint.products) ? endpoint.products : 
@@ -192,28 +214,52 @@ const AdminPanel = () => {
 
   const saveToApiData = async (updatedEndpoints) => {
     try {
-      // Save to local file system using the local server
-      const response = await fetch('http://localhost:3001/api/save-api-data', {
+      // Save to database using the new API
+      const response = await fetch('/api/endpoints', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          updatedEndpoints: updatedEndpoints,
-          mode: 'local'
+          endpointKey: editingEndpoint ? editingEndpoint.id : formData.endpoint.replace(/\//g, '-').replace(/^-/, ''),
+          data: {
+            name: formData.name,
+            endpoint: formData.endpoint,
+            description: formData.description,
+            category: formData.category,
+            products: formData.products,
+            purpose: formData.purpose,
+            methods: formData.methods,
+            status: formData.status,
+            rank: formData.rank,
+            requestSchema: formData.requestSchema,
+            responseSchema: formData.responseSchema,
+            sampleRequest: formData.sampleRequest,
+            sampleResponse: formData.sampleResponse,
+            sampleResponses: formData.sampleResponses,
+            errorResponses: formData.errorResponses,
+            curlExample: formData.curlExample,
+            curlExampleStaging: formData.curlExampleStaging,
+            curlExampleProduction: formData.curlExampleProduction,
+            validationNotes: formData.validationNotes,
+            fieldTable: formData.fieldTable,
+            importantNotes: formData.importantNotes,
+            headers: formData.headers,
+            additionalExamples: formData.additionalExamples
+          }
         })
       });
       
       if (response.ok) {
-        alert('✅ Changes saved to local apiData.js file!\n\n🔄 Refreshing to show updated data...');
+        alert('✅ Changes saved to database!\n\n🔄 Refreshing to show updated data...');
         setTimeout(() => window.location.reload(), 1000);
-        return { success: true, mode: 'local' };
+        return { success: true, mode: 'database' };
       } else {
         throw new Error('Server returned error');
       }
     } catch (error) {
-      console.error('Error saving to local file:', error);
-      alert('❌ Local server not running!\n\n📝 Please run this command in your terminal:\n\nnpm run local-server\n\nThen try saving again.');
+      console.error('Error saving to database:', error);
+      alert('❌ Database server not running!\n\n📝 Please run this command in your terminal:\n\nnpm run local-server\n\nThen try saving again.');
       return { success: false, mode: 'error' };
     }
   };
@@ -510,7 +556,7 @@ const AdminPanel = () => {
           </TableHead>
           <TableBody>
             {endpoints.map((endpoint) => (
-              <TableRow key={endpoint.endpoint}>
+              <TableRow key={endpoint.id}>
                 <TableCell>{endpoint.name}</TableCell>
                 <TableCell>{endpoint.endpoint}</TableCell>
                 <TableCell>

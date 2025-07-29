@@ -1,0 +1,67 @@
+{
+  "kind": "collectionType",
+  "collectionName": "api_endpoints",
+  "info": {
+    "singularName": "api-endpoint",
+    "pluralName": "api-endpoints",
+    "displayName": "api_endpoint"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "endpoint": {
+      "type": "string"
+    },
+    "method": {
+      "type": "enumeration",
+      "enum": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH"
+      ]
+    },
+    "category": {
+      "type": "string"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "requestSchema": {
+      "type": "json"
+    },
+    "responseSchema": {
+      "type": "json"
+    },
+    "validationNotes": {
+      "type": "blocks"
+    },
+    "curl_example_staging": {
+      "type": "blocks"
+    },
+    "sampleRequest": {
+      "type": "blocks"
+    },
+    "sampleResponse": {
+      "type": "blocks"
+    },
+    "errorResponse": {
+      "type": "blocks"
+    },
+    "state": {
+      "type": "string"
+    },
+    "products": {
+      "type": "string"
+    },
+    "curl_example_production": {
+      "type": "blocks"
+    }
+  }
+}

@@ -8,17 +8,39 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 3002;
 
-// Serve static files
-app.use(express.static(__dirname));
+// Set correct MIME types for JavaScript modules
+app.use((req, res, next) => {
+  if (req.url.endsWith('.js') || req.url.endsWith('.jsx') || req.url.endsWith('.mjs')) {
+    res.type('application/javascript');
+  }
+  next();
+});
 
-// Serve the Swagger UI
+// Serve only specific files, not the entire directory
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'swagger-ui.html'));
 });
 
-// Serve the OpenAPI spec
 app.get('/openapi-spec.json', (req, res) => {
     res.sendFile(path.join(__dirname, 'openapi-spec.json'));
+});
+
+// Serve Swagger UI assets from CDN (no local files needed)
+app.get('/swagger-ui.css', (req, res) => {
+    res.redirect('https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css');
+});
+
+app.get('/swagger-ui-bundle.js', (req, res) => {
+    res.redirect('https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js');
+});
+
+app.get('/swagger-ui-standalone-preset.js', (req, res) => {
+    res.redirect('https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js');
+});
+
+// Catch all other routes and serve the Swagger UI
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'swagger-ui.html'));
 });
 
 app.listen(PORT, () => {

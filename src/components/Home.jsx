@@ -29,6 +29,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { getApiBaseUrl } from '../config/environments';
 import { apiData } from '../data/apiData';
+import { strapiApi } from '../services/strapiApi';
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -64,18 +65,14 @@ const Home = () => {
         
         let data;
         
-        if (!API_BASE_URL) {
-          // Use static data in production
-          console.log('Home - Using static data from apiData.js');
+        // Try Strapi first, then fallback to static data
+        console.log('Home - Trying Strapi first, then static data fallback');
+        try {
+          data = await strapiApi.getAllEndpoints();
+          console.log('Home - Successfully fetched from Strapi');
+        } catch (strapiError) {
+          console.log('Home - Strapi error, using static data:', strapiError.message);
           data = apiData;
-        } else {
-          // Use local server in development
-          console.log('Home - Fetching from local server:', API_BASE_URL);
-          const response = await fetch(`${API_BASE_URL}/endpoints`);
-          if (!response.ok) {
-            throw new Error('Failed to fetch endpoints from server');
-          }
-          data = await response.json();
         }
         
         // Convert object to array format

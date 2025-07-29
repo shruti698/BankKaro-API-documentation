@@ -69,11 +69,26 @@ const Layout = ({ children }) => {
         } else {
           // Use local server in development
           console.log('Layout - Fetching from local server:', API_BASE_URL);
-          const response = await fetch(`${API_BASE_URL}/endpoints`);
+          const response = await fetch(`${API_BASE_URL}/api/endpoints`);
           if (!response.ok) {
             throw new Error('Failed to fetch endpoints from server');
           }
-          data = await response.json();
+          const endpoints = await response.json();
+          // Convert database format to apiData format
+          data = {};
+          endpoints.forEach(endpoint => {
+            data[endpoint.id] = {
+              name: endpoint.name,
+              endpoint: endpoint.endpoint,
+              methods: endpoint.methods,
+              status: endpoint.status || 'live',
+              description: endpoint.description,
+              category: endpoint.category,
+              purpose: endpoint.purpose,
+              products: endpoint.products,
+              rank: endpoint.rank || 999
+            };
+          });
         }
 
         // Convert object to array format

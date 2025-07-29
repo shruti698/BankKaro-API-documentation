@@ -94,12 +94,11 @@ const ApiDocumentation = () => {
           // Development mode - try server first, fallback to static data
           console.log('ApiDocumentation - Trying server first (development mode)');
           try {
-            const response = await fetch(`${API_BASE_URL}/endpoints`);
+            const response = await fetch(`/api/endpoints/${encodeURIComponent(endpoint)}`);
             if (response.ok) {
-              const endpointsData = await response.json();
-              console.log('ApiDocumentation - Server data keys:', Object.keys(endpointsData));
-              foundApi = endpointsData[endpoint];
-              console.log('ApiDocumentation - Server data match for:', endpoint, foundApi ? 'FOUND' : 'NOT FOUND');
+              const endpointData = await response.json();
+              console.log('ApiDocumentation - Server data for endpoint:', endpoint, endpointData ? 'FOUND' : 'NOT FOUND');
+              foundApi = endpointData;
             } else {
               throw new Error('Server response not ok');
             }
