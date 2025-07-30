@@ -16,18 +16,13 @@ export default async function handler(req, res) {
 
   try {
     console.log('🔍 API Route - Starting request');
-    // Initialize database if not already done
-    if (!dbManager.db) {
-      console.log('🔍 API Route - Initializing database');
-      await dbManager.initialize();
-      
-      // Import existing data if database is empty
-      const endpoints = await dbManager.getAllEndpoints();
-      console.log('🔍 API Route - Found endpoints:', endpoints.length);
-      if (endpoints.length === 0) {
-        console.log('🔍 API Route - Importing from apiData');
-        await dbManager.importFromApiData(apiData);
-      }
+    
+    // Check if database has data, import if empty
+    const endpoints = await dbManager.getAllEndpoints();
+    console.log('🔍 API Route - Found endpoints:', endpoints.length);
+    if (endpoints.length === 0) {
+      console.log('🔍 API Route - Importing from apiData');
+      await dbManager.importFromApiData(apiData);
     }
 
     if (req.method === 'GET') {

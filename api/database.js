@@ -114,6 +114,25 @@ class DatabaseManager {
       databasePath: this.dbPath
     };
   }
+
+  async initialize() {
+    // Database is already initialized in constructor
+    console.log('✅ Database already initialized');
+    return true;
+  }
+
+  async importFromApiData(apiData) {
+    try {
+      const endpoints = Object.entries(apiData).map(([key, data]) => ({ id: key, ...data }));
+      const db = { endpoints };
+      this.writeDb(db);
+      console.log('✅ Imported data from apiData.js');
+      return true;
+    } catch (error) {
+      console.error('❌ Failed to import from apiData:', error);
+      return false;
+    }
+  }
 }
 
 export default DatabaseManager; 
