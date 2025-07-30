@@ -259,7 +259,7 @@ const AdminPanel = () => {
       }
     } catch (error) {
       console.error('Error saving to database:', error);
-      alert('❌ Database server not running!\n\n📝 Please run this command in your terminal:\n\nnpm run local-server\n\nThen try saving again.');
+      alert('❌ Failed to save to database!\n\n🔍 Check the browser console for more details.\n\n📝 If you\'re in development, ensure the local server is running with:\n\nnpm run local-server');
       return { success: false, mode: 'error' };
     }
   };

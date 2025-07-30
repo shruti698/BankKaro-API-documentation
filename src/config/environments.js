@@ -22,10 +22,11 @@ export const getEnvironmentUrl = (environment, isCardGenius) => {
 
 // API Base URL configuration
 export const getApiBaseUrl = () => {
-  // In production, return null to use static data
-  // In development, use local server
-  if (import.meta.env.PROD) {
-    return null; // Use static data in production
+  // Check if we're in production (Vercel) or development (localhost)
+  const isProduction = window.location.hostname !== 'localhost';
+  
+  if (isProduction) {
+    return ''; // Use Vercel API routes in production
   }
   return 'http://localhost:3001'; // Use local server in development
 };
