@@ -138,7 +138,7 @@ const Layout = ({ children }) => {
             description: endpointData.description,
             category: endpointData.category,
             products: endpointData.products || (endpointData.category === 'Partner APIs' ? ['Loan Genius', 'Card Genius'] : ['Card Genius']),
-            methods: endpointData.methods,
+            methods: Array.isArray(endpointData.methods) ? endpointData.methods : [],
             purpose: endpointData.purpose
           }));
 

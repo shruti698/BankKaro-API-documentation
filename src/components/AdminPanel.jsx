@@ -221,7 +221,7 @@ const AdminPanel = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          endpointKey: editingEndpoint ? editingEndpoint.id : formData.endpoint.replace(/\//g, '-').replace(/^-/, ''),
+          endpointKey: editingEndpoint ? editingEndpoint.id : formData.endpoint,
           data: {
             name: formData.name,
             endpoint: formData.endpoint,
