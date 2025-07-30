@@ -63,13 +63,40 @@ const Layout = ({ children }) => {
         let data;
         
         if (!API_BASE_URL) {
-          // Use static data in production
-          console.log('Layout - Using static data from apiData.js');
-          data = apiData;
+          // Use Vercel API routes in production
+          console.log('Layout - Fetching from Vercel API routes');
+          try {
+            const response = await fetch('/api/endpoints');
+            console.log('Layout - API response status:', response.status);
+            if (!response.ok) {
+              console.log('Layout - API failed, using static data as fallback');
+              data = apiData;
+            } else {
+              const endpoints = await response.json();
+              // Convert array format to apiData format
+              data = {};
+              endpoints.forEach(endpoint => {
+                data[endpoint.endpoint_key] = {
+                  name: endpoint.name,
+                  endpoint: endpoint.endpoint,
+                  methods: endpoint.methods ? endpoint.methods.split(',') : [],
+                  status: endpoint.status || 'live',
+                  description: endpoint.description,
+                  category: endpoint.category,
+                  purpose: endpoint.purpose,
+                  rank: endpoint.rank || 999
+                };
+              });
+              console.log('Layout - API data received:', Object.keys(data));
+            }
+          } catch (error) {
+            console.log('Layout - API call failed with error:', error.message);
+            data = apiData;
+          }
         } else {
           // Use local server in development
           console.log('Layout - Fetching from local server:', API_BASE_URL);
-          const response = await fetch(`${API_BASE_URL}/api/endpoints`);
+          const response = await fetch(`${API_BASE_URL}/endpoints`);
           if (!response.ok) {
             throw new Error('Failed to fetch endpoints from server');
           }
@@ -77,15 +104,14 @@ const Layout = ({ children }) => {
           // Convert database format to apiData format
           data = {};
           endpoints.forEach(endpoint => {
-            data[endpoint.id] = {
+            data[endpoint.endpoint_key] = {
               name: endpoint.name,
               endpoint: endpoint.endpoint,
-              methods: endpoint.methods,
+              methods: endpoint.methods ? endpoint.methods.split(',') : [],
               status: endpoint.status || 'live',
               description: endpoint.description,
               category: endpoint.category,
               purpose: endpoint.purpose,
-              products: endpoint.products,
               rank: endpoint.rank || 999
             };
           });

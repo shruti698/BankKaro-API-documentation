@@ -65,14 +65,45 @@ const Home = () => {
         
         let data;
         
-        // Try Strapi first, then fallback to static data
-        console.log('Home - Trying Strapi first, then static data fallback');
-        try {
-          data = await strapiApi.getAllEndpoints();
-          console.log('Home - Successfully fetched from Strapi');
-        } catch (strapiError) {
-          console.log('Home - Strapi error, using static data:', strapiError.message);
-          data = apiData;
+        if (!API_BASE_URL) {
+          // Use Vercel API routes in production
+          console.log('Home - Fetching from Vercel API routes');
+          try {
+            const response = await fetch('/api/endpoints');
+            console.log('Home - API response status:', response.status);
+            if (!response.ok) {
+              console.log('Home - API failed, using static data as fallback');
+              data = apiData;
+            } else {
+              const endpoints = await response.json();
+              // Convert array format to apiData format
+              data = {};
+              endpoints.forEach(endpoint => {
+                data[endpoint.endpoint_key] = {
+                  name: endpoint.name,
+                  endpoint: endpoint.endpoint,
+                  description: endpoint.description,
+                  category: endpoint.category,
+                  purpose: endpoint.purpose,
+                  methods: endpoint.methods ? endpoint.methods.split(',') : [],
+                  status: endpoint.status,
+                  rank: endpoint.rank
+                };
+              });
+              console.log('Home - API data received:', Object.keys(data));
+            }
+          } catch (error) {
+            console.log('Home - API call failed with error:', error.message);
+            data = apiData;
+          }
+        } else {
+          // Use local server in development
+          console.log('Home - Fetching from local server:', API_BASE_URL);
+          const response = await fetch(`${API_BASE_URL}/endpoints`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch endpoints from server');
+          }
+          data = await response.json();
         }
         
         // Convert object to array format
