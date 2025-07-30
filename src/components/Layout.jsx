@@ -76,10 +76,10 @@ const Layout = ({ children }) => {
               // Convert array format to apiData format
               data = {};
               endpoints.forEach(endpoint => {
-                data[endpoint.endpoint_key] = {
+                data[endpoint.id] = {
                   name: endpoint.name,
                   endpoint: endpoint.endpoint,
-                  methods: endpoint.methods ? endpoint.methods.split(',') : [],
+                  methods: Array.isArray(endpoint.methods) ? endpoint.methods : [],
                   status: endpoint.status || 'live',
                   description: endpoint.description,
                   category: endpoint.category,
@@ -104,10 +104,10 @@ const Layout = ({ children }) => {
           // Convert database format to apiData format
           data = {};
           endpoints.forEach(endpoint => {
-            data[endpoint.endpoint_key] = {
+            data[endpoint.id] = {
               name: endpoint.name,
               endpoint: endpoint.endpoint,
-              methods: endpoint.methods ? endpoint.methods.split(',') : [],
+              methods: Array.isArray(endpoint.methods) ? endpoint.methods : [],
               status: endpoint.status || 'live',
               description: endpoint.description,
               category: endpoint.category,

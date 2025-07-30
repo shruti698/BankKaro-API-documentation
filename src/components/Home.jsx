@@ -79,13 +79,13 @@ const Home = () => {
               // Convert array format to apiData format
               data = {};
               endpoints.forEach(endpoint => {
-                data[endpoint.endpoint_key] = {
+                data[endpoint.id] = {
                   name: endpoint.name,
                   endpoint: endpoint.endpoint,
                   description: endpoint.description,
                   category: endpoint.category,
                   purpose: endpoint.purpose,
-                  methods: endpoint.methods ? endpoint.methods.split(',') : [],
+                  methods: Array.isArray(endpoint.methods) ? endpoint.methods : [],
                   status: endpoint.status,
                   rank: endpoint.rank
                 };
