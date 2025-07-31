@@ -1,4 +1,4 @@
-import DatabaseManager from '../../database.js';
+import DatabaseManager from '../database.js';
 import { apiData } from '../../src/data/apiData.js';
 
 const dbManager = new DatabaseManager();
