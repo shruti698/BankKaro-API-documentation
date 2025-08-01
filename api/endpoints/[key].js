@@ -44,4 +44,4 @@ export default async function handler(req, res) {
     console.error('API Error:', error);
     res.status(500).json({ error: 'Internal server error', details: error.message });
   }
-} 
+} // Force complete rebuild - cache bust 

@@ -30,4 +30,4 @@ export default async function handler(req, res) {
     console.error('Test error:', error);
     return res.status(500).json({ error: error.message });
   }
-} 
+} // Force complete rebuild - cache bust 
