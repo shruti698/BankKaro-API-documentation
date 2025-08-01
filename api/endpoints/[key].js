@@ -1,7 +1,9 @@
-import DatabaseManager from '../database.js';
-import { apiData } from '../../src/data/apiData.js';
+import { createClient } from '@supabase/supabase-js';
 
-const dbManager = new DatabaseManager();
+const supabaseUrl = 'https://amvdndglahktcmmtlgtm.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtdmRuZGdsYWhrdGNtbXRsZ3RtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5NTQ4OTIsImV4cCI6MjA2OTUzMDg5Mn0.PuPbuCWDve-YuwHM3fJe_Y62_6kOXCoYKXHV4r1koYM';
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -21,19 +23,18 @@ export default async function handler(req, res) {
   try {
     const { key } = req.query;
     
-    // Initialize database if not already done
-    if (!dbManager.db) {
-      await dbManager.initialize();
-      
-      // Import existing data if database is empty
-      const endpoints = await dbManager.getAllEndpoints();
-      if (endpoints.length === 0) {
-        await dbManager.importFromApiData(apiData);
-      }
+    // Get single endpoint from Supabase
+    const { data: endpoint, error } = await supabase
+      .from('api_endpoints')
+      .select('*')
+      .eq('id', key)
+      .single();
+
+    if (error) {
+      console.error('Supabase error:', error);
+      return res.status(500).json({ error: 'Database error', details: error.message });
     }
 
-    const endpoint = await dbManager.getEndpoint(key);
-    
     if (!endpoint) {
       return res.status(404).json({ error: 'Endpoint not found' });
     }
