@@ -90,8 +90,8 @@ const ApiDocumentation = () => {
         console.log('ApiDocumentation - Trying API first');
         try {
           const apiUrl = API_BASE_URL 
-            ? `${API_BASE_URL}/endpoints/get-endpoint?key=${encodeURIComponent(endpoint)}&_t=${Date.now()}&v=2`
-            : `/api/endpoints/get-endpoint?key=${encodeURIComponent(endpoint)}&_t=${Date.now()}&v=2`;
+            ? `${API_BASE_URL}/get-endpoint?key=${encodeURIComponent(endpoint)}&_t=${Date.now()}&v=2`
+            : `/api/get-endpoint?key=${encodeURIComponent(endpoint)}&_t=${Date.now()}&v=2`;
           
           console.log('ApiDocumentation - Fetching from:', apiUrl);
           const response = await fetch(apiUrl);
