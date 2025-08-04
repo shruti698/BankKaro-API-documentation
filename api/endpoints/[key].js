@@ -23,11 +23,15 @@ export default async function handler(req, res) {
   try {
     const { key } = req.query;
     
+    // Decode the URL-encoded key
+    const decodedKey = decodeURIComponent(key);
+    console.log('API Route - Looking for endpoint with key:', decodedKey);
+    
     // Get single endpoint from Supabase
     const { data: endpoint, error } = await supabase
       .from('api_endpoints')
       .select('*')
-      .eq('id', key)
+      .eq('id', decodedKey)
       .single();
 
     if (error) {
