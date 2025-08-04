@@ -52,7 +52,6 @@ const AdminPanel = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [editingEndpoint, setEditingEndpoint] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
-  const [saveMode, setSaveMode] = useState('local'); // 'local' or 'download'
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -63,6 +62,7 @@ const AdminPanel = () => {
     purpose: '',
     methods: [],
     status: 'live',
+    rank: 999,
     requestSchema: {},
     responseSchema: {},
     sampleRequest: {},
@@ -214,7 +214,7 @@ const AdminPanel = () => {
 
   const saveToApiData = async (updatedEndpoints) => {
     try {
-      // Save to database using the new API
+      // Save to database
       const response = await fetch('/api/endpoints', {
         method: 'POST',
         headers: {
@@ -259,7 +259,7 @@ const AdminPanel = () => {
       }
     } catch (error) {
       console.error('Error saving to database:', error);
-      alert('❌ Failed to save to database!\n\n🔍 Check the browser console for more details.\n\n📝 If you\'re in development, ensure the local server is running with:\n\nnpm run local-server');
+      alert('❌ Failed to save to database!\n\n🔍 Check the browser console for more details.');
       return { success: false, mode: 'error' };
     }
   };
@@ -511,32 +511,19 @@ const AdminPanel = () => {
           </Box>
         </Box>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={saveMode === 'local'}
-                onChange={(e) => setSaveMode(e.target.checked ? 'local' : 'download')}
-              />
-            }
-            label="Local save mode (recommended for development)"
-          />
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-        >
-          Add Endpoint
-        </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog()}
+          >
+            Add Endpoint
+          </Button>
         </Box>
       </Box>
 
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>Save Mode:</strong> 
-          {saveMode === 'local' 
-            ? ' Changes are saved directly to the local apiData.js file. Perfect for development with multiple changes. For true local development, run "npm run dev-server" and access via http://localhost:3001'
-            : ' Changes generate a downloadable apiData.js file. Use this for production deployment.'
-          }
+          <strong>Save Mode:</strong> Changes are saved directly to the Supabase database for real-time updates.
         </Typography>
       </Alert>
 

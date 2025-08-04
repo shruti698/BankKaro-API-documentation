@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -64,6 +64,38 @@ const CardGeniusDashboard = () => {
   });
 
   const [expandedStep, setExpandedStep] = useState(0);
+  const [cardApis, setCardApis] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch Card APIs from database
+  useEffect(() => {
+    const fetchCardApis = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/endpoints?_t=' + Date.now());
+        
+        if (response.ok) {
+          const endpoints = await response.json();
+          // Filter for Card APIs and sort by rank
+          const cardEndpoints = endpoints
+            .filter(endpoint => endpoint.category === 'Card APIs')
+            .sort((a, b) => (a.rank || 999) - (b.rank || 999));
+          
+          setCardApis(cardEndpoints);
+          console.log('✅ Fetched Card APIs from database:', cardEndpoints.length);
+        } else {
+          console.log('❌ Failed to fetch from API, using static data');
+          // Fallback to static data if needed
+        }
+      } catch (error) {
+        console.error('Error fetching Card APIs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCardApis();
+  }, []);
 
   const environmentList = [
     {
@@ -82,29 +114,14 @@ const CardGeniusDashboard = () => {
     }
   ];
 
-  const workflowSteps = [
-    {
-      label: 'Calculate Savings',
-      description: 'Find the best card based on spending',
-      endpoint: '/v1/cards/calculate',
-      method: 'POST',
-      details: 'Enter monthly spending habits to receive a personalized card recommendation with estimated yearly savings.'
-    },
-    {
-      label: 'Check Eligibility',
-      description: 'Verify if you can apply for the card',
-      endpoint: '/v1/cards/eligibility',
-      method: 'POST',
-      details: 'Check if you meet the basic eligibility criteria for the recommended card before proceeding.'
-    },
-    {
-      label: 'View Card Details',
-      description: 'Explore the card features and apply',
-      endpoint: '/v1/cards/{card_slug}',
-      method: 'GET',
-      details: 'Navigate to the detailed documentation to view all features, fees, and benefits of the recommended card.'
-    }
-  ];
+  // Convert Card APIs to workflow steps
+  const workflowSteps = cardApis.slice(0, 3).map(api => ({
+    label: api.name,
+    description: api.description,
+    endpoint: api.endpoint,
+    method: api.methods?.[0] || 'GET',
+    details: api.purpose || api.description
+  }));
 
   const quickActions = [
     {
@@ -140,28 +157,28 @@ const CardGeniusDashboard = () => {
   const stats = [
     {
       title: 'Card APIs',
-      value: '12',
+      value: cardApis.length.toString(),
       description: 'Available endpoints',
       icon: <ApiIcon />,
       color: 'primary'
     },
     {
       title: 'Personalization',
-      value: '3',
+      value: cardApis.filter(api => api.name.toLowerCase().includes('calculate') || api.name.toLowerCase().includes('planner')).length.toString(),
       description: 'Calculator & Planners',
       icon: <FunctionsIcon />,
       color: 'success'
     },
     {
       title: 'Data Endpoints',
-      value: '5',
+      value: cardApis.filter(api => api.name.toLowerCase().includes('catalog') || api.name.toLowerCase().includes('bank') || api.name.toLowerCase().includes('category')).length.toString(),
       description: 'Banks, Cards, Categories',
       icon: <CreditCardIcon />,
       color: 'warning'
     },
     {
       title: 'Real-time Feeds',
-      value: '4',
+      value: cardApis.filter(api => api.name.toLowerCase().includes('offer') || api.name.toLowerCase().includes('lounge') || api.name.toLowerCase().includes('webhook')).length.toString(),
       description: 'Offers, Lounges, Webhooks',
       icon: <TimelineIcon />,
       color: 'info'
@@ -314,6 +331,17 @@ const CardGeniusDashboard = () => {
       setExpandedStep(expandedStep === stepIndex ? -1 : stepIndex);
     }
   };
+
+  if (loading) {
+    return (
+      <Box sx={{ p: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <CircularProgress size={60} sx={{ mb: 2 }} />
+          <Typography variant="h6">Loading Card Genius APIs...</Typography>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1200, mx: 'auto' }}>

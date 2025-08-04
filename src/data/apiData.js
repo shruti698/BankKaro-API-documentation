@@ -2025,7 +2025,7 @@ export const apiData = {
   "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,11],\n    \"card_networks\": [\"VISA\",\"Mastercard\",\"RuPay\"],\n    \"annualFees\": \"0-15000\",\n    \"credit_score\": 750,\n    \"sort_by\": \"annual_savings\",\n    \"free_cards\": true,\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"5000\"\n    }\n  }'\n",
   "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,7],\n    \"card_networks\": [\"VISA\",\"Mastercard\",\"RuPay\"],\n    \"annualFees\": \"0-15000\",\n    \"credit_score\": 750,\n    \"sort_by\": \"annual_fees\",\n    \"free_cards\": true,\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"2\",\n      \"fuel\": \"3000\"\n    }\n  }'\n",
   "status": "live",
-  "rank": 6.5,
+  "rank": 6,
   "validationNotes": [
     "credit_score must be one of: 600, 650, 750, 800",
     "sort_by must be one of: recommended, annual_savings, annual_fees",
