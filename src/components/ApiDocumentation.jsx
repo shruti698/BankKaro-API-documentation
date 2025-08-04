@@ -86,26 +86,26 @@ const ApiDocumentation = () => {
         const staticApi = apiData[endpoint];
         console.log('ApiDocumentation - Static data available for:', endpoint, staticApi ? 'YES' : 'NO');
         
-        // If API_BASE_URL is null (production), use static data only
-        if (!API_BASE_URL) {
-          console.log('ApiDocumentation - Using static data (production mode)');
-          foundApi = staticApi;
-        } else {
-          // Development mode - try server first, fallback to static data
-          console.log('ApiDocumentation - Trying server first (development mode)');
-          try {
-            const response = await fetch(`/api/endpoints/${encodeURIComponent(endpoint)}?_t=${Date.now()}`);
-            if (response.ok) {
-              const endpointData = await response.json();
-              console.log('ApiDocumentation - Server data for endpoint:', endpoint, endpointData ? 'FOUND' : 'NOT FOUND');
-              foundApi = endpointData;
-            } else {
-              throw new Error('Server response not ok');
-            }
-          } catch (serverError) {
-            console.log('ApiDocumentation - Server failed, using static data:', serverError.message);
-            foundApi = staticApi;
+        // Try API first (both production and development), fallback to static data
+        console.log('ApiDocumentation - Trying API first');
+        try {
+          const apiUrl = API_BASE_URL 
+            ? `${API_BASE_URL}/endpoints/${encodeURIComponent(endpoint)}?_t=${Date.now()}`
+            : `/api/endpoints/${encodeURIComponent(endpoint)}?_t=${Date.now()}`;
+          
+          console.log('ApiDocumentation - Fetching from:', apiUrl);
+          const response = await fetch(apiUrl);
+          
+          if (response.ok) {
+            const endpointData = await response.json();
+            console.log('ApiDocumentation - API data for endpoint:', endpoint, endpointData ? 'FOUND' : 'NOT FOUND');
+            foundApi = endpointData;
+          } else {
+            throw new Error('API response not ok');
           }
+        } catch (apiError) {
+          console.log('ApiDocumentation - API failed, using static data:', apiError.message);
+          foundApi = staticApi;
         }
         
         console.log('ApiDocumentation - Final API data for endpoint:', endpoint, foundApi);
