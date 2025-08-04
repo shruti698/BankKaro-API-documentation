@@ -86,7 +86,7 @@ const ApiDocumentation = () => {
         const staticApi = apiData[endpoint];
         console.log('ApiDocumentation - Static data available for:', endpoint, staticApi ? 'YES' : 'NO');
         
-        // Try API first (both production and development), fallback to static data
+        // Try API first (both production and development), fallback to static data - FORCE DEPLOY
         console.log('ApiDocumentation - Trying API first');
         try {
           const apiUrl = API_BASE_URL 
