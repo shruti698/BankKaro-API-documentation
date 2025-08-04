@@ -69,7 +69,7 @@ const Home = () => {
           // Use Vercel API routes in production
           console.log('Home - Fetching from Vercel API routes');
           try {
-            const response = await fetch('/api/endpoints');
+            const response = await fetch('/api/endpoints?_t=' + Date.now());
             console.log('Home - API response status:', response.status);
             if (!response.ok) {
               console.log('Home - API failed, using static data as fallback');

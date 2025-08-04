@@ -83,7 +83,7 @@ const AdminPanel = () => {
   const fetchEndpoints = async () => {
     try {
       // Try to fetch from database first, fallback to static data
-      const response = await fetch('/api/endpoints');
+              const response = await fetch('/api/endpoints?_t=' + Date.now());
       
       if (response.ok) {
         const endpoints = await response.json();

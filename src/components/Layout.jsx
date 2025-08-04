@@ -66,7 +66,7 @@ const Layout = ({ children }) => {
           // Use Vercel API routes in production
           console.log('Layout - Fetching from Vercel API routes');
           try {
-            const response = await fetch('/api/endpoints');
+            const response = await fetch('/api/endpoints?_t=' + Date.now());
             console.log('Layout - API response status:', response.status);
             if (!response.ok) {
               console.log('Layout - API failed, using static data as fallback');

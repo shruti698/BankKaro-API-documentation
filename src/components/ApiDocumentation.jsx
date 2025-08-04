@@ -94,7 +94,7 @@ const ApiDocumentation = () => {
           // Development mode - try server first, fallback to static data
           console.log('ApiDocumentation - Trying server first (development mode)');
           try {
-            const response = await fetch(`/api/endpoints/${encodeURIComponent(endpoint)}`);
+            const response = await fetch(`/api/endpoints/${encodeURIComponent(endpoint)}?_t=${Date.now()}`);
             if (response.ok) {
               const endpointData = await response.json();
               console.log('ApiDocumentation - Server data for endpoint:', endpoint, endpointData ? 'FOUND' : 'NOT FOUND');
