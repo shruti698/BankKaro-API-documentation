@@ -41,35 +41,50 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'endpointKey and data are required' });
       }
 
+      console.log('🔍 API Route - Saving endpoint:', endpointKey);
+      console.log('🔍 API Route - Data received:', Object.keys(data));
+
+      // Prepare the data with ONLY columns that exist in Supabase
+      const supabaseData = {
+        id: endpointKey,
+        name: data.name,
+        endpoint: data.endpoint,
+        description: data.description,
+        category: data.category,
+        purpose: data.purpose,
+        methods: data.methods,
+        status: data.status,
+        rank: data.rank,
+        request_schema: data.requestSchema,
+        response_schema: data.responseSchema,
+        sample_request: data.sampleRequest,
+        sample_response: data.sampleResponse,
+        error_responses: data.errorResponses,
+        curl_examples: data.curlExample ? { curl: data.curlExample } : {},
+        validation_notes: data.validationNotes,
+        field_table: data.fieldTable,
+        products: data.products,
+        sample_responses: data.sampleResponses
+        // Removed non-existent columns:
+        // headers: data.headers || {},
+        // additional_examples: data.additionalExamples || [],
+        // important_notes: data.importantNotes || [],
+        // curl_example_staging: data.curlExampleStaging || '',
+        // curl_example_production: data.curlExampleProduction || ''
+      };
+
+      console.log('🔍 API Route - Mapped data (existing columns only):', Object.keys(supabaseData));
+
       const { error } = await supabase
         .from('api_endpoints')
-        .upsert({
-          id: endpointKey,
-          name: data.name,
-          endpoint: data.endpoint,
-          description: data.description,
-          category: data.category,
-          purpose: data.purpose,
-          methods: data.methods,
-          status: data.status,
-          rank: data.rank,
-          request_schema: data.requestSchema,
-          response_schema: data.responseSchema,
-          sample_request: data.sampleRequest,
-          sample_response: data.sampleResponse,
-          error_responses: data.errorResponses,
-          curl_examples: data.curlExample ? { curl: data.curlExample } : {},
-          validation_notes: data.validationNotes,
-          field_table: data.fieldTable,
-          products: data.products,
-          sample_responses: data.sampleResponses
-        });
+        .upsert(supabaseData);
 
       if (error) {
         console.error('Supabase save error:', error);
         return res.status(500).json({ error: 'Failed to save endpoint', details: error.message });
       }
 
+      console.log('✅ API Route - Endpoint saved successfully');
       res.status(200).json({ success: true, message: 'Endpoint saved successfully' });
     } else {
       res.status(405).json({ error: 'Method not allowed' });

@@ -47,8 +47,32 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Endpoint not found' });
     }
 
+    // Convert Supabase format to apiData format
+    const apiDataFormat = {
+      name: endpoint.name,
+      endpoint: endpoint.endpoint,
+      methods: Array.isArray(endpoint.methods) ? endpoint.methods : [],
+      status: endpoint.status || 'live',
+      description: endpoint.description,
+      category: endpoint.category,
+      purpose: endpoint.purpose,
+      rank: endpoint.rank || 999,
+      // Map all the fields properly
+      requestSchema: endpoint.request_schema,
+      responseSchema: endpoint.response_schema,
+      sampleRequest: endpoint.sample_request,
+      sampleResponse: endpoint.sample_response,
+      sampleResponses: endpoint.sample_responses,
+      errorResponses: endpoint.error_responses,
+      curlExample: endpoint.curl_examples?.curl || '',
+      validationNotes: endpoint.validation_notes,
+      fieldTable: endpoint.field_table,
+      products: endpoint.products
+    };
+
     console.log('API Route - Found endpoint:', endpoint.name);
-    res.status(200).json(endpoint);
+    console.log('API Route - Returning endpoint in apiData format:', Object.keys(apiDataFormat));
+    res.status(200).json(apiDataFormat);
   } catch (error) {
     console.error('API Error:', error);
     res.status(500).json({ error: 'Internal server error', details: error.message });

@@ -84,7 +84,18 @@ const Layout = ({ children }) => {
                   description: endpoint.description,
                   category: endpoint.category,
                   purpose: endpoint.purpose,
-                  rank: endpoint.rank || 999
+                  rank: endpoint.rank || 999,
+                  // Add ALL the missing fields
+                  requestSchema: endpoint.request_schema,
+                  responseSchema: endpoint.response_schema,
+                  sampleRequest: endpoint.sample_request,
+                  sampleResponse: endpoint.sample_response,
+                  sampleResponses: endpoint.sample_responses,
+                  errorResponses: endpoint.error_responses,
+                  curlExample: endpoint.curl_examples?.curl || '',
+                  validationNotes: endpoint.validation_notes,
+                  fieldTable: endpoint.field_table,
+                  products: endpoint.products
                 };
               });
               console.log('Layout - API data received:', Object.keys(data));
@@ -112,7 +123,18 @@ const Layout = ({ children }) => {
               description: endpoint.description,
               category: endpoint.category,
               purpose: endpoint.purpose,
-              rank: endpoint.rank || 999
+              rank: endpoint.rank || 999,
+              // Add ALL the missing fields
+              requestSchema: endpoint.request_schema,
+              responseSchema: endpoint.response_schema,
+              sampleRequest: endpoint.sample_request,
+              sampleResponse: endpoint.sample_response,
+              sampleResponses: endpoint.sample_responses,
+              errorResponses: endpoint.error_responses,
+              curlExample: endpoint.curl_examples?.curl || '',
+              validationNotes: endpoint.validation_notes,
+              fieldTable: endpoint.field_table,
+              products: endpoint.products
             };
           });
         }
