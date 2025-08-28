@@ -1,6 +1,6 @@
 export const apiData = {
   'partner-auth': {
-  "name": "Partner Authentication",
+  "name": "Partner Authentication - TEST 5:05:30 PM",
   "endpoint": "/partner/auth",
   "methods": [
     "POST"
@@ -743,7 +743,7 @@ export const apiData = {
     {
       "title": "Auto Auth using Exit ID (ProfitShare)",
       "description": "Authenticate using ProfitShare exit_id",
-        "curl": "curl --location 'https://uat-partner.bankkaro.com/partner/autoAuth' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"exit_id\": \"CHKR20241125A336129939\",\n  \"vendor\": \"CK\"\n}'"
+      "curl": "curl --location 'https://uat-partner.bankkaro.com/partner/autoAuth' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"exit_id\": \"CHKR20241125A336129939\",\n  \"vendor\": \"CK\"\n}'"
     }
   ],
   "products": [
@@ -884,7 +884,11 @@ export const apiData = {
   },
   "sampleRequest": {
     "points": 35000,
-    "preferred_redemption_types": ["cash", "amazon_voucher", "air_miles"]
+    "preferred_redemption_types": [
+      "cash",
+      "amazon_voucher",
+      "air_miles"
+    ]
   },
   "sampleResponse": {
     "best_option": {
@@ -1153,7 +1157,10 @@ export const apiData = {
     },
     "redemptions": {
       "available_points": 5000,
-      "redemption_options": ["cash", "vouchers"]
+      "redemption_options": [
+        "cash",
+        "vouchers"
+      ]
     }
   },
   "curlExample": "curl --location 'https://api.bankkaro.com/v1/cards/omni' \\\n--header 'Authorization: Bearer <jwt>' \\\n--header 'Content-Type: application/json' \\\n--data '{\"include_banks\": true, \"include_categories\": true}'",
@@ -1334,7 +1341,11 @@ export const apiData = {
   },
   "sampleRequest": {
     "url": "https://partner.com/hook",
-    "events": ["application.approved", "reward.posted", "card.activated"]
+    "events": [
+      "application.approved",
+      "reward.posted",
+      "card.activated"
+    ]
   },
   "sampleResponse": {
     "success": true,
@@ -1360,1511 +1371,6 @@ export const apiData = {
     }
   },
   "errorResponse": {},
-  "validationNotes": [],
-  "fieldTable": []
-},
-  'partner/token': {
-  "name": "Partner Token Generation",
-  "endpoint": "/partner/token",
-  "methods": [
-    "POST"
-  ],
-  "description": "Generate a partner-token (JWT) that is required for authorization in subsequent Card Genius API calls",
-  "category": "Partner APIs",
-  "purpose": "Used to generate a `partner-token` (JWT) that is required for authorization in subsequent Card Genius API calls like `/cardgenius/initial-data`, `/cardgenius/cards`, etc.",
-  "requestSchema": {
-    "type": "object",
-    "required": [
-      "x-api-key"
-    ],
-    "additionalProperties": false,
-    "properties": {
-      "x-api-key": {
-        "type": "string",
-        "description": "Secret API key issued by BankKaro (environment-specific)",
-        "minLength": 5
-      }
-    }
-  },
-  "responseSchema": {
-    "type": "object",
-    "required": [
-      "status",
-      "message",
-      "data"
-    ],
-    "properties": {
-      "status": {
-        "type": "string",
-        "enum": [
-          "success",
-          "error"
-        ],
-        "description": "Overall operation status"
-      },
-      "message": {
-        "type": "string",
-        "description": "Optional human-readable message"
-      },
-      "data": {
-        "type": "object",
-        "required": [
-          "jwttoken",
-          "expiresAt"
-        ],
-        "properties": {
-          "jwttoken": {
-            "type": "string",
-            "description": "Bearer token (JWT) to be supplied in the Authorization header"
-          },
-          "expiresAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "ISO-8601 expiry timestamp (UTC)"
-          }
-        }
-      }
-    }
-  },
-  "sampleRequest": {
-    "x-api-key": "test"
-  },
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"{{API_KEY}}\"\n}'",
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"test\"\n}'",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"YOUR_PROD_KEY\"\n}'",
-  "validationNotes": [
-    "x-api-key must be a valid API key provided by BankKaro",
-    "This API must only be called from the server-side to prevent leaking the x-api-key",
-    "Do not expose this API in frontend JavaScript or browser tools",
-    "The jwttoken is time-bound and should be refreshed before expiry"
-  ],
-  "importantNotes": [
-    "🔐 This API must only be called from the server-side to prevent leaking the x-api-key.",
-    "⚠️ Do not expose this API in frontend JavaScript or browser tools.",
-    "⏱ The jwttoken is time-bound and should be refreshed before expiry.",
-    "📎 To use it in subsequent requests, include in headers: Authorization: Bearer <jwttoken>"
-  ],
-  "fieldTable": [
-    {
-      "field": "x-api-key",
-      "type": "string",
-      "required": "Yes",
-      "description": "Unique key provided by BankKaro (staging/prod specific). Must be kept secret on the backend."
-    }
-  ],
-  "products": [
-    "Card Genius"
-  ],
-  "sampleResponses": [
-    {
-      "status": "success",
-      "message": "",
-      "data": {
-        "jwttoken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.******",
-        "expiresAt": "2025-07-08T12:50:24.634Z"
-      }
-    }
-  ],
-  "errorResponses": [],
-  "status": "live",
-  "sampleResponse": {},
-  "errorResponse": {},
-  "headers": [],
-  "additionalExamples": [],
-  "rank": 2
-},
-  'cardgenius/initial-data': {
-  "name": "Initialization Bundle",
-  "endpoint": "/partner/cardgenius/init-bundle",
-  "methods": [
-    "GET"
-  ],
-  "status": "live",
-  "description": "Returns all static data required to initialize the CardGenius app.",
-  "category": "Card APIs",
-  "purpose": "Provides banks, categories, and other static data needed for app initialization.",
-  "responseSchema": {
-    "status": "string",
-    "message": "string",
-    "data": {
-      "bank_data": [
-        {
-          "id": 0,
-          "name": "string",
-          "criff_bank_name": "string",
-          "logo": "string"
-        }
-      ],
-      "tag_data": [
-        {
-          "id": 0,
-          "name": "string",
-          "seo_alias": "string",
-          "tag_genius_fields": [
-            {
-              "label": "string",
-              "key": "string",
-              "value": "string"
-            }
-          ]
-        }
-      ],
-      "card_data": [
-        {
-          "id": 0,
-          "name": "string",
-          "card_alias": "string",
-          "product_type": "string",
-          "card_type": "string",
-          "bank_id": 0,
-          "priority": 0,
-          "status": true
-        }
-      ]
-    }
-  },
-  "sampleResponse": {
-    "status": "success",
-    "message": "",
-    "data": {
-      "bank_data": [
-        {
-          "id": 1,
-          "name": "Axis Bank",
-          "criff_bank_name": "AXISBANK",
-          "logo": "https://example.com/axis.png"
-        },
-        {
-          "id": 3,
-          "name": "SBI",
-          "criff_bank_name": "SBIBANK",
-          "logo": "https://example.com/sbi.png"
-        }
-      ],
-      "tag_data": [
-        {
-          "id": 2,
-          "name": "Fuel",
-          "seo_alias": "fuel",
-          "tag_genius_fields": [
-            {
-              "label": "Monthly Fuel Spend",
-              "key": "monthly_fuel_spend",
-              "value": "0"
-            }
-          ]
-        },
-        {
-          "id": 5,
-          "name": "Dining",
-          "seo_alias": "dining",
-          "tag_genius_fields": [
-            {
-              "label": "Monthly Dining Spend",
-              "key": "online_food_ordering",
-              "value": "0"
-            }
-          ]
-        }
-      ],
-      "card_data": [
-        {
-          "id": 27,
-          "name": "SBI Cashback Credit Card",
-          "card_alias": "sbi-cashback-credit-card",
-          "product_type": "credit_card",
-          "card_type": "VISA,Mastercard",
-          "bank_id": 3,
-          "priority": 29,
-          "status": true
-        },
-        {
-          "id": 54,
-          "name": "ICICI Platinum Chip Credit Card",
-          "card_alias": "icici-platinum-chip-credit-card",
-          "product_type": "credit_card",
-          "card_type": "Mastercard",
-          "bank_id": 11,
-          "priority": 15,
-          "status": true
-        }
-      ]
-    }
-  },
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: {{JWT_TOKEN}}'",
-  "requestSchema": {},
-  "sampleRequest": {},
-  "errorResponse": {},
-  "validationNotes": [],
-  "fieldTable": [],
-  "products": [
-    "Card Genius"
-  ],
-  "sampleResponses": {
-    "status": "success",
-    "message": "",
-    "data": {
-      "bank_data": [
-        {
-          "id": 1,
-          "name": "Axis Bank",
-          "criff_bank_name": "AXISBANK",
-          "logo": "https://example.com/axis.png"
-        },
-        {
-          "id": 3,
-          "name": "SBI",
-          "criff_bank_name": "SBIBANK",
-          "logo": "https://example.com/sbi.png"
-        }
-      ],
-      "tag_data": [
-        {
-          "id": 2,
-          "name": "Fuel",
-          "seo_alias": "fuel",
-          "tag_genius_fields": [
-            {
-              "label": "Monthly Fuel Spend",
-              "key": "monthly_fuel_spend",
-              "value": "0"
-            }
-          ]
-        },
-        {
-          "id": 5,
-          "name": "Dining",
-          "seo_alias": "dining",
-          "tag_genius_fields": [
-            {
-              "label": "Monthly Dining Spend",
-              "key": "online_food_ordering",
-              "value": "0"
-            }
-          ]
-        }
-      ],
-      "card_data": [
-        {
-          "id": 27,
-          "name": "SBI Cashback Credit Card",
-          "card_alias": "sbi-cashback-credit-card",
-          "product_type": "credit_card",
-          "card_type": "VISA,Mastercard",
-          "bank_id": 3,
-          "priority": 29,
-          "status": true
-        },
-        {
-          "id": 54,
-          "name": "ICICI Platinum Chip Credit Card",
-          "card_alias": "icici-platinum-chip-credit-card",
-          "product_type": "credit_card",
-          "card_type": "Mastercard",
-          "bank_id": 11,
-          "priority": 15,
-          "status": true
-        }
-      ]
-    }
-  },
-  "errorResponses": [],
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: <your_jwt_token>'\n",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: <your_jwt_token>'\n",
-  "importantNotes": [],
-  "headers": [],
-  "additionalExamples": [],
-  "rank": 3
-},
-  'cardgenius/cards': {
-  "name": "Cards Catalog (GET)",
-  "endpoint": "/partner/cardgenius/cards",
-  "methods": [
-    "GET"
-  ],
-  "description": "Get a list of all available credit cards with no request parameters.",
-  "category": "Card APIs",
-  "purpose": "Retrieve a comprehensive list of credit cards with no filtering.",
-  "requestSchema": {},
-  "responseSchema": {
-    "type": "object",
-    "properties": {
-      "status": {
-        "type": "string"
-      },
-      "message": {
-        "type": "string"
-      },
-      "data": {
-        "type": "object",
-        "properties": {
-          "cards": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "card_alias": {
-                  "type": "string"
-                },
-                "bank_id": {
-                  "type": "integer"
-                },
-                "status": {
-                  "type": "boolean"
-                }
-              },
-              "required": [
-                "id",
-                "name",
-                "card_alias",
-                "bank_id",
-                "status"
-              ]
-            }
-          },
-          "filteredCards": {
-            "type": "array",
-            "items": {
-              "type": "object"
-            }
-          },
-          "tag_slug": {
-            "type": "boolean"
-          },
-          "card_slug": {
-            "type": "boolean"
-          },
-          "tag": {
-            "type": "object"
-          },
-          "card_details": {
-            "type": "object"
-          },
-          "tag_genius_data": {
-            "type": "object"
-          }
-        },
-        "required": [
-          "cards",
-          "filteredCards",
-          "tag_slug",
-          "card_slug",
-          "tag",
-          "card_details",
-          "tag_genius_data"
-        ]
-      }
-    },
-    "required": [
-      "status",
-      "message",
-      "data"
-    ]
-  },
-  "sampleResponse": {},
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
-  "sampleRequest": {},
-  "validationNotes": [],
-  "fieldTable": [],
-  "products": [
-    "Card Genius"
-  ],
-  "methodDescriptions": {},
-  "sampleResponses": {
-    "status": "success",
-    "message": "Cards generated successfully",
-    "data": {
-      "cards": [
-        {
-          "id": 27,
-          "name": "SBI Cashback Credit Card",
-          "card_alias": "sbi-cashback-credit-card",
-          "bank_id": 3,
-          "status": true
-        }
-      ],
-      "filteredCards": [],
-      "tag_slug": false,
-      "card_slug": true,
-      "tag": {},
-      "card_details": {},
-      "tag_genius_data": {}
-    }
-  },
-  "errorResponses": [],
-  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
-  "curlExampleProduction": "curl --location 'https://prod-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
-  "status": "live",
-  "rank": 6,
-  "errorResponse": {},
-  "importantNotes": [],
-  "headers": [],
-  "additionalExamples": []
-},
-  'cardgenius/cards-post': {
-  "name": "Cards Catalog (POST)",
-  "endpoint": "/partner/cardgenius/cards",
-  "methods": [
-    "POST"
-  ],
-  "description": "Get a filtered list of credit cards based on user preferences and eligibility criteria.",
-  "category": "Card APIs",
-  "purpose": "Retrieve a filtered list of credit cards that match user-supplied preferences and eligibility.",
-  "requestSchema": {
-    "type": "object",
-    "description": "Generate a filtered list of credit cards based on user preferences and eligibility criteria.",
-    "properties": {
-      "slug": {
-        "type": "string",
-        "description": "Card-category slug (e.g. \"best-fuel-credit-card\"). Optional when you want an unfiltered catalogue."
-      },
-      "banks_ids": {
-        "type": "array",
-        "items": {
-          "type": "integer"
-        },
-        "description": "Restrict results to these bank IDs. Can be obtained from the banks endpoint."
-      },
-      "card_networks": {
-        "type": "array",
-        "items": {
-          "type": "string",
-          "enum": ["VISA", "Mastercard", "RuPay", "AmericanExpress"]
-        },
-        "description": "Restrict results to these card networks. Available options: VISA, Mastercard, RuPay, AmericanExpress."
-      },
-      "annualFees": {
-        "type": "string",
-        "description": "Annual fee range filter (e.g., \"0-15000\", \"0-5000\"). Empty string means no filter."
-      },
-      "credit_score": {
-        "type": "integer",
-        "description": "Credit score filter. Available options: 600 (Below 600), 650 (Upto 650), 750 (Upto 750), 800 (Upto 800)."
-      },
-      "sort_by": {
-        "type": "string",
-        "enum": ["recommended", "annual_savings", "annual_fees"],
-        "description": "Sort order for results. Options: recommended (default), annual_savings (highest savings first), annual_fees (lowest fees first)."
-      },
-      "free_cards": {
-        "type": "boolean",
-        "description": "Filter for lifetime-free cards only. true for free cards only, false or omit for all cards."
-      },
-      "eligiblityPayload": {
-        "type": "object",
-        "properties": {
-          "pincode": {
-            "type": "string",
-            "description": "User's pincode for location-based eligibility"
-          },
-          "inhandIncome": {
-            "type": "string",
-            "description": "User's monthly in-hand income"
-          },
-          "empStatus": {
-            "type": "string",
-            "enum": [
-              "salaried",
-              "self-employed"
-            ],
-            "description": "Employment status of the user"
-          }
-        },
-        "required": [
-          "pincode",
-          "inhandIncome",
-          "empStatus"
-        ]
-      },
-      "cardGeniusPayload": {
-        "type": "object",
-        "properties": {
-          "tag_id": {
-            "type": "string",
-            "description": "Tag ID for specific card category filtering"
-          },
-          "fuel": {
-            "type": "string",
-            "description": "₹ value of monthly fuel spend (example field—others may be added)."
-          }
-        }
-      }
-    },
-    "required": [
-      "eligiblityPayload",
-      "cardGeniusPayload"
-    ]
-  },
-  "responseSchema": {
-    "type": "object",
-    "properties": {
-      "status": {
-        "type": "string"
-      },
-      "message": {
-        "type": "string"
-      },
-      "data": {
-        "type": "object",
-        "properties": {
-          "cards": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "card_alias": {
-                  "type": "string"
-                },
-                "bank_id": {
-                  "type": "integer"
-                },
-                "status": {
-                  "type": "boolean"
-                }
-              },
-              "required": [
-                "id",
-                "name",
-                "card_alias",
-                "bank_id",
-                "status"
-              ]
-            }
-          },
-          "filteredCards": {
-            "type": "array",
-            "items": {
-              "type": "object"
-            }
-          },
-          "tag_slug": {
-            "type": "boolean"
-          },
-          "card_slug": {
-            "type": "boolean"
-          },
-          "tag": {
-            "type": "object"
-          },
-          "card_details": {
-            "type": "object"
-          },
-          "tag_genius_data": {
-            "type": "object"
-          }
-        },
-        "required": [
-          "cards",
-          "filteredCards",
-          "tag_slug",
-          "card_slug",
-          "tag",
-          "card_details",
-          "tag_genius_data"
-        ]
-      }
-    },
-    "required": [
-      "status",
-      "message",
-      "data"
-    ]
-  },
-  "sampleRequest": {
-    "slug": "best-fuel-credit-card",
-    "banks_ids": [],
-    "card_networks": [],
-    "annualFees": "",
-    "credit_score": "",
-    "sort_by": "",
-    "free_cards": "",
-    "eligiblityPayload": {
-      "pincode": "110001",
-      "inhandIncome": "50000",
-      "empStatus": "salaried"
-    },
-    "cardGeniusPayload": {
-      "tag_id": "1",
-      "fuel": "5000"
-    }
-  },
-  "sampleResponse": {
-    "status": "success",
-    "message": "Cards generated successfully",
-    "data": {
-      "cards": [
-        {
-          "id": 27,
-          "name": "SBI Cashback Credit Card",
-          "card_alias": "sbi-cashback-credit-card",
-          "bank_id": 3,
-          "status": true
-        }
-      ],
-      "filteredCards": [],
-      "tag_slug": false,
-      "card_slug": true,
-      "tag": {},
-      "card_details": {},
-      "tag_genius_data": {}
-    }
-  },
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [],\n    \"card_networks\": [],\n    \"annualFees\": \"\",\n    \"credit_score\": \"\",\n    \"sort_by\": \"\",\n    \"free_cards\": \"\",\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"100\"\n    }\n  }'\n",
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,11],\n    \"card_networks\": [\"VISA\",\"Mastercard\",\"RuPay\"],\n    \"annualFees\": \"0-15000\",\n    \"credit_score\": 750,\n    \"sort_by\": \"annual_savings\",\n    \"free_cards\": true,\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"1\",\n      \"fuel\": \"5000\"\n    }\n  }'\n",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"slug\": \"best-fuel-credit-card\",\n    \"banks_ids\": [3,7],\n    \"card_networks\": [\"VISA\",\"Mastercard\",\"RuPay\"],\n    \"annualFees\": \"0-15000\",\n    \"credit_score\": 750,\n    \"sort_by\": \"annual_fees\",\n    \"free_cards\": true,\n    \"eligiblityPayload\": {\n      \"pincode\": \"110001\",\n      \"inhandIncome\": \"50000\",\n      \"empStatus\": \"salaried\"\n    },\n    \"cardGeniusPayload\": {\n      \"tag_id\": \"2\",\n      \"fuel\": \"3000\"\n    }\n  }'\n",
-  "status": "live",
-  "rank": 6.5,
-  "validationNotes": [
-    "credit_score must be one of: 600, 650, 750, 800",
-    "sort_by must be one of: recommended, annual_savings, annual_fees",
-    "card_networks must be one or more of: VISA, Mastercard, RuPay, AmericanExpress",
-    "annualFees should be in format 'min-max' (e.g., '0-15000')",
-    "free_cards should be boolean (true/false) or omitted"
-  ],
-  "fieldTable": [
-    {
-      "field": "slug",
-      "type": "string",
-      "required": "No",
-      "description": "Card category slug (e.g., 'best-fuel-credit-card'). Optional for unfiltered catalogue."
-    },
-    {
-      "field": "banks_ids",
-      "type": "array[integer]",
-      "required": "No",
-      "description": "Array of bank IDs to filter results. Can be obtained from the banks endpoint."
-    },
-    {
-      "field": "card_networks",
-      "type": "array[string]",
-      "required": "No",
-      "description": "Card networks to filter by. Options: VISA, Mastercard, RuPay, AmericanExpress."
-    },
-    {
-      "field": "annualFees",
-      "type": "string",
-      "required": "No",
-      "description": "Annual fee range filter (e.g., '0-15000', '0-5000'). Empty for no filter."
-    },
-    {
-      "field": "credit_score",
-      "type": "integer",
-      "required": "No",
-      "description": "Credit score filter. Options: 600 (Below 600), 650 (Upto 650), 750 (Upto 750), 800 (Upto 800)."
-    },
-    {
-      "field": "sort_by",
-      "type": "string",
-      "required": "No",
-      "description": "Sort order. Options: recommended (default), annual_savings, annual_fees."
-    },
-    {
-      "field": "free_cards",
-      "type": "boolean",
-      "required": "No",
-      "description": "Filter for lifetime-free cards only. true for free cards, false/omit for all cards."
-    },
-    {
-      "field": "eligiblityPayload.pincode",
-      "type": "string",
-      "required": "Yes",
-      "description": "User's 6-digit pincode for location-based eligibility."
-    },
-    {
-      "field": "eligiblityPayload.inhandIncome",
-      "type": "string",
-      "required": "Yes",
-      "description": "User's monthly in-hand income in INR."
-    },
-    {
-      "field": "eligiblityPayload.empStatus",
-      "type": "string",
-      "required": "Yes",
-      "description": "Employment status. Options: salaried, self-employed."
-    },
-    {
-      "field": "cardGeniusPayload.tag_id",
-      "type": "string",
-      "required": "No",
-      "description": "Tag ID for specific card category filtering."
-    },
-    {
-      "field": "cardGeniusPayload.fuel",
-      "type": "string",
-      "required": "No",
-      "description": "Monthly fuel spend in INR (example field)."
-    }
-  ],
-  "products": [
-    "Card Genius"
-  ],
-  "sampleResponses": [],
-  "errorResponses": [],
-  "errorResponse": {},
-  "importantNotes": [],
-  "headers": [],
-  "additionalExamples": []
-},
-  'cardgenius/eligibility': {
-  "name": "Eligibility",
-  "endpoint": "/cardgenius/eligibility",
-  "methods": [
-    "POST"
-  ],
-  "description": "Check if a user qualifies for one or more cards based on pincode, in‑hand salary and employment type.",
-  "category": "Card APIs",
-  "purpose": "Surface only cards the user is eligible for before they start the application flow.",
-  "requestSchema": {
-    "type": "object",
-    "required": [
-      "pincode",
-      "inhandIncome",
-      "empStatus"
-    ],
-    "properties": {
-      "alias": {
-        "type": "string",
-        "description": "Optional – slug of a single card to check. Omit to get results for ALL cards."
-      },
-      "pincode": {
-        "type": "string",
-        "description": "6‑digit Indian postal code of the applicant."
-      },
-      "inhandIncome": {
-        "type": "integer",
-        "description": "Monthly in‑hand income (salary or business profits) in INR."
-      },
-      "empStatus": {
-        "type": "string",
-        "description": "Employment status. Allowed values: \"salaried\" | \"self_employed\" | \"business\"."
-      }
-    }
-  },
-  "fieldTable": [
-    {
-      "field": "alias",
-      "type": "string",
-      "required": "No",
-      "description": "Card slug to evaluate. If omitted, API returns eligibility for all cards."
-    },
-    {
-      "field": "pincode",
-      "type": "string",
-      "required": "Yes",
-      "description": "6‑digit pincode."
-    },
-    {
-      "field": "inhandIncome",
-      "type": "integer",
-      "required": "Yes",
-      "description": "Monthly in‑hand income (₹)."
-    },
-    {
-      "field": "empStatus",
-      "type": "string",
-      "required": "Yes",
-      "description": "Employment status: salaried | self_employed | business."
-    }
-  ],
-  "responseSchema": {
-    "type": "object",
-    "properties": {
-      "status": {
-        "type": "string",
-        "description": "success | error"
-      },
-      "message": {
-        "type": "string"
-      },
-      "data": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer",
-              "description": "Internal product ID."
-            },
-            "card_alias": {
-              "type": "string",
-              "description": "Slug/alias for the card."
-            },
-            "seo_card_alias": {
-              "type": "string",
-              "description": "SEO version of alias"
-            },
-            "eligible": {
-              "type": "boolean",
-              "description": "Eligibility flag."
-            },
-            "rejectionReason": {
-              "type": "string",
-              "description": "If ineligible, primary reason (e.g., \"income\", \"location\").",
-              "nullable": true
-            },
-            "bank_id": {
-              "type": "integer",
-              "description": "Bank ID (present only when not eligible).",
-              "nullable": true
-            },
-            "product_id": {
-              "type": "integer",
-              "description": "Product ID (present only when not eligible).",
-              "nullable": true
-            },
-            "redirectionFlag": {
-              "type": "boolean",
-              "description": "If true, redirect to bank site immediately.",
-              "nullable": true
-            }
-          }
-        }
-      }
-    }
-  },
-  "sampleRequest": {
-    "pincode": "110001",
-    "inhandIncome": 50000,
-    "empStatus": "salaried"
-  },
-  "sampleResponse": {
-    "status": "success",
-    "message": "",
-    "data": [
-      {
-        "card_alias": "icici-platinum-chip-credit-card",
-        "id": 54,
-        "seo_card_alias": "icici-platinum-chip-credit-card",
-        "eligible": true
-      },
-      {
-        "card_alias": "icici-mmt-platinum-credit-card",
-        "id": 55,
-        "seo_card_alias": "icici-mmt-platinum-credit-card",
-        "eligible": true
-      },
-      {
-        "card_alias": "icici-hpcl-super-saver-credit-card",
-        "id": 51,
-        "seo_card_alias": "icici-hpcl-super-saver-credit-card",
-        "eligible": true
-      },
-      {
-        "card_alias": "au-zenith-plus-credit-card",
-        "bank_id": 7,
-        "product_id": 49,
-        "redirectionFlag": true,
-        "seo_card_alias": "au-zenith-plus-credit-card",
-        "rejectionReason": "income",
-        "eligible": false
-      }
-    ]
-  },
-  "errorResponse": {
-    "status": "error",
-    "message": "Invalid pincode or employment status.",
-    "data": null
-  },
-  "sampleResponseBulk": {
-    "status": "success",
-    "message": "",
-    "data": [
-      {
-        "card_alias": "icici-platinum-chip-credit-card",
-        "id": 54,
-        "seo_card_alias": "icici-platinum-chip-credit-card",
-        "eligible": true
-      },
-      {
-        "card_alias": "icici-mmt-platinum-credit-card",
-        "id": 55,
-        "seo_card_alias": "icici-mmt-platinum-credit-card",
-        "eligible": true
-      },
-      {
-        "card_alias": "icici-hpcl-super-saver-credit-card",
-        "id": 51,
-        "seo_card_alias": "icici-hpcl-super-saver-credit-card",
-        "eligible": true
-      },
-      {
-        "card_alias": "au-zenith-plus-credit-card",
-        "bank_id": 7,
-        "product_id": 49,
-        "redirectionFlag": true,
-        "seo_card_alias": "au-zenith-plus-credit-card",
-        "rejectionReason": "income",
-        "eligible": false
-      }
-    ]
-  },
-  "sampleResponseSingle": {
-    "status": "success",
-    "message": "",
-    "data": [
-      {
-        "card_alias": "sbi-cashback-credit-card",
-        "id": 27,
-        "seo_card_alias": "sbi-cashback-credit-card",
-        "eligible": true
-      }
-    ]
-  },
-  "validationNotes": [
-    "pincode must be a valid 6-digit Indian postal code",
-    "inhandIncome must be a positive integer in INR",
-    "empStatus must be one of: \"salaried\", \"self_employed\", \"business\"",
-    "alias is optional - if provided, checks eligibility for specific card only",
-    "Response includes eligibility status and rejection reasons if applicable"
-  ],
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/eligibility' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"pincode\": \"110001\",\n  \"inhandIncome\": 50000,\n  \"empStatus\": \"salaried\"\n}'",
-  "curlExampleProd": "curl --location 'https://prod-partner.bankkaro.com/partner/cardgenius/eligibility' \\\n--header 'Content-Type: application/json' \\\n--data '{\"pincode\":\"110001\",\"inhandIncome\":\"50000\",\"empStatus\":\"salaried\"}'",
-  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/eligibility' \\\n--header 'Content-Type: application/json' \\\n--data '{\"alias\":\"sbi-cashback-credit-card\",\"pincode\":\"560001\",\"inhandIncome\":\"35000\",\"empStatus\":\"salaried\"}'",
-  "products": [
-    "Card Genius"
-  ],
-  "status": "live",
-  "rank": 7,
-  "sampleResponses": [],
-  "errorResponses": [],
-  "curlExampleProduction": "",
-  "importantNotes": [],
-  "headers": [],
-  "additionalExamples": []
-},
-  'cardgenius/cards/{card_slug}': {
-  "name": "Card Detail",
-  "endpoint": "/cardgenius/cards/{card_slug}",
-  "methods": [
-    "GET"
-  ],
-  "description": "Fetch the full specification and meta‑data for a single credit card.",
-  "category": "Card APIs",
-  "purpose": "Used on product‑detail pages, comparison views, or pre‑filled applications to obtain every field we store for a card.",
-  "fieldTable": [
-    {
-      "field": "card_slug",
-      "type": "string",
-      "required": "Yes",
-      "description": "The SEO‑friendly slug of the card (e.g. sbi-cashback-credit-card)."
-    }
-  ],
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
-  "requestSchema": {
-    "type": "object",
-    "properties": {
-      "card_alias": {
-        "type": "string",
-        "description": "Path parameter: the slug/alias of the card (e.g. \"icici-platinum-chip-credit-card\")"
-      }
-    },
-    "required": [
-      "card_alias"
-    ]
-  },
-  "responseSchema": {
-    "type": "object",
-    "properties": {
-      "status": {
-        "type": "string"
-      },
-      "message": {
-        "type": "string"
-      },
-      "data": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer"
-            },
-            "name": {
-              "type": "string"
-            },
-            "nick_name": {
-              "type": "string"
-            },
-            "product_type": {
-              "type": "string"
-            },
-            "card_type": {
-              "type": "string"
-            },
-            "user_rating_count": {
-              "type": "integer"
-            },
-            "rating": {
-              "type": "number"
-            },
-            "bank_id": {
-              "type": "integer"
-            },
-            "priority": {
-              "type": "integer"
-            },
-            "bk_commission": {
-              "type": "string"
-            },
-            "new_to_credit": {
-              "type": "boolean"
-            },
-            "existing_customer": {
-              "type": "boolean"
-            },
-            "commission_type": {
-              "type": "string"
-            },
-            "commission": {
-              "type": "string"
-            },
-            "commission_percent": {
-              "type": "string"
-            },
-            "sub_agent_commission": {
-              "type": "string"
-            },
-            "seo_card_alias": {
-              "type": "string"
-            },
-            "card_alias": {
-              "type": "string"
-            },
-            "image": {
-              "type": "string"
-            },
-            "card_bg_image": {
-              "type": "string"
-            },
-            "card_bg_gradient": {
-              "type": "string"
-            },
-            "other_images": {
-              "type": "string"
-            },
-            "age_criteria": {
-              "type": "string"
-            },
-            "age_criteria_comment": {
-              "type": "string"
-            },
-            "min_age": {
-              "type": "integer"
-            },
-            "max_age": {
-              "type": "integer"
-            },
-            "crif": {
-              "type": "string"
-            },
-            "crif_comment": {
-              "type": "string"
-            },
-            "income": {
-              "type": "string"
-            },
-            "income_comment": {
-              "type": "string"
-            },
-            "joining_fee_text": {
-              "type": "string"
-            },
-            "joining_fee_offset": {
-              "type": "string"
-            },
-            "joining_fee_comment": {
-              "type": "string"
-            },
-            "annual_fee_text": {
-              "type": "string"
-            },
-            "annual_fee_waiver": {
-              "type": "string"
-            },
-            "annual_fee_comment": {
-              "type": "string"
-            },
-            "annual_saving": {
-              "type": "string"
-            },
-            "annual_saving_comment": {
-              "type": "string"
-            },
-            "reward_conversion_rate": {
-              "type": "string"
-            },
-            "redemption_options": {
-              "type": "string"
-            },
-            "redemption_catalogue": {
-              "type": "string"
-            },
-            "exclusion_earnings": {
-              "type": "string"
-            },
-            "exclusion_spends": {
-              "type": "string"
-            },
-            "network_url": {
-              "type": "string"
-            },
-            "employment_type": {
-              "type": "string"
-            },
-            "tnc": {
-              "type": "string"
-            },
-            "status": {
-              "type": "boolean"
-            },
-            "redirectionFlag": {
-              "type": "boolean"
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updatedAt": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "meta_title": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
-            "meta_description": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
-            "banks": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer"
-                },
-                "name": {
-                  "type": "string"
-                }
-              }
-            },
-            "product_usps": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "header": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "priority": {
-                    "type": "integer"
-                  },
-                  "tag_id": {
-                    "type": "integer"
-                  }
-                }
-              }
-            },
-            "tags": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "integer"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "image": {
-                    "type": "string"
-                  },
-                  "image2": {
-                    "type": "string"
-                  },
-                  "genius_title": {
-                    "type": "string"
-                  },
-                  "genius_subtitle": {
-                    "type": "string"
-                  },
-                  "genius_title2": {
-                    "type": "string"
-                  },
-                  "genius_subtitle2": {
-                    "type": "string"
-                  },
-                  "genius_bg_color": {
-                    "type": "string"
-                  },
-                  "genius_image": {
-                    "type": "string"
-                  },
-                  "genius_image_web": {
-                    "type": "string"
-                  },
-                  "status": {
-                    "type": "boolean"
-                  },
-                  "seo_alias": {
-                    "type": "string"
-                  },
-                  "seo_tag_title": {
-                    "type": "string"
-                  },
-                  "meta_title": {
-                    "type": [
-                      "string",
-                      "null"
-                    ]
-                  },
-                  "meta_description": {
-                    "type": [
-                      "string",
-                      "null"
-                    ]
-                  },
-                  "createdAt": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "format": "date-time"
-                  },
-                  "updatedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "bk_product_tags": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer"
-                      },
-                      "priority": {
-                        "type": [
-                          "integer",
-                          "null"
-                        ]
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "bank_fee_structure": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer"
-                },
-                "product_id": {
-                  "type": "integer"
-                },
-                "forex_markup": {
-                  "type": "string"
-                },
-                "forex_markup_comment": {
-                  "type": "string"
-                },
-                "apr_fees": {
-                  "type": "string"
-                },
-                "apr_fees_comment": {
-                  "type": "string"
-                },
-                "atm_withdrawal": {
-                  "type": "string"
-                },
-                "atm_withdrawal_comment": {
-                  "type": "string"
-                },
-                "reward_redemption_fees": {
-                  "type": "string"
-                },
-                "link": {
-                  "type": "string"
-                },
-                "railway_surcharge": {
-                  "type": "string"
-                },
-                "railway_surcharge_comment": {
-                  "type": "string"
-                },
-                "rent_payment_fees": {
-                  "type": "string"
-                },
-                "check_payment_fees": {
-                  "type": "string"
-                },
-                "check_payment_fees_comment": {
-                  "type": "string"
-                },
-                "cash_payment_fees": {
-                  "type": "string"
-                },
-                "cash_payment_fees_comment": {
-                  "type": "string"
-                },
-                "late_payment_annual": {
-                  "type": "string"
-                },
-                "late_payment_fine": {
-                  "type": "string"
-                },
-                "late_payment_comment": {
-                  "type": "string"
-                },
-                "createdAt": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "updatedAt": {
-                  "type": "string",
-                  "format": "date-time"
-                }
-              }
-            },
-            "product_benefits": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "integer"
-                  },
-                  "product_id": {
-                    "type": "integer"
-                  },
-                  "benefit_type": {
-                    "type": "string"
-                  },
-                  "sub_type": {
-                    "type": "string"
-                  },
-                  "html_text": {
-                    "type": "string"
-                  },
-                  "createdAt": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "format": "date-time"
-                  },
-                  "updatedAt": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "format": "date-time"
-                  }
-                }
-              }
-            }
-          },
-          "required": [
-            "id",
-            "name",
-            "card_alias",
-            "status"
-          ]
-        }
-      }
-    },
-    "required": [
-      "status",
-      "message",
-      "data"
-    ]
-  },
-  "sampleRequest": {},
-  "validationNotes": [],
-  "products": [
-    "Card Genius"
-  ],
-  "methodDescriptions": {},
-  "sampleResponses": {
-    "status": "success",
-    "message": "Card details fetched successfully",
-    "data": {
-      "id": 27,
-      "name": "SBI Cashback Credit Card",
-      "card_alias": "sbi-cashback-credit-card",
-      "bank_id": 3,
-      "status": true
-    }
-  },
-  "errorResponses": [],
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>'\n",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>'\n",
-  "status": "live",
-  "rank": 8,
-  "sampleResponse": {},
-  "errorResponse": {},
-  "importantNotes": [],
-  "headers": [],
-  "additionalExamples": []
-},
-  'partner/health': {
-  "name": "Health Check",
-  "endpoint": "/partner/health",
-  "description": "This provides a health check for the API ecosystem and sends in a message \"Up and Running\"",
-  "category": "Partner APIs",
-  "products": [
-    "Card Genius"
-  ],
-  "purpose": "System stability",
-  "methods": [
-    "GET"
-  ],
-  "status": "live",
-  "rank": 1,
-  "requestSchema": {},
-  "responseSchema": {
-    "type": "array",
-    "items": {
-      "type": "object",
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "Health check status message"
-        }
-      },
-      "required": [
-        "message"
-      ]
-    }
-  },
-  "sampleRequest": {},
-  "sampleResponse": [
-    {
-      "message": "Up and Running"
-    }
-  ],
-  "sampleResponses": [],
-  "errorResponses": [],
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/health'\n",
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/health'\n",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/health'\n",
   "validationNotes": [],
   "fieldTable": []
 },
@@ -3379,6 +1885,1601 @@ export const apiData = {
   ],
   "sampleResponses": [],
   "errorResponses": []
+},
+  '/partner/health': {
+  "name": "Health Check",
+  "endpoint": "/partner/health",
+  "description": "This provides a health check for the API ecosystem and sends in a message \"Up and Running\"",
+  "category": "Partner APIs",
+  "products": [
+    "Card Genius"
+  ],
+  "purpose": "System stability",
+  "methods": [
+    "GET"
+  ],
+  "status": "live",
+  "rank": 1,
+  "requestSchema": {},
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "message": {
+        "type": "string",
+        "description": "Status message indicating the system's operational state"
+      }
+    },
+    "required": [
+      "message"
+    ]
+  },
+  "sampleRequest": {},
+  "sampleResponse": [
+    {
+      "message": "Up and Running"
+    }
+  ],
+  "sampleResponses": {},
+  "errorResponses": [],
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/health'\n",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/health'\n",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/health'\n",
+  "validationNotes": [],
+  "fieldTable": []
+},
+  '/partner/cardgenius/cards': {
+  "name": "Cards Catalog (GET)",
+  "endpoint": "/partner/cardgenius/cards",
+  "description": "Get a list of all available credit cards with no request parameters.",
+  "category": "Card APIs",
+  "products": [
+    "Card Genius"
+  ],
+  "purpose": "Retrieve a comprehensive list of credit cards with no filtering.",
+  "methods": [
+    "GET"
+  ],
+  "status": "live",
+  "rank": 6,
+  "requestSchema": {},
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "cards": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "card_alias": {
+                  "type": "string"
+                },
+                "bank_id": {
+                  "type": "integer"
+                },
+                "status": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "card_alias",
+                "bank_id",
+                "status"
+              ]
+            }
+          },
+          "filteredCards": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "tag_slug": {
+            "type": "boolean"
+          },
+          "card_slug": {
+            "type": "boolean"
+          },
+          "tag": {
+            "type": "object"
+          },
+          "card_details": {
+            "type": "object"
+          },
+          "tag_genius_data": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "cards",
+          "filteredCards",
+          "tag_slug",
+          "card_slug",
+          "tag",
+          "card_details",
+          "tag_genius_data"
+        ]
+      }
+    },
+    "required": [
+      "status",
+      "message",
+      "data"
+    ]
+  },
+  "sampleRequest": {},
+  "sampleResponse": {
+    "status": "success",
+    "message": "",
+    "data": [
+      {
+        "id": 54,
+        "name": "ICICI Platinum Chip Credit Card",
+        "nick_name": "ICICI Platinum Chip, Credit Card",
+        "product_type": "credit_card",
+        "card_type": "VISA",
+        "user_rating_count": 300,
+        "rating": 2.5,
+        "bank_id": 14,
+        "priority": 0,
+        "bk_commission": "2000",
+        "new_to_credit": true,
+        "existing_customer": false,
+        "commission_type": "Flat",
+        "commission": "1800",
+        "commission_percent": "90",
+        "sub_agent_commission": "",
+        "seo_card_alias": "icici-platinum-chip-credit-card",
+        "card_alias": "icici-platinum-chip-credit-card",
+        "image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Card%20Type%3DICICI%20Platinum.png1735906432341",
+        "api_redirection_url": null,
+        "card_bg_image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Mockup-41.webp1735906433314",
+        "card_bg_gradient": "radial-gradient(99.6% 170.48% at 50% -70.48%, #B2B2B2 0%, #1B1B1B 100%)",
+        "other_images": "",
+        "age_criteria": "21-60",
+        "age_criteria_comment": "",
+        "age_self_emp": "21-60",
+        "age_self_emp_comment": "",
+        "min_age": 21,
+        "max_age": 60,
+        "crif": "700",
+        "crif_comment": "",
+        "income": "20000",
+        "income_comment": "",
+        "crif_self_emp": "700",
+        "crif_self_emp_comment": "",
+        "income_salaried": "2",
+        "income_self_emp": "2",
+        "income_self_emp_comment": "",
+        "joining_fee_text": "0",
+        "joining_fee_offset": "N/A",
+        "joining_fee_comment": "",
+        "annual_fee_text": "0",
+        "annual_fee_waiver": "N/A",
+        "annual_fee_comment": "",
+        "annual_saving": "2601",
+        "annual_saving_comment": null,
+        "reward_conversion_rate": "1reward points = Rs 0.25",
+        "redemption_options": "<p>You can redeem reward points by login in with your internet banking login credentials.</p>",
+        "redemption_catalogue": "https://www.icicibank.com/",
+        "exclusion_earnings": "Rent Payment, Insurance, Cash Withdrawls, School & Educational Services, GST Charges, Tolls",
+        "exclusion_spends": "Rent Payment, Insurance, Cash Withdrawls, School & Educational Services, GST Charges, Tolls",
+        "network_url": "https://secure.traqkarr.com/click?pid=10&offer_id=1389&sub2=",
+        "employment_type": "both",
+        "tnc": "The bank may offer a different card variant based on your eligibility. Please carefully read the features of the card offered before submitting your application || A minimum transaction of Rs.100 within 30 days is required to activate the card, otherwise, you won’t be eligible for the Rewards",
+        "status": true,
+        "redirectionFlag": true,
+        "createdAt": "2025-01-03T17:42:24.000Z",
+        "updatedAt": "2025-07-08T12:44:31.000Z",
+        "meta_title": null,
+        "meta_description": null,
+        "ck_banner_images": null,
+        "ek_banner_images": null,
+        "ps_banner_images": null,
+        "dsa_banner_images": null,
+        "card_additional_information": {},
+        "product_usps": [
+          {
+            "header": "Earn 2 Reward Points ",
+            "description": "for every ₹100 spent on retail purchases, excluding fuel transactions, and redeem them for exciting rewards",
+            "priority": 1,
+            "tag_id": 0
+          },
+          {
+            "header": "Earn 1 Reward Point ",
+            "description": "for every ₹100 spent on insurance, utilities, and government transactions, making every payment more rewarding",
+            "priority": 2,
+            "tag_id": 0
+          },
+          {
+            "header": "Earn 2 Reward Points ",
+            "description": "for every ₹100 spent on retail purchases and redeem them for exciting rewards",
+            "priority": 1,
+            "tag_id": 2
+          }
+        ]
+      }
+    ]
+  },
+  "sampleResponses": {
+    "status": "success",
+    "message": "Cards generated successfully",
+    "data": {
+      "cards": [
+        {
+          "id": 27,
+          "name": "SBI Cashback Credit Card",
+          "card_alias": "sbi-cashback-credit-card",
+          "bank_id": 3,
+          "status": true
+        }
+      ],
+      "filteredCards": [],
+      "tag_slug": false,
+      "card_slug": true,
+      "tag": {},
+      "card_details": {},
+      "tag_genius_data": {}
+    }
+  },
+  "errorResponses": [],
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
+  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
+  "curlExampleProduction": "curl --location 'https://prod-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
+  "validationNotes": [],
+  "fieldTable": []
+},
+  '/cardgenius/eligibility': {
+  "name": "Eligibility",
+  "endpoint": "/cardgenius/eligibility",
+  "description": "Check if a user qualifies for one or more cards based on pincode, in‑hand salary and employment type.",
+  "category": "Card APIs",
+  "products": [
+    "Card Genius"
+  ],
+  "purpose": "Surface only cards the user is eligible for before they start the application flow.",
+  "methods": [
+    "POST"
+  ],
+  "status": "live",
+  "rank": 7,
+  "requestSchema": {
+    "type": "object",
+    "required": [
+      "pincode",
+      "inhandIncome",
+      "empStatus"
+    ],
+    "properties": {
+      "alias": {
+        "type": "string",
+        "description": "Optional – slug of a single card to check. Omit to get results for ALL cards."
+      },
+      "pincode": {
+        "type": "string",
+        "description": "6‑digit Indian postal code of the applicant."
+      },
+      "inhandIncome": {
+        "type": "integer",
+        "description": "Monthly in‑hand income (salary or business profits) in INR."
+      },
+      "empStatus": {
+        "type": "string",
+        "description": "Employment status. Allowed values: \"salaried\" | \"self_employed\" | \"business\"."
+      }
+    }
+  },
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string",
+        "description": "success | error"
+      },
+      "message": {
+        "type": "string"
+      },
+      "data": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "description": "Internal product ID."
+            },
+            "card_alias": {
+              "type": "string",
+              "description": "Slug/alias for the card."
+            },
+            "seo_card_alias": {
+              "type": "string",
+              "description": "SEO version of alias"
+            },
+            "eligible": {
+              "type": "boolean",
+              "description": "Eligibility flag."
+            },
+            "rejectionReason": {
+              "type": "string",
+              "description": "If ineligible, primary reason (e.g., \"income\", \"location\").",
+              "nullable": true
+            },
+            "bank_id": {
+              "type": "integer",
+              "description": "Bank ID (present only when not eligible).",
+              "nullable": true
+            },
+            "product_id": {
+              "type": "integer",
+              "description": "Product ID (present only when not eligible).",
+              "nullable": true
+            },
+            "redirectionFlag": {
+              "type": "boolean",
+              "description": "If true, redirect to bank site immediately.",
+              "nullable": true
+            }
+          }
+        }
+      }
+    }
+  },
+  "sampleRequest": {
+    "pincode": "110001",
+    "inhandIncome": 50000,
+    "empStatus": "salaried"
+  },
+  "sampleResponse": {
+    "status": "success",
+    "message": "",
+    "data": [
+      {
+        "card_alias": "icici-platinum-chip-credit-card",
+        "id": 54,
+        "seo_card_alias": "icici-platinum-chip-credit-card",
+        "eligible": true
+      },
+      {
+        "card_alias": "icici-mmt-platinum-credit-card",
+        "id": 55,
+        "seo_card_alias": "icici-mmt-platinum-credit-card",
+        "eligible": true
+      },
+      {
+        "card_alias": "icici-hpcl-super-saver-credit-card",
+        "id": 51,
+        "seo_card_alias": "icici-hpcl-super-saver-credit-card",
+        "eligible": true
+      },
+      {
+        "card_alias": "au-zenith-plus-credit-card",
+        "bank_id": 7,
+        "product_id": 49,
+        "redirectionFlag": true,
+        "seo_card_alias": "au-zenith-plus-credit-card",
+        "rejectionReason": "income",
+        "eligible": false
+      }
+    ]
+  },
+  "sampleResponses": [],
+  "errorResponses": [],
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/eligibility' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"pincode\": \"110001\",\n  \"inhandIncome\": 50000,\n  \"empStatus\": \"salaried\"\n}'",
+  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/eligibility' \\\n--header 'Content-Type: application/json' \\\n--data '{\"alias\":\"sbi-cashback-credit-card\",\"pincode\":\"560001\",\"inhandIncome\":\"35000\",\"empStatus\":\"salaried\"}'",
+  "curlExampleProduction": "",
+  "validationNotes": [
+    "pincode must be a valid 6-digit Indian postal code",
+    "inhandIncome must be a positive integer in INR",
+    "empStatus must be one of: \"salaried\", \"self_employed\", \"business\"",
+    "alias is optional - if provided, checks eligibility for specific card only",
+    "Response includes eligibility status and rejection reasons if applicable"
+  ],
+  "fieldTable": [
+    {
+      "field": "alias",
+      "type": "string",
+      "required": "No",
+      "description": "Card slug to evaluate. If omitted, API returns eligibility for all cards."
+    },
+    {
+      "field": "pincode",
+      "type": "string",
+      "required": "Yes",
+      "description": "6‑digit pincode."
+    },
+    {
+      "field": "inhandIncome",
+      "type": "integer",
+      "required": "Yes",
+      "description": "Monthly in‑hand income (₹)."
+    },
+    {
+      "field": "empStatus",
+      "type": "string",
+      "required": "Yes",
+      "description": "Employment status: salaried | self_employed | business."
+    }
+  ]
+},
+  '/cardgenius/cards/{card_slug}': {
+  "name": "Card Detail",
+  "endpoint": "/cardgenius/cards/{card_slug}",
+  "description": "Fetch the full specification and meta‑data for a single credit card.",
+  "category": "Card APIs",
+  "products": [
+    "Card Genius"
+  ],
+  "purpose": "Used on product‑detail pages, comparison views, or pre‑filled applications to obtain every field we store for a card.",
+  "methods": [
+    "GET"
+  ],
+  "status": "live",
+  "rank": 8,
+  "requestSchema": {
+    "type": "object",
+    "properties": {
+      "card_alias": {
+        "type": "string",
+        "description": "Path parameter: the slug/alias of the card (e.g. \"icici-platinum-chip-credit-card\")"
+      }
+    },
+    "required": [
+      "card_alias"
+    ]
+  },
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      },
+      "data": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "nick_name": {
+              "type": "string"
+            },
+            "product_type": {
+              "type": "string"
+            },
+            "card_type": {
+              "type": "string"
+            },
+            "user_rating_count": {
+              "type": "integer"
+            },
+            "rating": {
+              "type": "number"
+            },
+            "bank_id": {
+              "type": "integer"
+            },
+            "priority": {
+              "type": "integer"
+            },
+            "bk_commission": {
+              "type": "string"
+            },
+            "new_to_credit": {
+              "type": "boolean"
+            },
+            "existing_customer": {
+              "type": "boolean"
+            },
+            "commission_type": {
+              "type": "string"
+            },
+            "commission": {
+              "type": "string"
+            },
+            "commission_percent": {
+              "type": "string"
+            },
+            "sub_agent_commission": {
+              "type": "string"
+            },
+            "seo_card_alias": {
+              "type": "string"
+            },
+            "card_alias": {
+              "type": "string"
+            },
+            "image": {
+              "type": "string"
+            },
+            "card_bg_image": {
+              "type": "string"
+            },
+            "card_bg_gradient": {
+              "type": "string"
+            },
+            "other_images": {
+              "type": "string"
+            },
+            "age_criteria": {
+              "type": "string"
+            },
+            "age_criteria_comment": {
+              "type": "string"
+            },
+            "min_age": {
+              "type": "integer"
+            },
+            "max_age": {
+              "type": "integer"
+            },
+            "crif": {
+              "type": "string"
+            },
+            "crif_comment": {
+              "type": "string"
+            },
+            "income": {
+              "type": "string"
+            },
+            "income_comment": {
+              "type": "string"
+            },
+            "joining_fee_text": {
+              "type": "string"
+            },
+            "joining_fee_offset": {
+              "type": "string"
+            },
+            "joining_fee_comment": {
+              "type": "string"
+            },
+            "annual_fee_text": {
+              "type": "string"
+            },
+            "annual_fee_waiver": {
+              "type": "string"
+            },
+            "annual_fee_comment": {
+              "type": "string"
+            },
+            "annual_saving": {
+              "type": "string"
+            },
+            "annual_saving_comment": {
+              "type": "string"
+            },
+            "reward_conversion_rate": {
+              "type": "string"
+            },
+            "redemption_options": {
+              "type": "string"
+            },
+            "redemption_catalogue": {
+              "type": "string"
+            },
+            "exclusion_earnings": {
+              "type": "string"
+            },
+            "exclusion_spends": {
+              "type": "string"
+            },
+            "network_url": {
+              "type": "string"
+            },
+            "employment_type": {
+              "type": "string"
+            },
+            "tnc": {
+              "type": "string"
+            },
+            "status": {
+              "type": "boolean"
+            },
+            "redirectionFlag": {
+              "type": "boolean"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "meta_title": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "meta_description": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "banks": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            },
+            "product_usps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "header": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "priority": {
+                    "type": "integer"
+                  },
+                  "tag_id": {
+                    "type": "integer"
+                  }
+                }
+              }
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "string"
+                  },
+                  "image2": {
+                    "type": "string"
+                  },
+                  "genius_title": {
+                    "type": "string"
+                  },
+                  "genius_subtitle": {
+                    "type": "string"
+                  },
+                  "genius_title2": {
+                    "type": "string"
+                  },
+                  "genius_subtitle2": {
+                    "type": "string"
+                  },
+                  "genius_bg_color": {
+                    "type": "string"
+                  },
+                  "genius_image": {
+                    "type": "string"
+                  },
+                  "genius_image_web": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "boolean"
+                  },
+                  "seo_alias": {
+                    "type": "string"
+                  },
+                  "seo_tag_title": {
+                    "type": "string"
+                  },
+                  "meta_title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "meta_description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "bk_product_tags": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "priority": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "bank_fee_structure": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "product_id": {
+                  "type": "integer"
+                },
+                "forex_markup": {
+                  "type": "string"
+                },
+                "forex_markup_comment": {
+                  "type": "string"
+                },
+                "apr_fees": {
+                  "type": "string"
+                },
+                "apr_fees_comment": {
+                  "type": "string"
+                },
+                "atm_withdrawal": {
+                  "type": "string"
+                },
+                "atm_withdrawal_comment": {
+                  "type": "string"
+                },
+                "reward_redemption_fees": {
+                  "type": "string"
+                },
+                "link": {
+                  "type": "string"
+                },
+                "railway_surcharge": {
+                  "type": "string"
+                },
+                "railway_surcharge_comment": {
+                  "type": "string"
+                },
+                "rent_payment_fees": {
+                  "type": "string"
+                },
+                "check_payment_fees": {
+                  "type": "string"
+                },
+                "check_payment_fees_comment": {
+                  "type": "string"
+                },
+                "cash_payment_fees": {
+                  "type": "string"
+                },
+                "cash_payment_fees_comment": {
+                  "type": "string"
+                },
+                "late_payment_annual": {
+                  "type": "string"
+                },
+                "late_payment_fine": {
+                  "type": "string"
+                },
+                "late_payment_comment": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            },
+            "product_benefits": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "product_id": {
+                    "type": "integer"
+                  },
+                  "benefit_type": {
+                    "type": "string"
+                  },
+                  "sub_type": {
+                    "type": "string"
+                  },
+                  "html_text": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "updatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "card_alias",
+            "status"
+          ]
+        }
+      }
+    },
+    "required": [
+      "status",
+      "message",
+      "data"
+    ]
+  },
+  "sampleRequest": {},
+  "sampleResponse": {},
+  "sampleResponses": {
+    "status": "success",
+    "message": "Card details fetched successfully",
+    "data": {
+      "id": 27,
+      "name": "SBI Cashback Credit Card",
+      "card_alias": "sbi-cashback-credit-card",
+      "bank_id": 3,
+      "status": true
+    }
+  },
+  "errorResponses": [],
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>'\n",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>'\n",
+  "validationNotes": [],
+  "fieldTable": [
+    {
+      "field": "card_slug",
+      "type": "string",
+      "required": "Yes",
+      "description": "The SEO‑friendly slug of the card (e.g. sbi-cashback-credit-card)."
+    }
+  ]
+},
+  '/partner/token': {
+  "name": "Partner Token Generation",
+  "endpoint": "/partner/token",
+  "description": "Generate a partner-token (JWT) that is required for authorization in subsequent Card Genius API calls",
+  "category": "Partner APIs",
+  "products": [
+    "Card Genius"
+  ],
+  "purpose": "Used to generate a `partner-token` (JWT) that is required for authorization in subsequent Card Genius API calls like `/cardgenius/initial-data`, `/cardgenius/cards`, etc.",
+  "methods": [
+    "POST"
+  ],
+  "status": "live",
+  "rank": 2,
+  "requestSchema": {
+    "type": "object",
+    "required": [
+      "x-api-key"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "x-api-key": {
+        "type": "string",
+        "description": "Secret API key issued by BankKaro (environment-specific)",
+        "minLength": 5
+      }
+    }
+  },
+  "responseSchema": {
+    "type": "object",
+    "required": [
+      "status",
+      "message",
+      "data"
+    ],
+    "properties": {
+      "status": {
+        "type": "string",
+        "enum": [
+          "success",
+          "error"
+        ],
+        "description": "Overall operation status"
+      },
+      "message": {
+        "type": "string",
+        "description": "Optional human-readable message"
+      },
+      "data": {
+        "type": "object",
+        "required": [
+          "jwttoken",
+          "expiresAt"
+        ],
+        "properties": {
+          "jwttoken": {
+            "type": "string",
+            "description": "Bearer token (JWT) to be supplied in the Authorization header"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 expiry timestamp (UTC)"
+          }
+        }
+      }
+    }
+  },
+  "sampleRequest": {
+    "x-api-key": "test"
+  },
+  "sampleResponse": {
+    "status": "success",
+    "message": "",
+    "data": {
+      "jwttoken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiOGZkYzIyYmRkMTkwZWFlNGRiMTFmZTUyYTQ5N2UyN2UxZDEwYWIyMTFiY2ZhZTVmOTYyOTUzOTZlNmFkZTA2NiIsImlhdCI6MTc1NjM1ODY2OCwiZXhwIjoxNzU2MzYyMjY4fQ.xaSdIOuA48yQ_Skiom5818vBxacGjuVeJ39f6_C6fxQ",
+      "expiresAt": "2025-08-28T06:24:28.810Z"
+    }
+  },
+  "sampleResponses": [
+    {
+      "status": "success",
+      "message": "",
+      "data": {
+        "jwttoken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.******",
+        "expiresAt": "2025-07-08T12:50:24.634Z"
+      }
+    }
+  ],
+  "errorResponses": [],
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"{{API_KEY}}\"\n}'",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"test\"\n}'",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"YOUR_PROD_KEY\"\n}'",
+  "validationNotes": [
+    "x-api-key must be a valid API key provided by BankKaro",
+    "This API must only be called from the server-side to prevent leaking the x-api-key",
+    "Do not expose this API in frontend JavaScript or browser tools",
+    "The jwttoken is time-bound and should be refreshed before expiry"
+  ],
+  "fieldTable": [
+    {
+      "field": "x-api-key",
+      "type": "string",
+      "required": "Yes",
+      "description": "Unique key provided by BankKaro (staging/prod specific). Must be kept secret on the backend."
+    }
+  ]
+},
+  '/partner/cardgenius/init-bundle': {
+  "name": "Initialization Bundle",
+  "endpoint": "/partner/cardgenius/init-bundle",
+  "description": "Returns all static data required to initialize the CardGenius app.",
+  "category": "Card APIs",
+  "products": [
+    "Card Genius"
+  ],
+  "purpose": "Provides banks, categories, and other static data needed for app initialization.",
+  "methods": [
+    "GET"
+  ],
+  "status": "live",
+  "rank": 3,
+  "requestSchema": {},
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "bank_data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "logo": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "logo"
+              ]
+            }
+          },
+          "tag_data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "tag_genius_fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "key": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "label",
+                      "key",
+                      "value"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "tag_genius_fields"
+              ]
+            }
+          },
+          "card_data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "card_type": {
+                  "type": "string"
+                },
+                "product_usps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "header": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "priority": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "header",
+                      "description",
+                      "priority"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "card_type",
+                "product_usps"
+              ]
+            }
+          }
+        },
+        "required": [
+          "bank_data",
+          "tag_data",
+          "card_data"
+        ]
+      }
+    },
+    "required": [
+      "status",
+      "message",
+      "data"
+    ]
+  },
+  "sampleRequest": {},
+  "sampleResponse": {
+    "status": "success",
+    "message": "",
+    "data": {
+      "bank_data": [
+        {
+          "id": 1,
+          "name": "Axis",
+          "logo": "https://example.com/logo1.png"
+        },
+        {
+          "id": 2,
+          "name": "IDFC",
+          "logo": "https://example.com/logo2.png"
+        }
+      ],
+      "tag_data": [
+        {
+          "id": 1,
+          "name": "Fuel",
+          "tag_genius_fields": [
+            {
+              "label": "Enter monthly fuel spend",
+              "key": "fuel",
+              "value": "10000"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Shopping",
+          "tag_genius_fields": [
+            {
+              "label": "Enter Amazon spend",
+              "key": "amazon_spends",
+              "value": "10000"
+            }
+          ]
+        }
+      ],
+      "card_data": [
+        {
+          "id": 54,
+          "name": "ICICI Platinum Card",
+          "card_type": "VISA",
+          "product_usps": [
+            {
+              "header": "Earn 2 Reward Points",
+              "description": "For every ₹100 spent on retail purchases",
+              "priority": 1
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "sampleResponses": {
+    "status": "success",
+    "message": "",
+    "data": {
+      "bank_data": [
+        {
+          "id": 1,
+          "name": "Axis Bank",
+          "criff_bank_name": "AXISBANK",
+          "logo": "https://example.com/axis.png"
+        },
+        {
+          "id": 3,
+          "name": "SBI",
+          "criff_bank_name": "SBIBANK",
+          "logo": "https://example.com/sbi.png"
+        }
+      ],
+      "tag_data": [
+        {
+          "id": 2,
+          "name": "Fuel",
+          "seo_alias": "fuel",
+          "tag_genius_fields": [
+            {
+              "label": "Monthly Fuel Spend",
+              "key": "monthly_fuel_spend",
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "name": "Dining",
+          "seo_alias": "dining",
+          "tag_genius_fields": [
+            {
+              "label": "Monthly Dining Spend",
+              "key": "online_food_ordering",
+              "value": "0"
+            }
+          ]
+        }
+      ],
+      "card_data": [
+        {
+          "id": 27,
+          "name": "SBI Cashback Credit Card",
+          "card_alias": "sbi-cashback-credit-card",
+          "product_type": "credit_card",
+          "card_type": "VISA,Mastercard",
+          "bank_id": 3,
+          "priority": 29,
+          "status": true
+        },
+        {
+          "id": 54,
+          "name": "ICICI Platinum Chip Credit Card",
+          "card_alias": "icici-platinum-chip-credit-card",
+          "product_type": "credit_card",
+          "card_type": "Mastercard",
+          "bank_id": 11,
+          "priority": 15,
+          "status": true
+        }
+      ]
+    }
+  },
+  "errorResponses": [],
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: {{JWT_TOKEN}}'",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: <your_jwt_token>'\n",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: <your_jwt_token>'\n",
+  "validationNotes": [],
+  "fieldTable": []
+},
+  '/cardgenius/cards': {
+  "name": "Cards Catalog (POST)",
+  "endpoint": "/cardgenius/cards",
+  "description": "Get a filtered list of credit cards based on request parameters.",
+  "category": "Card APIs",
+  "products": [
+    "Card Genius"
+  ],
+  "purpose": "Retrieve a filtered list of credit cards based on user preferences and criteria.",
+  "methods": [
+    "POST"
+  ],
+  "status": "live",
+  "rank": 6,
+  "requestSchema": {
+    "type": "object",
+    "properties": {
+      "filters": {
+        "type": "object",
+        "description": "Optional filters to apply to the card search",
+        "properties": {
+          "bank_id": {
+            "type": "integer",
+            "description": "Filter by specific bank ID"
+          },
+          "card_type": {
+            "type": "string",
+            "description": "Filter by card type (e.g., 'credit', 'debit')"
+          },
+          "annual_fee": {
+            "type": "object",
+            "description": "Filter by annual fee range",
+            "properties": {
+              "min": {
+                "type": "integer",
+                "description": "Minimum annual fee"
+              },
+              "max": {
+                "type": "integer",
+                "description": "Maximum annual fee"
+              }
+            }
+          }
+        }
+      },
+      "sort_by": {
+        "type": "string",
+        "description": "Sort criteria (e.g., 'name', 'annual_fee', 'rewards')",
+        "enum": [
+          "name",
+          "annual_fee",
+          "rewards",
+          "popularity"
+        ]
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Maximum number of cards to return",
+        "default": 50
+      },
+      "offset": {
+        "type": "integer",
+        "description": "Number of cards to skip for pagination",
+        "default": 0
+      }
+    }
+  },
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "cards": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "card_alias": {
+                  "type": "string"
+                },
+                "bank_id": {
+                  "type": "integer"
+                },
+                "status": {
+                  "type": "boolean"
+                },
+                "annual_fee": {
+                  "type": "integer"
+                },
+                "card_type": {
+                  "type": "string"
+                },
+                "rewards_rate": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "card_alias",
+                "bank_id",
+                "status"
+              ]
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          },
+          "has_more": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "cards",
+          "total_count",
+          "has_more"
+        ]
+      }
+    },
+    "required": [
+      "status",
+      "message",
+      "data"
+    ]
+  },
+  "sampleRequest": {
+    "filters": {
+      "card_type": "credit",
+      "annual_fee": {
+        "max": 5000
+      }
+    },
+    "sort_by": "rewards",
+    "limit": 10,
+    "offset": 0
+  },
+  "sampleResponse": {
+    "status": "success",
+    "message": "",
+    "data": [
+      {
+        "id": 54,
+        "name": "ICICI Platinum Chip Credit Card",
+        "nick_name": "ICICI Platinum Chip, Credit Card",
+        "product_type": "credit_card",
+        "card_type": "VISA",
+        "user_rating_count": 300,
+        "rating": 2.5,
+        "bank_id": 14,
+        "priority": 0,
+        "bk_commission": "2000",
+        "new_to_credit": true,
+        "existing_customer": false,
+        "commission_type": "Flat",
+        "commission": "1800",
+        "commission_percent": "90",
+        "sub_agent_commission": "",
+        "seo_card_alias": "icici-platinum-chip-credit-card",
+        "card_alias": "icici-platinum-chip-credit-card",
+        "image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Card%20Type%3DICICI%20Platinum.png1735906432341",
+        "api_redirection_url": null,
+        "card_bg_image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Mockup-41.webp1735906433314",
+        "card_bg_gradient": "radial-gradient(99.6% 170.48% at 50% -70.48%, #B2B2B2 0%, #1B1B1B 100%)",
+        "other_images": "",
+        "age_criteria": "21-60",
+        "age_criteria_comment": "",
+        "age_self_emp": "21-60",
+        "age_self_emp_comment": "",
+        "min_age": 21,
+        "max_age": 60,
+        "crif": "700",
+        "crif_comment": "",
+        "income": "20000",
+        "income_comment": "",
+        "crif_self_emp": "700",
+        "crif_self_emp_comment": "",
+        "income_salaried": "2",
+        "income_self_emp": "2",
+        "income_self_emp_comment": "",
+        "joining_fee_text": "0",
+        "joining_fee_offset": "N/A",
+        "joining_fee_comment": "",
+        "annual_fee_text": "0",
+        "annual_fee_waiver": "N/A",
+        "annual_fee_comment": "",
+        "annual_saving": "2601",
+        "annual_saving_comment": null,
+        "reward_conversion_rate": "1reward points = Rs 0.25",
+        "redemption_options": "<p>You can redeem reward points by login in with your internet banking login credentials.</p>",
+        "redemption_catalogue": "https://www.icicibank.com/",
+        "exclusion_earnings": "Rent Payment, Insurance, Cash Withdrawls, School & Educational Services, GST Charges, Tolls",
+        "exclusion_spends": "Rent Payment, Insurance, Cash Withdrawls, School & Educational Services, GST Charges, Tolls",
+        "network_url": "https://secure.traqkarr.com/click?pid=10&offer_id=1389&sub2=",
+        "employment_type": "both",
+        "tnc": "The bank may offer a different card variant based on your eligibility. Please carefully read the features of the card offered before submitting your application || A minimum transaction of Rs.100 within 30 days is required to activate the card, otherwise, you won’t be eligible for the Rewards",
+        "status": true,
+        "redirectionFlag": true,
+        "createdAt": "2025-01-03T17:42:24.000Z",
+        "updatedAt": "2025-07-08T12:44:31.000Z",
+        "meta_title": null,
+        "meta_description": null,
+        "ck_banner_images": null,
+        "ek_banner_images": null,
+        "ps_banner_images": null,
+        "dsa_banner_images": null,
+        "card_additional_information": {},
+        "product_usps": [
+          {
+            "header": "Earn 2 Reward Points ",
+            "description": "for every ₹100 spent on retail purchases, excluding fuel transactions, and redeem them for exciting rewards",
+            "priority": 1,
+            "tag_id": 0
+          },
+          {
+            "header": "Earn 1 Reward Point ",
+            "description": "for every ₹100 spent on insurance, utilities, and government transactions, making every payment more rewarding",
+            "priority": 2,
+            "tag_id": 0
+          },
+          {
+            "header": "Earn 2 Reward Points ",
+            "description": "for every ₹100 spent on retail purchases and redeem them for exciting rewards",
+            "priority": 1,
+            "tag_id": 2
+          }
+        ]
+      }
+    ]
+  },
+  "sampleResponses": {
+    "status": "success",
+    "message": "Cards filtered successfully",
+    "data": {
+      "cards": [
+        {
+          "id": 27,
+          "name": "SBI Cashback Credit Card",
+          "card_alias": "sbi-cashback-credit-card",
+          "bank_id": 3,
+          "status": true,
+          "annual_fee": 999,
+          "card_type": "credit",
+          "rewards_rate": 5
+        }
+      ],
+      "total_count": 1,
+      "has_more": false
+    }
+  },
+  "errorResponses": [],
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"filters\": {\n      \"card_type\": \"credit\",\n      \"annual_fee\": {\n        \"max\": 5000\n      }\n    },\n    \"sort_by\": \"rewards\",\n    \"limit\": 10,\n    \"offset\": 0\n  }'\n",
+  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"filters\": {\n      \"card_type\": \"credit\",\n      \"annual_fee\": {\n        \"max\": 5000\n      }\n    },\n    \"sort_by\": \"rewards\",\n    \"limit\": 10,\n    \"offset\": 0\n  }'\n",
+  "curlExampleProduction": "curl --location 'https://prod-partner.bankkaro.com/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"filters\": {\n      \"card_type\": \"credit\",\n      \"annual_fee\": {\n        \"max\": 5000\n      }\n    },\n    \"sort_by\": \"rewards\",\n    \"limit\": 10,\n    \"offset\": 0\n  }'\n",
+  "validationNotes": [
+    "Filters are optional - if not provided, all cards will be returned",
+    "Sort criteria must be one of the allowed values",
+    "Limit and offset are used for pagination",
+    "Partner token is required for authentication"
+  ],
+  "fieldTable": [
+    {
+      "field": "filters",
+      "type": "object",
+      "required": "No",
+      "description": "Optional filters to apply to the card search"
+    },
+    {
+      "field": "sort_by",
+      "type": "string",
+      "required": "No",
+      "description": "Sort criteria (name, annual_fee, rewards, popularity)"
+    },
+    {
+      "field": "limit",
+      "type": "integer",
+      "required": "No",
+      "description": "Maximum number of cards to return (default: 50)"
+    },
+    {
+      "field": "offset",
+      "type": "integer",
+      "required": "No",
+      "description": "Number of cards to skip for pagination (default: 0)"
+    }
+  ]
 }
 };
 

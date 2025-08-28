@@ -205,8 +205,11 @@ const AdminPanel = () => {
       });
       
       if (response.ok) {
-        alert('✅ Changes saved to local apiData.js file!\n\n🔄 Refreshing to show updated data...');
-        setTimeout(() => window.location.reload(), 1000);
+        const responseData = await response.json();
+        const message = responseData.reloaded 
+          ? '✅ Changes saved and data reloaded in memory!\n\n🔄 Your changes should now be visible.'
+          : '✅ Changes saved to file!\n\n⚠️ Data may need a moment to refresh.';
+        alert(message);
         return { success: true, mode: 'local' };
       } else {
         throw new Error('Server returned error');

@@ -26,12 +26,25 @@ let apiData = { ...importedApiData };
 // Function to reload data from file
 const reloadApiData = async () => {
   try {
-    // Re-import the data
-    const { apiData: freshData } = await import('./src/data/apiData.js');
-    apiData = { ...freshData };
+    // Read the file directly to avoid module caching
+    const apiDataPath = path.join(__dirname, 'src', 'data', 'apiData.js');
+    const fileContent = fs.readFileSync(apiDataPath, 'utf8');
     
-    console.log('🔄 Reloaded API data, count:', Object.keys(apiData).length);
-    return true;
+    // Extract the apiData object from the file content
+    // This is a simple approach - we'll look for the export const apiData = { ... } pattern
+    const match = fileContent.match(/export const apiData = ({[\s\S]*?});/);
+    if (match) {
+      // Evaluate the object (this is safe since we control the file content)
+      const apiDataString = match[1];
+      const freshData = eval(`(${apiDataString})`);
+      apiData = { ...freshData };
+      
+      console.log('🔄 Reloaded API data, count:', Object.keys(apiData).length);
+      return true;
+    } else {
+      console.error('❌ Could not find apiData export in file');
+      return false;
+    }
   } catch (error) {
     console.error('❌ Error reloading API data:', error);
     return false;
@@ -58,7 +71,7 @@ app.get('/reload', async (req, res) => {
 });
 
 // API endpoint to update apiData.js
-app.post('/api/save-api-data', (req, res) => {
+app.post('/api/save-api-data', async (req, res) => {
   try {
     const { updatedEndpoints, mode = 'local' } = req.body;
 
@@ -90,10 +103,15 @@ app.post('/api/save-api-data', (req, res) => {
       
       console.log('✅ Updated apiData.js file:', apiDataPath);
       
+      // Reload the data in memory after writing the file
+      const reloadSuccess = await reloadApiData();
+      console.log('🔄 Data reloaded in memory:', reloadSuccess ? 'SUCCESS' : 'FAILED');
+      
       return res.status(200).json({
         success: true,
-        message: 'Changes saved to local apiData.js file',
-        mode: 'local'
+        message: 'Changes saved to local apiData.js file and reloaded in memory',
+        mode: 'local',
+        reloaded: reloadSuccess
       });
     } else {
       // Download mode

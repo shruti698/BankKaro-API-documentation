@@ -54,16 +54,11 @@ import { apiData } from '../data/apiData';
 const API_BASE_URL = getApiBaseUrl();
 
 const ApiDocumentation = () => {
-  console.log('🚀 ApiDocumentation component is being rendered!');
   const location = useLocation();
   const endpoint = decodeURIComponent(location.pathname.replace('/docs/', ''));
-  console.log('🚀 ApiDocumentation - window.location.pathname:', window.location.pathname);
-  console.log('🚀 ApiDocumentation - extracted endpoint:', endpoint);
   const [api, setApi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  console.log('🔍 ApiDocumentation component rendered with endpoint:', endpoint);
   const [selectedMethod, setSelectedMethod] = useState('POST');
   const [selectedEnvironment, setSelectedEnvironment] = useState('uat');
   // const [showSandbox, setShowSandbox] = useState(false);
@@ -71,52 +66,46 @@ const ApiDocumentation = () => {
   //   testing: false
   // });
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchApiData = async () => {
       try {
         setLoading(true);
-        console.log('ApiDocumentation - Fetching data for endpoint:', endpoint);
-        console.log('ApiDocumentation - Endpoint type:', typeof endpoint);
-        console.log('ApiDocumentation - Endpoint length:', endpoint ? endpoint.length : 'null');
-        console.log('ApiDocumentation - URL pathname:', window.location.pathname);
+
         
         let foundApi = null;
         
         // Always try static data first as fallback
-        const staticApi = apiData[endpoint];
-        console.log('ApiDocumentation - Static data available for:', endpoint, staticApi ? 'YES' : 'NO');
+        const staticApi = apiData[endpoint] || apiData[`/${endpoint}`] || apiData[endpoint.replace(/^\//, '')];
         
         // If API_BASE_URL is null (production), use static data only
         if (!API_BASE_URL) {
-          console.log('ApiDocumentation - Using static data (production mode)');
           foundApi = staticApi;
         } else {
           // Development mode - try server first, fallback to static data
-          console.log('ApiDocumentation - Trying server first (development mode)');
           try {
             const response = await fetch(`${API_BASE_URL}/endpoints`);
             if (response.ok) {
               const endpointsData = await response.json();
-              console.log('ApiDocumentation - Server data keys:', Object.keys(endpointsData));
-              foundApi = endpointsData[endpoint];
-              console.log('ApiDocumentation - Server data match for:', endpoint, foundApi ? 'FOUND' : 'NOT FOUND');
+              
+              // Try to find the endpoint with flexible matching (with/without leading slash)
+              foundApi = endpointsData[endpoint] || endpointsData[`/${endpoint}`] || endpointsData[endpoint.replace(/^\//, '')];
+              
+              // If still not found, try static data
+              if (!foundApi) {
+                foundApi = staticApi;
+              }
             } else {
               throw new Error('Server response not ok');
             }
           } catch (serverError) {
-            console.log('ApiDocumentation - Server failed, using static data:', serverError.message);
             foundApi = staticApi;
           }
         }
         
-        console.log('ApiDocumentation - Final API data for endpoint:', endpoint, foundApi);
-        
         if (foundApi) {
           setApi(foundApi);
           setSelectedMethod(foundApi.methods[0] || 'POST');
-          console.log('ApiDocumentation - Set API data successfully');
         } else {
-          console.error('ApiDocumentation - API not found for endpoint:', endpoint);
           setError('API endpoint not found in admin data');
         }
       } catch (err) {
@@ -152,6 +141,8 @@ const ApiDocumentation = () => {
 
   const hasMultipleMethods = api.methods.length > 1;
   const currentApiData = hasMultipleMethods ? api[selectedMethod.toLowerCase()] : api;
+  
+
 
   const renderSchemaProperties = (properties) => {
     if (!properties || typeof properties !== 'object') {
@@ -263,10 +254,10 @@ const ApiDocumentation = () => {
       // Use environment-specific cURL if available, otherwise fall back to the default
       let curlToUse = curlExample;
       
-      if ((environment === 'staging' || environment === 'uat') && currentApiData.curlExampleStaging) {
+      if ((environment === 'staging' || environment === 'uat') && currentApiData?.curlExampleStaging) {
         curlToUse = currentApiData.curlExampleStaging;
 
-      } else if (environment === 'production' && currentApiData.curlExampleProduction) {
+      } else if (environment === 'production' && currentApiData?.curlExampleProduction) {
         curlToUse = currentApiData.curlExampleProduction;
 
       } else {
@@ -387,8 +378,22 @@ const ApiDocumentation = () => {
   //   }));
   // };
 
+  // Add safety check
+  if (!api) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">
+          API data is not available. Please try refreshing the page.
+        </Alert>
+      </Box>
+    );
+  }
+
   return (
-    <Box sx={{ maxWidth: '100%' }}>
+    <Box sx={{ maxWidth: '100%', padding: 2 }}>
+
+
+      
       {/* ===== QUICK NAVIGATION ===== */}
       <Box sx={{ 
         mb: 4, 
@@ -552,11 +557,11 @@ const ApiDocumentation = () => {
         {/* Quick cURL Example */}
         {currentApiData.curlExample && (
           <Card sx={{ borderRadius: 2, mb: 4 }}>
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <CodeIcon sx={{ mr: 1 }} />
-                Quick Start (cURL)
-              </Typography>
+                          <CardContent sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <CodeIcon sx={{ mr: 1 }} />
+                  Quick Start (cURL)
+                </Typography>
               <Divider sx={{ mb: 3 }} />
               
               {/* Environment Tabs */}
