@@ -207,7 +207,7 @@ const AdminPanel = () => {
       if (response.ok) {
         const responseData = await response.json();
         
-        // Also save to production (GitHub)
+        // Also try to save to production (GitHub) - but don't fail if it doesn't work
         try {
           const productionResponse = await fetch('/api/production-update', {
             method: 'POST',
@@ -243,19 +243,15 @@ const AdminPanel = () => {
             
             return { success: true, mode: 'local-with-production-content', content: prodResponseData.content };
           } else {
-            // Local save succeeded but production failed
-            const message = responseData.reloaded 
-              ? '✅ Changes saved locally!\n\n⚠️ Production update failed. Please try again.'
-              : '✅ Changes saved to local file!\n\n⚠️ Production update failed. Please try again.';
-            alert(message);
+            // Production failed but local succeeded - show warning but don't fail
+            console.warn('Production update failed, but local save succeeded');
+            alert('✅ Changes saved locally!\n\n⚠️ Production update is not available in this environment.\n\nYour changes are saved locally and will be available when you restart the server.');
             return { success: true, mode: 'local' };
           }
         } catch (prodError) {
-          // Local save succeeded but production failed
-          const message = responseData.reloaded 
-            ? '✅ Changes saved locally!\n\n⚠️ Production update failed. Please try again.'
-            : '✅ Changes saved to local file!\n\n⚠️ Production update failed. Please try again.';
-          alert(message);
+          // Production failed but local succeeded - show warning but don't fail
+          console.warn('Production update failed:', prodError);
+          alert('✅ Changes saved locally!\n\n⚠️ Production update is not available in this environment.\n\nYour changes are saved locally and will be available when you restart the server.');
           return { success: true, mode: 'local' };
         }
       } else {
@@ -263,7 +259,7 @@ const AdminPanel = () => {
       }
     } catch (error) {
       console.error('Error saving to local file:', error);
-      alert('❌ Local server not running!\n\n📝 Please run this command in your terminal:\n\nnpm run local-server\n\nThen try saving again.');
+      alert('❌ Local server not running!\n\n📝 Please run this command in your terminal:\n\nnpm run dev-server\n\nThen try saving again.');
       return { success: false, mode: 'error' };
     }
   };

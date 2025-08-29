@@ -41,14 +41,16 @@ export default async function handler(req, res) {
         '   git commit -m "Update API data from admin panel"',
         '   git push origin main'
       ],
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      endpointCount: Object.keys(updatedEndpoints).length
     });
 
   } catch (error) {
     console.error('Error generating production update:', error);
     return res.status(500).json({ 
       error: 'Failed to generate production update',
-      details: error.message 
+      details: error.message,
+      stack: error.stack
     });
   }
 } 
