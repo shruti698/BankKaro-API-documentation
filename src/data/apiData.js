@@ -65,7 +65,7 @@ export const apiData = {
     "mobile": "9999999999",
     "otp": "123456"
   },
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/auth' \\\n--header 'partner-token: {{JWT_TOKEN}}' \\\n--header 'x-epoch: <your_epoch_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"mobile\": \"7028333370\",\n  \"otp\": \"661801\"\n}'",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/auth' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'x-epoch: <your_epoch_token>' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"mobile\": \"7028333370\",\n  \"otp\": \"661801\"\n}'",
   "validationNotes": [
     "mobile must be a valid 10-digit number",
     "otp must be exactly 6 digits",
@@ -90,7 +90,44 @@ export const apiData = {
     "Loan Genius"
   ],
   "sampleResponses": [],
-  "errorResponses": []
+  "errorResponse": {
+    "status": "error",
+    "message": "Authentication failed",
+    "data": null,
+    "error_code": "AUTH_001"
+  },
+  "errorResponses": [
+    {
+      "title": "Invalid Mobile Number",
+      "statusCode": 400,
+      "response": {
+        "status": "error",
+        "message": "Invalid mobile number format",
+        "data": null,
+        "error_code": "AUTH_002"
+      }
+    },
+    {
+      "title": "Invalid OTP",
+      "statusCode": 401,
+      "response": {
+        "status": "error",
+        "message": "Invalid or expired OTP",
+        "data": null,
+        "error_code": "AUTH_003"
+      }
+    },
+    {
+      "title": "Too Many Attempts",
+      "statusCode": 429,
+      "response": {
+        "status": "error",
+        "message": "Too many authentication attempts. Please try again later.",
+        "data": null,
+        "error_code": "AUTH_004"
+      }
+    }
+  ]
 },
   'lead-details': {
   "name": "Lead Details",
@@ -599,6 +636,12 @@ export const apiData = {
     "Loan Genius"
   ],
   "sampleResponses": [],
+  "errorResponse": {
+    "status": "error",
+    "message": "Application submission failed",
+    "data": null,
+    "error_code": "APP_001"
+  },
   "errorResponses": []
 },
   'partner-autoAuth': {
@@ -678,7 +721,7 @@ export const apiData = {
   "sampleRequest": {
     "mobile": "7011048697"
   },
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/autoAuth' \\\n--header 'partner-token: {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"mobile\": \"7028333370\"\n}'",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/autoAuth' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    \"mobile\": \"7028333370\"\n}'",
   "validationNotes": [
     "One of mobile or exit_id + vendor must be provided",
     "mobile must be a valid 10-digit number if provided",
@@ -750,6 +793,12 @@ export const apiData = {
     "Loan Genius"
   ],
   "sampleResponses": [],
+  "errorResponse": {
+    "status": "error",
+    "message": "Auto authentication failed",
+    "data": null,
+    "error_code": "AUTO_AUTH_001"
+  },
   "errorResponses": []
 },
   'partner-token': {
@@ -854,6 +903,12 @@ export const apiData = {
       }
     }
   ],
+  "errorResponse": {
+    "status": "error",
+    "message": "Token generation failed",
+    "data": null,
+    "error_code": "TOKEN_001"
+  },
   "errorResponses": []
 },
   'v1-redemption-planner': {
@@ -962,7 +1017,12 @@ export const apiData = {
       }
     }
   },
-  "errorResponse": {},
+  "errorResponse": {
+    "status": "error",
+    "message": "Redemption planner request failed",
+    "data": null,
+    "error_code": "REDEMPTION_001"
+  },
   "validationNotes": [],
   "fieldTable": []
 },
@@ -1021,7 +1081,12 @@ export const apiData = {
     }
   },
   "sampleRequest": {},
-  "errorResponse": {},
+  "errorResponse": {
+    "status": "error",
+    "message": "Instant offers request failed",
+    "data": null,
+    "error_code": "OFFERS_001"
+  },
   "validationNotes": [],
   "fieldTable": []
 },
@@ -1093,7 +1158,12 @@ export const apiData = {
     }
   },
   "sampleRequest": {},
-  "errorResponse": {},
+  "errorResponse": {
+    "status": "error",
+    "message": "Lounge finder request failed",
+    "data": null,
+    "error_code": "LOUNGE_001"
+  },
   "validationNotes": [],
   "fieldTable": []
 },
@@ -1309,7 +1379,12 @@ export const apiData = {
       }
     }
   },
-  "errorResponse": {},
+  "errorResponse": {
+    "status": "error",
+    "message": "Omni endpoint request failed",
+    "data": null,
+    "error_code": "OMNI_001"
+  },
   "validationNotes": [],
   "fieldTable": []
 },
@@ -1370,7 +1445,12 @@ export const apiData = {
       }
     }
   },
-  "errorResponse": {},
+  "errorResponse": {
+    "status": "error",
+    "message": "Webhook subscription failed",
+    "data": null,
+    "error_code": "WEBHOOK_001"
+  },
   "validationNotes": [],
   "fieldTable": []
 },
@@ -1781,9 +1861,9 @@ export const apiData = {
     }
   },
   "errorResponses": [],
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'",
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/calculate' \\\n  --header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"amazon_spends\": 15000,\n    \"flipkart_spends\": 25000,\n    \"other_online_spends\": 0,\n    \"other_offline_spends\": 0,\n    \"grocery_spends_online\": 0,\n    \"online_food_ordering\": 0,\n    \"fuel\": 0,\n    \"dining_or_going_out\": 0,\n    \"flights_annual\": 0,\n    \"hotels_annual\": 0,\n    \"domestic_lounge_usage_quarterly\": 0,\n    \"international_lounge_usage_quarterly\": 0,\n    \"mobile_phone_bills\": 0,\n    \"electricity_bills\": 0,\n    \"water_bills\": 0,\n    \"insurance_health_annual\": 0,\n    \"insurance_car_or_bike_annual\": 0,\n    \"rent\": 0,\n    \"school_fees\": 30000\n}'",
   "validationNotes": [],
   "fieldTable": [
     {
@@ -1846,7 +1926,13 @@ export const apiData = {
       "required": "No",
       "description": "₹ / year – flight tickets"
     }
-  ]
+  ],
+  "errorResponse": {
+    "status": "error",
+    "message": "Card calculation request failed",
+    "data": null,
+    "error_code": "CALC_001"
+  }
 },
   'partner/logout': {
   "name": "Partner Logout",
@@ -1873,7 +1959,7 @@ export const apiData = {
     }
   },
   "sampleRequest": {},
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/logout' \\\n--header 'partner-token: {{JWT_TOKEN}}' \\\n--header 'Authorization: <your_auth_token>'",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/logout' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}'",
   "validationNotes": [
     "partner-token header is required",
     "Authorization header with user token is required"
@@ -1925,6 +2011,12 @@ export const apiData = {
   "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/health'\n",
   "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/health'\n",
   "validationNotes": [],
+  "errorResponse": {
+    "status": "error",
+    "message": "Health check failed",
+    "data": null,
+    "error_code": "HEALTH_001"
+  },
   "fieldTable": []
 },
   '/partner/cardgenius/cards': {
@@ -2082,7 +2174,7 @@ export const apiData = {
         "exclusion_spends": "Rent Payment, Insurance, Cash Withdrawls, School & Educational Services, GST Charges, Tolls",
         "network_url": "https://secure.traqkarr.com/click?pid=10&offer_id=1389&sub2=",
         "employment_type": "both",
-        "tnc": "The bank may offer a different card variant based on your eligibility. Please carefully read the features of the card offered before submitting your application || A minimum transaction of Rs.100 within 30 days is required to activate the card, otherwise, you won’t be eligible for the Rewards",
+        "tnc": "The bank may offer a different card variant based on your eligibility. Please carefully read the features of the card offered before submitting your application || A minimum transaction of Rs.100 within 30 days is required to activate the card, otherwise, you won't be eligible for the Rewards",
         "status": true,
         "redirectionFlag": true,
         "createdAt": "2025-01-03T17:42:24.000Z",
@@ -2138,10 +2230,37 @@ export const apiData = {
       "tag_genius_data": {}
     }
   },
-  "errorResponses": [],
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
-  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
-  "curlExampleProduction": "curl --location 'https://prod-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
+  "errorResponse": {
+    "status": "error",
+    "message": "Failed to fetch cards catalog",
+    "data": null,
+    "error_code": "CARDS_001"
+  },
+  "errorResponses": [
+    {
+      "title": "Invalid Partner Token",
+      "statusCode": 401,
+      "response": {
+        "status": "error",
+        "message": "Invalid or expired partner token",
+        "data": null,
+        "error_code": "AUTH_001"
+      }
+    },
+    {
+      "title": "Service Unavailable",
+      "statusCode": 503,
+      "response": {
+        "status": "error",
+        "message": "Cards service temporarily unavailable",
+        "data": null,
+        "error_code": "SERVICE_001"
+      }
+    }
+  ],
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Authorization: Bearer {{JWT_TOKEN}}'\n",
+  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Authorization: Bearer {{JWT_TOKEN}}'\n",
+  "curlExampleProduction": "curl --location 'https://prod-partner.bankkaro.com/partner/cardgenius/cards' \\\n  --header 'Authorization: Bearer {{JWT_TOKEN}}'\n",
   "validationNotes": [],
   "fieldTable": []
 },
@@ -2280,9 +2399,15 @@ export const apiData = {
     ]
   },
   "sampleResponses": [],
+  "errorResponse": {
+    "status": "error",
+    "message": "Eligibility check failed",
+    "data": null,
+    "error_code": "ELIGIBILITY_001"
+  },
   "errorResponses": [],
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/eligibility' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"pincode\": \"110001\",\n  \"inhandIncome\": 50000,\n  \"empStatus\": \"salaried\"\n}'",
-  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/eligibility' \\\n--header 'Content-Type: application/json' \\\n--data '{\"alias\":\"sbi-cashback-credit-card\",\"pincode\":\"560001\",\"inhandIncome\":\"35000\",\"empStatus\":\"salaried\"}'",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/eligibility' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"pincode\": \"110001\",\n  \"inhandIncome\": 50000,\n  \"empStatus\": \"salaried\"\n}'",
+      "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/eligibility' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\"alias\":\"sbi-cashback-credit-card\",\"pincode\":\"560001\",\"inhandIncome\":\"35000\",\"empStatus\":\"salaried\"}'",
   "curlExampleProduction": "",
   "validationNotes": [
     "pincode must be a valid 6-digit Indian postal code",
@@ -2767,7 +2892,176 @@ export const apiData = {
     ]
   },
   "sampleRequest": {},
-  "sampleResponse": {},
+  "sampleResponse": {
+    "status": "success",
+    "message": "",
+    "data": [
+      {
+        "id": 54,
+        "name": "ICICI Platinum Chip Credit Card",
+        "nick_name": "ICICI Platinum Chip, Credit Card",
+        "product_type": "credit_card",
+        "card_type": "VISA",
+        "user_rating_count": 300,
+        "rating": 2.5,
+        "bank_id": 14,
+        "priority": 0,
+        "bk_commission": "2000",
+        "new_to_credit": true,
+        "existing_customer": false,
+        "commission_type": "Flat",
+        "commission": "1800",
+        "commission_percent": "90",
+        "sub_agent_commission": "",
+        "seo_card_alias": "icici-platinum-chip-credit-card",
+        "card_alias": "icici-platinum-chip-credit-card",
+        "image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Card%20Type%3DICICI%20Platinum.png1735906432341",
+        "api_redirection_url": null,
+        "card_bg_image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Mockup-41.webp1735906433314",
+        "card_bg_gradient": "radial-gradient(99.6% 170.48% at 50% -70.48%, #B2B2B2 0%, #1B1B1B 100%)",
+        "other_images": "",
+        "age_criteria": "21-60",
+        "age_criteria_comment": "",
+        "age_self_emp": "21-60",
+        "age_self_emp_comment": "",
+        "min_age": 21,
+        "max_age": 60,
+        "crif": "700",
+        "crif_comment": "",
+        "income": "20000",
+        "income_comment": "",
+        "crif_self_emp": "700",
+        "crif_self_emp_comment": "",
+        "income_salaried": "2",
+        "income_self_emp": "2",
+        "income_self_emp_comment": "",
+        "joining_fee_text": "0",
+        "joining_fee_offset": "N/A",
+        "joining_fee_comment": "",
+        "annual_fee_text": "0",
+        "annual_fee_waiver": "N/A",
+        "annual_fee_comment": "",
+        "annual_saving": "2601",
+        "annual_saving_comment": null,
+        "reward_conversion_rate": "1reward points = Rs 0.25",
+        "redemption_options": "<p>You can redeem reward points by login in with your internet banking login credentials.</p>",
+        "redemption_catalogue": "https://www.icicibank.com/",
+        "exclusion_earnings": "Rent Payment, Insurance, Cash Withdrawls, School & Educational Services, GST Charges, Tolls",
+        "exclusion_spends": "Rent Payment, Insurance, Cash Withdrawls, School & Educational Services, GST Charges, Tolls",
+        "network_url": "https://secure.traqkarr.com/click?pid=10&offer_id=1389&sub2=",
+        "employment_type": "both",
+        "tnc": "The bank may offer a different card variant based on your eligibility. Please carefully read the features of the card offered before submitting your application || A minimum transaction of Rs.100 within 30 days is required to activate the card, otherwise, you won't be eligible for the Rewards",
+        "status": true,
+        "redirectionFlag": true,
+        "createdAt": "2025-01-03T17:42:24.000Z",
+        "updatedAt": "2025-07-08T12:44:31.000Z",
+        "meta_title": null,
+        "meta_description": null,
+        "ck_banner_images": null,
+        "ek_banner_images": null,
+        "ps_banner_images": null,
+        "dsa_banner_images": null,
+        "card_additional_information": {},
+        "banks": {
+          "id": 14,
+          "name": "ICICI Bank"
+        },
+        "product_usps": [
+          {
+            "header": "Earn 2 Reward Points ",
+            "description": "for every ₹100 spent on retail purchases, excluding fuel transactions, and redeem them for exciting rewards",
+            "priority": 1,
+            "tag_id": 0
+          },
+          {
+            "header": "Earn 1 Reward Point ",
+            "description": "for every ₹100 spent on insurance, utilities, and government transactions, making every payment more rewarding",
+            "priority": 2,
+            "tag_id": 0
+          },
+          {
+            "header": "Earn 2 Reward Points ",
+            "description": "for every ₹100 spent on retail purchases and redeem them for exciting rewards",
+            "priority": 1,
+            "tag_id": 2
+          }
+        ],
+        "tags": [
+          {
+            "id": 2,
+            "name": "Shopping",
+            "image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_On.png1732014642228",
+            "image2": "",
+            "genius_title": "Shop More, Save More",
+            "genius_subtitle": "Unwrap cashback and rewards with the perfect shopping cards",
+            "genius_title2": "Your Best Shopping Card Awaits!",
+            "genius_subtitle2": "Add your monthly shopping spend to discover the rewards you could stack on every purchase",
+            "genius_bg_color": "linear-gradient( 180deg , #5E949A 0%, #274B4D 100%)",
+            "genius_image": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Shop.webp1737011649292",
+            "genius_image_web": "https://offline-agent-bk.s3.ap-south-1.amazonaws.com/AGB_Shop.webp1737011649722",
+            "status": true,
+            "seo_alias": "best-shopping-credit-card",
+            "seo_tag_title": "Best Shopping Credit Card",
+            "meta_title": null,
+            "meta_description": null,
+            "createdAt": null,
+            "updatedAt": "2025-01-24T15:22:04.000Z",
+            "bk_product_tags": {
+              "id": 1232,
+              "priority": null
+            }
+          }
+        ],
+        "vendors": [],
+        "bank_fee_structure": {
+          "id": 66,
+          "product_id": 54,
+          "forex_markup": "3.5%",
+          "forex_markup_comment": "<p>3.5% Forex Markups are levied if you use your card to make payments in any currency other than ₹ (INR). This fee applies to payments on e-commerce websites accepting foreign currencies or transactions made outside India using a POS. Below is a breakdown of forex markup for common spends:</p><ul><li>₹100 - ₹3.5</li><li>₹1,000 - ₹35</li><li>₹10,000 - ₹350</li><li>₹1,00,000 - ₹3,500</li></ul>",
+          "apr_fees": " 3.4%",
+          "apr_fees_comment": "<p>3.4% monthly fee. Credit cards allow you for a interest free payment period of 20-55 days. However, if you fail to make payment for your statement in due time then bank starts charging interest. A simple way to avoid heavy interest rates over long time is to convert your large spends in EMIs. Normally bank charges 16% p.a interest on EMIs however if you fail to pay in time then annual interest can reach upto 36%</p>",
+          "atm_withdrawal": "2.5%",
+          "atm_withdrawal_comment": "",
+          "reward_redemption_fees": "₹99",
+          "reward_redemption_fees_comment": "<p>₹99 plus GST per redemption request.</p>",
+          "link": "",
+          "railway_surcharge": "",
+          "railway_surcharge_comment": "",
+          "rent_payment_fees": "",
+          "rent_payment_fees_comment": "",
+          "check_payment_fees": "₹100",
+          "check_payment_fees_comment": "",
+          "cash_payment_fees": "",
+          "cash_payment_fees_comment": "",
+          "late_payment_annual": "₹0 - ₹100 | ₹101 - ₹500 | ₹501 - ₹10,000 | Above ₹10,000",
+          "late_payment_fine": "₹0 | ₹100 | ₹500 | ₹750",
+          "late_payment_comment": "<p>Late Payment charges will be applicable if Minimum Amount Due is not paid by the payment due date</p>",
+          "createdAt": "2025-01-15T01:13:40.000Z",
+          "updatedAt": "2025-01-15T01:13:40.000Z"
+        },
+        "product_benefits": [
+          {
+            "id": 959,
+            "product_id": 54,
+            "benefit_type": "all",
+            "sub_type": "All Benefits",
+            "html_text": "<ul><li>Earn 2 Reward Points for every ₹100 spent on retail purchases, excluding fuel transactions.</li><li>Get 1 Reward Point for every ₹100 spent on insurance, utilities, and government transactions.</li><li>Enjoy up to 15% savings at over 2,500 partner restaurants across India through ICICI's Culinary Treats program.</li><li>Save 1% on fuel surcharge for transactions between ₹500 and ₹4,000 at HPCL fuel stations, with maximum savings capped at ₹100 per billing cycle</li></ul>",
+            "createdAt": "2025-01-15T01:04:18.000Z",
+            "updatedAt": "2025-01-15T01:04:18.000Z"
+          },
+          {
+            "id": 960,
+            "product_id": 54,
+            "benefit_type": "dining",
+            "sub_type": "Dining Benefits",
+            "html_text": "<p>Enjoy up to 15% savings at over 2,500 partner restaurants across India through ICICI's Culinary Treats program</p>",
+            "createdAt": "2025-01-15T01:05:09.000Z",
+            "updatedAt": "2025-01-15T01:05:09.000Z"
+          }
+        ]
+      }
+    ]
+  },
   "sampleResponses": {
     "status": "success",
     "message": "Card details fetched successfully",
@@ -2780,10 +3074,16 @@ export const apiData = {
     }
   },
   "errorResponses": [],
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: {{JWT_TOKEN}}'\n",
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>'\n",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Content-Type: application/json' \\\n  --header 'partner-token: <your_token_here>'\n",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json'\n",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json'\n",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/cards/icici-platinum-chip-credit-card' \\\n  --header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json'\n",
   "validationNotes": [],
+  "errorResponse": {
+    "status": "error",
+    "message": "Card detail request failed",
+    "data": null,
+    "error_code": "CARD_DETAIL_001"
+  },
   "fieldTable": [
     {
       "field": "card_slug",
@@ -2868,8 +3168,8 @@ export const apiData = {
     "status": "success",
     "message": "",
     "data": {
-      "jwttoken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiOGZkYzIyYmRkMTkwZWFlNGRiMTFmZTUyYTQ5N2UyN2UxZDEwYWIyMTFiY2ZhZTVmOTYyOTUzOTZlNmFkZTA2NiIsImlhdCI6MTc1NjM1ODY2OCwiZXhwIjoxNzU2MzYyMjY4fQ.xaSdIOuA48yQ_Skiom5818vBxacGjuVeJ39f6_C6fxQ",
-      "expiresAt": "2025-08-28T06:24:28.810Z"
+      "jwttoken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiOGZkYzIyYmRkMTkwZWFlNGRiMTFmZTUyYTQ5N2UyN2UxZDEwYWIyMTFiY2ZhZTVmOTYyOTUzOTZlNmFkZTA2NiIsImlhdCI6MTc1NjM3OTE4MCwiZXhwIjoxNzU2MzgyNzgwfQ.l1ecORgstrVsx2p5sOtIl-FKzZiw-D90As3_jAkym2g",
+      "expiresAt": "2025-08-28T12:06:20.293Z"
     }
   },
   "sampleResponses": [
@@ -2882,7 +3182,12 @@ export const apiData = {
       }
     }
   ],
-  "errorResponses": [],
+  "errorResponse": {
+    "status": "error",
+    "message": "Authentication failed",
+    "data": null,
+    "error_code": "AUTH_001"
+  },
   "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"{{API_KEY}}\"\n}'",
   "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"test\"\n}'",
   "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/token' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"x-api-key\": \"YOUR_PROD_KEY\"\n}'",
@@ -3175,10 +3480,16 @@ export const apiData = {
       ]
     }
   },
+  "errorResponse": {
+    "status": "error",
+    "message": "Initialization bundle request failed",
+    "data": null,
+    "error_code": "INIT_BUNDLE_001"
+  },
   "errorResponses": [],
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: {{JWT_TOKEN}}'",
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: <your_jwt_token>'\n",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'partner-token: <your_jwt_token>'\n",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'Authorization: Bearer {{JWT_TOKEN}}'",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'Authorization: Bearer {{JWT_TOKEN}}'\n",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/cardgenius/init-bundle' \\  \n--header 'Authorization: Bearer {{JWT_TOKEN}}'\n",
   "validationNotes": [],
   "fieldTable": []
 },
@@ -3389,7 +3700,7 @@ export const apiData = {
         "exclusion_spends": "Rent Payment, Insurance, Cash Withdrawls, School & Educational Services, GST Charges, Tolls",
         "network_url": "https://secure.traqkarr.com/click?pid=10&offer_id=1389&sub2=",
         "employment_type": "both",
-        "tnc": "The bank may offer a different card variant based on your eligibility. Please carefully read the features of the card offered before submitting your application || A minimum transaction of Rs.100 within 30 days is required to activate the card, otherwise, you won’t be eligible for the Rewards",
+        "tnc": "The bank may offer a different card variant based on your eligibility. Please carefully read the features of the card offered before submitting your application || A minimum transaction of Rs.100 within 30 days is required to activate the card, otherwise, you won't be eligible for the Rewards",
         "status": true,
         "redirectionFlag": true,
         "createdAt": "2025-01-03T17:42:24.000Z",
@@ -3444,10 +3755,16 @@ export const apiData = {
       "has_more": false
     }
   },
+  "errorResponse": {
+    "status": "error",
+    "message": "Cards catalog request failed",
+    "data": null,
+    "error_code": "CARDS_CATALOG_001"
+  },
   "errorResponses": [],
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"filters\": {\n      \"card_type\": \"credit\",\n      \"annual_fee\": {\n        \"max\": 5000\n      }\n    },\n    \"sort_by\": \"rewards\",\n    \"limit\": 10,\n    \"offset\": 0\n  }'\n",
-  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"filters\": {\n      \"card_type\": \"credit\",\n      \"annual_fee\": {\n        \"max\": 5000\n      }\n    },\n    \"sort_by\": \"rewards\",\n    \"limit\": 10,\n    \"offset\": 0\n  }'\n",
-  "curlExampleProduction": "curl --location 'https://prod-partner.bankkaro.com/cardgenius/cards' \\\n  --header 'partner-token: {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"filters\": {\n      \"card_type\": \"credit\",\n      \"annual_fee\": {\n        \"max\": 5000\n      }\n    },\n    \"sort_by\": \"rewards\",\n    \"limit\": 10,\n    \"offset\": 0\n  }'\n",
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/cardgenius/cards' \\\n  --header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"filters\": {\n      \"card_type\": \"credit\",\n      \"annual_fee\": {\n        \"max\": 5000\n      }\n    },\n    \"sort_by\": \"rewards\",\n    \"limit\": 10,\n    \"offset\": 0\n  }'\n",
+  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/cardgenius/cards' \\\n  --header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"filters\": {\n      \"card_type\": \"credit\",\n      \"annual_fee\": {\n        \"max\": 5000\n      }\n    },\n    \"sort_by\": \"rewards\",\n    \"limit\": 10,\n    \"offset\": 0\n  }'\n",
+  "curlExampleProduction": "curl --location 'https://prod-partner.bankkaro.com/cardgenius/cards' \\\n  --header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n    \"filters\": {\n      \"card_type\": \"credit\",\n      \"annual_fee\": {\n        \"max\": 5000\n      }\n    },\n    \"sort_by\": \"rewards\",\n    \"limit\": 10,\n    \"offset\": 0\n  }'\n",
   "validationNotes": [
     "Filters are optional - if not provided, all cards will be returned",
     "Sort criteria must be one of the allowed values",

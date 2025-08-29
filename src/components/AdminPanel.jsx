@@ -68,7 +68,7 @@ const AdminPanel = () => {
     sampleRequest: {},
     sampleResponse: {},
     sampleResponses: [],
-    errorResponses: [],
+    errorResponse: {},
     curlExample: '',
     curlExampleStaging: '',
     curlExampleProduction: '',
@@ -113,7 +113,7 @@ const AdminPanel = () => {
               sampleRequest: data.sampleRequest || {},
               sampleResponse: data.sampleResponse || {},
               sampleResponses: data.sampleResponses || [],
-              errorResponses: data.errorResponses || [],
+                    errorResponse: data.errorResponse || {},
             curlExample: data.curlExample || '',
             curlExampleStaging: data.curlExampleStaging || '',
             curlExampleProduction: data.curlExampleProduction || '',
@@ -148,8 +148,8 @@ const AdminPanel = () => {
         responseSchema: endpoint.responseSchema || {},
         sampleRequest: endpoint.sampleRequest || {},
         sampleResponse: endpoint.sampleResponse || {},
-        sampleResponses: endpoint.sampleResponses || [],
-        errorResponses: endpoint.errorResponses || [],
+                            sampleResponses: endpoint.sampleResponses || [],
+                  errorResponse: endpoint.errorResponse || {},
         curlExample: endpoint.curlExample || '',
         curlExampleStaging: endpoint.curlExampleStaging || '',
         curlExampleProduction: endpoint.curlExampleProduction || '',
@@ -173,7 +173,7 @@ const AdminPanel = () => {
         sampleRequest: {},
         sampleResponse: {},
         sampleResponses: [],
-        errorResponses: [],
+        errorResponse: {},
         curlExample: '',
         curlExampleStaging: '',
         curlExampleProduction: '',
@@ -252,7 +252,7 @@ const AdminPanel = () => {
           sampleRequest: formData.sampleRequest,
           sampleResponse: formData.sampleResponse,
           sampleResponses: formData.sampleResponses,
-          errorResponses: formData.errorResponses,
+          errorResponse: formData.errorResponse,
           curlExample: formData.curlExample,
           curlExampleStaging: formData.curlExampleStaging,
           curlExampleProduction: formData.curlExampleProduction,
@@ -279,7 +279,7 @@ const AdminPanel = () => {
           sampleRequest: formData.sampleRequest,
           sampleResponse: formData.sampleResponse,
           sampleResponses: formData.sampleResponses,
-          errorResponses: formData.errorResponses,
+          errorResponse: formData.errorResponse,
           curlExample: formData.curlExample,
           curlExampleStaging: formData.curlExampleStaging,
           curlExampleProduction: formData.curlExampleProduction,
@@ -887,8 +887,7 @@ const AdminPanel = () => {
                 </AccordionDetails>
               </Accordion>
 
-              {/* Error Response - Hidden for now */}
-              {/* <Accordion>
+              <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>Error Response (JSON)</Typography>
                 </AccordionSummary>
@@ -942,7 +941,7 @@ const AdminPanel = () => {
                     </Alert>
                   </Box>
                 </AccordionDetails>
-              </Accordion> */}
+              </Accordion>
 
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -1018,76 +1017,7 @@ const AdminPanel = () => {
                 </AccordionDetails>
               </Accordion>
 
-              {/* Error Responses - Hidden for now */}
-              {/* <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>Error Responses (JSON Array)</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Add multiple error responses for different scenarios. Each error should have a status code, message, and description.
-                    </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Enter valid JSON array for error responses
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Button
-                          size="small"
-                          startIcon={<FormatIcon />}
-                          onClick={() => formatJson('errorResponses')}
-                          variant="outlined"
-                        >
-                          Format JSON
-                        </Button>
-                        <Button
-                          size="small"
-                          onClick={() => clearJsonField('errorResponses')}
-                          variant="outlined"
-                          color="warning"
-                        >
-                          Clear
-                        </Button>
-                      </Box>
-                    </Box>
-                    <TextField
-                      multiline
-                      rows={8}
-                      fullWidth
-                      value={getJsonDisplayValue('errorResponses')}
-                      onChange={(e) => updateJsonField('errorResponses', e.target.value)}
-                      placeholder='[
-  {
-    "statusCode": 400,
-    "error": "Bad Request",
-    "message": "Invalid input parameters",
-    "description": "One or more required fields are missing or invalid"
-  },
-  {
-    "statusCode": 401,
-    "error": "Unauthorized",
-    "message": "Invalid API key",
-    "description": "The provided API key is invalid or expired"
-  }
-]'
-                      error={typeof formData.errorResponses === 'string' && formData.errorResponses !== ''}
-                      helperText={typeof formData.errorResponses === 'string' && formData.errorResponses !== '' 
-                        ? '⚠️ Invalid JSON format. Please check your syntax.' 
-                        : 'Paste your JSON array here - it will be automatically cleaned up'}
-                    />
-                    <Alert severity="info">
-                      <Typography variant="body2">
-                        <strong>Error Response Format:</strong>
-                        <br />• statusCode: HTTP status code (e.g., 400, 401, 404, 500)
-                        <br />• error: Error type (e.g., "Bad Request", "Unauthorized")
-                        <br />• message: Brief error message
-                        <br />• description: Detailed explanation of the error
-                      </Typography>
-                    </Alert>
-                  </Box>
-                </AccordionDetails>
-              </Accordion> */}
+
 
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>

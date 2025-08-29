@@ -140,7 +140,12 @@ const ApiDocumentation = () => {
   }
 
   const hasMultipleMethods = api.methods.length > 1;
-  const currentApiData = hasMultipleMethods ? api[selectedMethod.toLowerCase()] : api;
+  // For APIs with multiple methods, get method-specific data, but keep root-level data for error responses
+  const methodData = hasMultipleMethods ? api[selectedMethod.toLowerCase()] : {};
+  const currentApiData = {
+    ...api,           // Include root-level data (like errorResponse, errorResponses)
+    ...methodData     // Override with method-specific data
+  };
   
 
 
@@ -237,7 +242,7 @@ const ApiDocumentation = () => {
             fontSize: '0.875rem',
             fontFamily: 'monospace',
             border: '1px solid #e2e8f0',
-            lineHeight: 1.6
+            lineHeight: 1.6,overflowX:'scroll',maxWidth:'500px'
           }}
         >
           {jsonString}
@@ -799,7 +804,7 @@ const ApiDocumentation = () => {
         
         <Grid container spacing={4}>
           {/* Response Schema */}
-          <Grid xs={12} md={6}>
+          <Grid item xs={12} md={6}>
             <Card sx={{ borderRadius: 2, height: 'fit-content' }}>
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -824,9 +829,9 @@ const ApiDocumentation = () => {
         <Grid container spacing={4} sx={{ mt: 2 }}>
           {/* Success Response */}
           {currentApiData.sampleResponse && Object.keys(currentApiData.sampleResponse).length > 0 && (
-            <Grid xs={12} md={6}>
+            <Grid item xs={12} md={6}>
               <Card sx={{ borderRadius: 2 }}>
-                <CardContent sx={{ p: 3 }}>
+                <CardContent sx={{ p: 3, }}>
                   <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <CheckCircleIcon sx={{ mr: 1, color: 'success.main' }} />
                     Success Response
@@ -837,10 +842,12 @@ const ApiDocumentation = () => {
               </Card>
             </Grid>
           )}
+        </Grid>
 
-          {/* Error Response - Hidden for now */}
-          {/* {currentApiData.errorResponse && Object.keys(currentApiData.errorResponse).length > 0 && !currentApiData.errorResponses && (
-            <Grid xs={12} md={6}>
+        {/* Error Response */}
+        {currentApiData?.errorResponse && Object.keys(currentApiData.errorResponse).length > 0 && (
+          <Grid container spacing={4} sx={{ mt: 2 }}>
+            <Grid item xs={12} md={6}>
               <Card sx={{ borderRadius: 2 }}>
                 <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -852,12 +859,12 @@ const ApiDocumentation = () => {
                 </CardContent>
               </Card>
             </Grid>
-          )} */}
-        </Grid>
+          </Grid>
+        )}
 
         {/* Fallback when no response data is available */}
         {(!currentApiData.sampleResponse || Object.keys(currentApiData.sampleResponse).length === 0) && (
-          <Grid xs={12}>
+          <Grid item xs={12}>
             <Card sx={{ borderRadius: 2 }}>
               <CardContent sx={{ p: 3 }}>
                 <Alert severity="info" sx={{ borderRadius: 2 }}>
@@ -870,50 +877,10 @@ const ApiDocumentation = () => {
           </Grid>
         )}
 
-        {/* Error Responses - Hidden for now */}
-        {/* {currentApiData.errorResponses && Array.isArray(currentApiData.errorResponses) && currentApiData.errorResponses.length > 0 && (
-          <Grid xs={12} sx={{ mt: 2 }}>
-            <Card sx={{ borderRadius: 2 }}>
-              <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <ErrorIcon sx={{ mr: 1, color: 'error.main' }} />
-                  Error Responses
-                </Typography>
-                <Divider sx={{ mb: 3 }} />
-                <Grid container spacing={3}>
-                  {currentApiData.errorResponses.map((error, index) => (
-                    <Grid xs={12} md={6} key={index}>
-                      <Paper 
-                        elevation={0} 
-                        sx={{ 
-                          p: 3, 
-                          border: '1px solid #fecaca',
-                          borderRadius: 2,
-                          backgroundColor: '#fef2f2'
-                        }}
-                      >
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'error.main' }}>
-                            🔴 {error.title}
-                          </Typography>
-                          <Chip 
-                            label={`${error.statusCode}`} 
-                            size="small" 
-                            color="error" 
-                            variant="outlined"
-                            sx={{ ml: 2 }}
-                          />
-                        </Box>
-                        {renderJson(error.response)}
-                      </Paper>
-                    </Grid>
-                  ))}
-                </Grid>
-              </CardContent>
-            </Card>
-          </Grid>
-        )} */}
+
       </Box>
+
+
 
 
 
