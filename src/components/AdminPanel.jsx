@@ -209,37 +209,52 @@ const AdminPanel = () => {
         
         // Also save to production (GitHub)
         try {
-          const productionResponse = await fetch('/api/update-api-data', {
+          const productionResponse = await fetch('/api/production-update', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              updatedEndpoints: updatedEndpoints,
-              mode: 'production'
+              updatedEndpoints: updatedEndpoints
             })
           });
           
           if (productionResponse.ok) {
             const prodResponseData = await productionResponse.json();
-            const message = responseData.reloaded 
-              ? '✅ Changes saved locally and to production!\n\n🔄 Your changes should now be visible everywhere.'
-              : '✅ Changes saved to local file and production!\n\n⚠️ Data may need a moment to refresh.';
-            alert(message);
-            return { success: true, mode: 'both' };
+            
+            // Show production update dialog with copy functionality
+            const instructions = prodResponseData.instructions.join('\n');
+            const message = `✅ Changes saved locally!\n\n📝 Production Update Required:\n\n${instructions}\n\n📋 Generated content is ready for manual commit.`;
+            
+            // Create a more user-friendly dialog
+            const userConfirmed = confirm(message + '\n\nWould you like to copy the generated content to clipboard?');
+            
+            if (userConfirmed) {
+              try {
+                await navigator.clipboard.writeText(prodResponseData.content);
+                alert('✅ Content copied to clipboard!\n\nNow you can paste it into src/data/apiData.js and commit to GitHub.');
+              } catch (clipboardError) {
+                alert('⚠️ Could not copy to clipboard automatically.\n\nPlease copy the content from the console log and update manually.');
+                console.log('Generated content for production:', prodResponseData.content);
+              }
+            } else {
+              console.log('Generated content for production:', prodResponseData.content);
+            }
+            
+            return { success: true, mode: 'local-with-production-content', content: prodResponseData.content };
           } else {
             // Local save succeeded but production failed
             const message = responseData.reloaded 
-              ? '✅ Changes saved locally!\n\n⚠️ Production save failed. Please check your deployment setup.'
-              : '✅ Changes saved to local file!\n\n⚠️ Production save failed. Please check your deployment setup.';
+              ? '✅ Changes saved locally!\n\n⚠️ Production update failed. Please try again.'
+              : '✅ Changes saved to local file!\n\n⚠️ Production update failed. Please try again.';
             alert(message);
             return { success: true, mode: 'local' };
           }
         } catch (prodError) {
           // Local save succeeded but production failed
           const message = responseData.reloaded 
-            ? '✅ Changes saved locally!\n\n⚠️ Production save failed. Please check your deployment setup.'
-            : '✅ Changes saved to local file!\n\n⚠️ Production save failed. Please check your deployment setup.';
+            ? '✅ Changes saved locally!\n\n⚠️ Production update failed. Please try again.'
+            : '✅ Changes saved to local file!\n\n⚠️ Production update failed. Please try again.';
           alert(message);
           return { success: true, mode: 'local' };
         }
