@@ -2006,17 +2006,16 @@ export const apiData = {
     }
   ],
   "sampleResponses": {},
-  "errorResponses": [],
-  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/health'\n",
-  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/health'\n",
-  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/health'\n",
-  "validationNotes": [],
   "errorResponse": {
     "status": "error",
     "message": "Health check failed",
     "data": null,
     "error_code": "HEALTH_001"
   },
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/health'\n",
+  "curlExampleStaging": "curl --location 'https://uat-platform.bankkaro.com/partner/health'\n",
+  "curlExampleProduction": "curl --location 'https://prod-platform.bankkaro.com/partner/health'\n",
+  "validationNotes": [],
   "fieldTable": []
 },
   '/partner/cardgenius/cards': {
@@ -2407,7 +2406,7 @@ export const apiData = {
   },
   "errorResponses": [],
   "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/eligibility' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\n  \"pincode\": \"110001\",\n  \"inhandIncome\": 50000,\n  \"empStatus\": \"salaried\"\n}'",
-      "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/eligibility' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\"alias\":\"sbi-cashback-credit-card\",\"pincode\":\"560001\",\"inhandIncome\":\"35000\",\"empStatus\":\"salaried\"}'",
+  "curlExampleStaging": "curl --location 'https://uat-partner.bankkaro.com/partner/cardgenius/eligibility' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\"alias\":\"sbi-cashback-credit-card\",\"pincode\":\"560001\",\"inhandIncome\":\"35000\",\"empStatus\":\"salaried\"}'",
   "curlExampleProduction": "",
   "validationNotes": [
     "pincode must be a valid 6-digit Indian postal code",

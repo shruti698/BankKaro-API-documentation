@@ -50,6 +50,28 @@ export default async function handler(req, res) {
           mode: 'download'
         });
       }
+    } else if (mode === 'production') {
+      // Production mode - save to GitHub and deploy
+      try {
+        const apiDataPath = path.join(process.cwd(), 'src', 'data', 'apiData.js');
+        fs.writeFileSync(apiDataPath, content);
+        
+        // In production, the file is automatically committed and deployed
+        return res.status(200).json({
+          success: true,
+          message: 'Changes saved to production and will be deployed automatically',
+          mode: 'production',
+          deployed: true
+        });
+      } catch (writeError) {
+        console.error('Production write failed:', writeError.message);
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to save to production',
+          error: writeError.message,
+          mode: 'production'
+        });
+      }
     } else {
       // Download mode (for production)
       return res.status(200).json({

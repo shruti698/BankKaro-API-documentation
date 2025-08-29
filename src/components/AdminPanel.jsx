@@ -206,11 +206,43 @@ const AdminPanel = () => {
       
       if (response.ok) {
         const responseData = await response.json();
-        const message = responseData.reloaded 
-          ? '✅ Changes saved and data reloaded in memory!\n\n🔄 Your changes should now be visible.'
-          : '✅ Changes saved to file!\n\n⚠️ Data may need a moment to refresh.';
-        alert(message);
-        return { success: true, mode: 'local' };
+        
+        // Also save to production (GitHub)
+        try {
+          const productionResponse = await fetch('/api/update-api-data', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              updatedEndpoints: updatedEndpoints,
+              mode: 'production'
+            })
+          });
+          
+          if (productionResponse.ok) {
+            const prodResponseData = await productionResponse.json();
+            const message = responseData.reloaded 
+              ? '✅ Changes saved locally and to production!\n\n🔄 Your changes should now be visible everywhere.'
+              : '✅ Changes saved to local file and production!\n\n⚠️ Data may need a moment to refresh.';
+            alert(message);
+            return { success: true, mode: 'both' };
+          } else {
+            // Local save succeeded but production failed
+            const message = responseData.reloaded 
+              ? '✅ Changes saved locally!\n\n⚠️ Production save failed. Please check your deployment setup.'
+              : '✅ Changes saved to local file!\n\n⚠️ Production save failed. Please check your deployment setup.';
+            alert(message);
+            return { success: true, mode: 'local' };
+          }
+        } catch (prodError) {
+          // Local save succeeded but production failed
+          const message = responseData.reloaded 
+            ? '✅ Changes saved locally!\n\n⚠️ Production save failed. Please check your deployment setup.'
+            : '✅ Changes saved to local file!\n\n⚠️ Production save failed. Please check your deployment setup.';
+          alert(message);
+          return { success: true, mode: 'local' };
+        }
       } else {
         throw new Error('Server returned error');
       }
@@ -296,8 +328,13 @@ const AdminPanel = () => {
       
       if (result.success) {
         // The file download and instructions are handled in saveToApiData
-      handleCloseDialog();
+        handleCloseDialog();
         fetchEndpoints(); // Refresh the list
+        
+        // Automatically navigate back to the previous page
+        setTimeout(() => {
+          window.history.back();
+        }, 1000); // Small delay to show the success message
       } else {
         alert('❌ Failed to generate updated content. Please try again.');
       }
@@ -322,6 +359,11 @@ const AdminPanel = () => {
         if (result.success) {
           // The file download and instructions are handled in saveToApiData
           fetchEndpoints(); // Refresh the list
+          
+          // Automatically navigate back to the previous page
+          setTimeout(() => {
+            window.history.back();
+          }, 1000); // Small delay to show the success message
         } else {
           alert('❌ Failed to delete endpoint. Please try again.');
         }
