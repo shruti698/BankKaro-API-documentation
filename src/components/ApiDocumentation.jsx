@@ -66,7 +66,7 @@ const ApiDocumentation = () => {
   //   testing: false
   // });
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchApiData = async () => {
       try {
         setLoading(true);
@@ -385,7 +385,7 @@ const ApiDocumentation = () => {
 
   // Add safety check
   if (!api) {
-    return (
+  return (
       <Box sx={{ p: 3 }}>
         <Alert severity="error">
           API data is not available. Please try refreshing the page.
@@ -562,11 +562,11 @@ const ApiDocumentation = () => {
         {/* Quick cURL Example */}
         {currentApiData.curlExample && (
           <Card sx={{ borderRadius: 2, mb: 4 }}>
-                          <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <CodeIcon sx={{ mr: 1 }} />
-                  Quick Start (cURL)
-                </Typography>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <CodeIcon sx={{ mr: 1 }} />
+                Quick Start (cURL)
+              </Typography>
               <Divider sx={{ mb: 3 }} />
               
               {/* Environment Tabs */}
@@ -859,7 +859,7 @@ const ApiDocumentation = () => {
                 </CardContent>
               </Card>
             </Grid>
-          </Grid>
+        </Grid>
         )}
 
         {/* Fallback when no response data is available */}

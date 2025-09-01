@@ -37,10 +37,10 @@ const reloadApiData = async () => {
       // Evaluate the object (this is safe since we control the file content)
       const apiDataString = match[1];
       const freshData = eval(`(${apiDataString})`);
-      apiData = { ...freshData };
-      
-      console.log('🔄 Reloaded API data, count:', Object.keys(apiData).length);
-      return true;
+    apiData = { ...freshData };
+    
+    console.log('🔄 Reloaded API data, count:', Object.keys(apiData).length);
+    return true;
     } else {
       console.error('❌ Could not find apiData export in file');
       return false;
