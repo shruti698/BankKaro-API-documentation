@@ -263,7 +263,19 @@ const AdminPanel = () => {
           }
         } else {
           // In production, show success message
-          alert('✅ Changes saved successfully!\n\nYour updates have been applied to the production environment.');
+          if (responseData.reloaded) {
+            alert('✅ Changes saved successfully!\n\n🔄 Your changes have been applied to production and the application will reload automatically.');
+            // Refresh the data to show the changes immediately
+            setTimeout(() => {
+              fetchEndpoints();
+            }, 1000);
+          } else {
+            alert('✅ Changes saved successfully!\n\nYour updates have been applied to the production environment.');
+            // Refresh the data to show the changes immediately
+            setTimeout(() => {
+              fetchEndpoints();
+            }, 1000);
+          }
           return { success: true, mode: 'production' };
         }
       } else {

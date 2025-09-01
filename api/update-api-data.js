@@ -51,22 +51,28 @@ export default async function handler(req, res) {
         });
       }
     } else if (mode === 'production') {
-      // Production mode - return content for manual update
-      return res.status(200).json({
-        success: true,
-        message: 'Production update content generated successfully',
-        content: content,
-        mode: 'production',
-        manualUpdate: true,
-        instructions: [
-          '1. Copy the generated content above',
-          '2. Update src/data/apiData.js with the new content',
-          '3. Commit and push to GitHub:',
-          '   git add src/data/apiData.js',
-          '   git commit -m "Update API data from admin panel"',
-          '   git push origin main'
-        ]
-      });
+      // Production mode - write to file and trigger rebuild
+      try {
+        const apiDataPath = path.join(process.cwd(), 'src', 'data', 'apiData.js');
+        fs.writeFileSync(apiDataPath, content);
+        
+        // In production (Vercel), the file change will trigger a rebuild
+        return res.status(200).json({
+          success: true,
+          message: 'Changes saved to production and will be deployed automatically',
+          mode: 'production',
+          deployed: true,
+          reloaded: true
+        });
+      } catch (writeError) {
+        console.error('Production write failed:', writeError.message);
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to save to production',
+          error: writeError.message,
+          mode: 'production'
+        });
+      }
     } else {
       // Download mode (for production)
       return res.status(200).json({
