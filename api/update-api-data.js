@@ -51,101 +51,22 @@ export default async function handler(req, res) {
         });
       }
     } else if (mode === 'production') {
-      // Production mode - commit and push to GitHub
-      try {
-        const githubToken = process.env.GITHUB_TOKEN;
-        const repoOwner = process.env.GITHUB_REPO_OWNER || 'your-username';
-        const repoName = process.env.GITHUB_REPO_NAME || 'BankKaro-API-documentation';
-        
-        if (!githubToken) {
-          // If no GitHub token, provide instructions for manual update
-          return res.status(200).json({
-            success: true,
-            message: 'Production update requires GitHub setup. Please manually commit the changes.',
-            content: content,
-            mode: 'production',
-            manualUpdate: true,
-            instructions: [
-              '1. Copy the generated content above',
-              '2. Update src/data/apiData.js with the new content',
-              '3. Commit and push to GitHub:',
-              '   git add src/data/apiData.js',
-              '   git commit -m "Update API data from admin panel"',
-              '   git push origin main'
-            ]
-          });
-        }
-
-        // Get the current file SHA (required for GitHub API)
-        const getFileResponse = await fetch(
-          `https://api.github.com/repos/${repoOwner}/${repoName}/contents/src/data/apiData.js`,
-          {
-            headers: {
-              'Authorization': `token ${githubToken}`,
-              'Accept': 'application/vnd.github.v3+json'
-            }
-          }
-        );
-
-        let currentSha = null;
-        if (getFileResponse.ok) {
-          const fileData = await getFileResponse.json();
-          currentSha = fileData.sha;
-        }
-
-        // Create the commit
-        const commitData = {
-          message: `Update API data from admin panel - ${new Date().toISOString()}`,
-          content: Buffer.from(content).toString('base64'),
-          branch: 'main'
-        };
-
-        if (currentSha) {
-          commitData.sha = currentSha;
-        }
-
-        const commitResponse = await fetch(
-          `https://api.github.com/repos/${repoOwner}/${repoName}/contents/src/data/apiData.js`,
-          {
-            method: 'PUT',
-            headers: {
-              'Authorization': `token ${githubToken}`,
-              'Accept': 'application/vnd.github.v3+json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(commitData)
-          }
-        );
-
-        if (commitResponse.ok) {
-          const commitResult = await commitResponse.json();
-          return res.status(200).json({
-            success: true,
-            message: 'Changes successfully committed to GitHub and will be deployed automatically',
-            mode: 'production',
-            deployed: true,
-            commitSha: commitResult.commit.sha
-          });
-        } else {
-          const errorData = await commitResponse.json();
-          console.error('GitHub API error:', errorData);
-          return res.status(500).json({
-            success: false,
-            message: 'Failed to commit to GitHub',
-            error: errorData.message || 'GitHub API error',
-            mode: 'production'
-          });
-        }
-        
-      } catch (prodError) {
-        console.error('Production update failed:', prodError.message);
-        return res.status(500).json({
-          success: false,
-          message: 'Failed to process production update',
-          error: prodError.message,
-          mode: 'production'
-        });
-      }
+      // Production mode - return content for manual update
+      return res.status(200).json({
+        success: true,
+        message: 'Production update content generated successfully',
+        content: content,
+        mode: 'production',
+        manualUpdate: true,
+        instructions: [
+          '1. Copy the generated content above',
+          '2. Update src/data/apiData.js with the new content',
+          '3. Commit and push to GitHub:',
+          '   git add src/data/apiData.js',
+          '   git commit -m "Update API data from admin panel"',
+          '   git push origin main'
+        ]
+      });
     } else {
       // Download mode (for production)
       return res.status(200).json({
