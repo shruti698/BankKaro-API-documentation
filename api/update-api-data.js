@@ -9,6 +9,9 @@ export default async function handler(req, res) {
   try {
     const { updatedEndpoints, mode = 'download' } = req.body;
 
+    console.log('API Handler - Mode:', mode);
+    console.log('API Handler - Endpoints count:', Object.keys(updatedEndpoints || {}).length);
+
     if (!updatedEndpoints) {
       return res.status(400).json({ error: 'updatedEndpoints is required' });
     }
@@ -16,19 +19,29 @@ export default async function handler(req, res) {
     // Generate the new apiData.js content
     let content = 'export const apiData = {\n';
     
-    Object.entries(updatedEndpoints).forEach(([key, data], index) => {
-      content += `  '${key}': ${JSON.stringify(data, null, 2)}`;
-      if (index < Object.keys(updatedEndpoints).length - 1) {
-        content += ',';
-      }
-      content += '\n';
-    });
+    try {
+      Object.entries(updatedEndpoints).forEach(([key, data], index) => {
+        content += `  '${key}': ${JSON.stringify(data, null, 2)}`;
+        if (index < Object.keys(updatedEndpoints).length - 1) {
+          content += ',';
+        }
+        content += '\n';
+      });
+    } catch (jsonError) {
+      console.error('JSON stringify error:', jsonError);
+      return res.status(500).json({ 
+        error: 'Failed to serialize API data',
+        details: jsonError.message 
+      });
+    }
     
     content += '};\n\n';
     
     // Add other exports
     content += 'export const cardGeniusApiData = {\n  // Card Genius specific data\n};\n\n';
     content += 'export const projects = {\n  // Project data\n};\n\n';
+
+    console.log('Generated content length:', content.length);
 
     if (mode === 'local') {
       // Try to write to local file system (for development)

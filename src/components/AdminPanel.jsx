@@ -218,6 +218,9 @@ const AdminPanel = () => {
       if (response.ok) {
         const responseData = await response.json();
         
+        // Add debugging
+        console.log('Save API Response:', responseData);
+        
         if (isDevelopment) {
           // In development, also try to save to production (GitHub) - but don't fail if it doesn't work
           try {
@@ -283,6 +286,16 @@ const AdminPanel = () => {
             });
             // Do not auto navigate back on manual flow; allow user to complete steps
             return { success: false, mode: 'production-manual' };
+          }
+
+          // Handle the case where success is false but it's not manual mode
+          if (!responseData.success) {
+            return { 
+              success: false, 
+              mode: 'production-error',
+              message: responseData.message || 'Production update failed',
+              error: responseData.error
+            };
           }
 
           // Generic success
@@ -393,7 +406,15 @@ const AdminPanel = () => {
           }, 1000);
         }
       } else {
-        alert('❌ Failed to generate updated content. Please try again.');
+        // Check if it's a manual mode (production without GitHub config)
+        if (result.mode === 'production-manual') {
+          // This is handled by the modal, just close the dialog
+          handleCloseDialog();
+        } else {
+          // Show specific error message if available
+          const errorMessage = result.message || result.error || 'Failed to generate updated content. Please try again.';
+          alert('❌ ' + errorMessage);
+        }
       }
     } catch (error) {
       console.error('Error saving endpoint:', error);
