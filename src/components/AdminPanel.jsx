@@ -54,6 +54,11 @@ const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [saveMode, setSaveMode] = useState('local'); // 'local' or 'download'
   const [saving, setSaving] = useState(false);
+  const [manualUpdateDialog, setManualUpdateDialog] = useState({
+    open: false,
+    content: '',
+    instructions: []
+  });
   const [formData, setFormData] = useState({
     name: '',
     endpoint: '',
@@ -270,17 +275,12 @@ const AdminPanel = () => {
           }
 
           if (responseData.manual) {
-            const instructions = (responseData.instructions || []).join('\n');
-            const wantCopy = confirm(`⚠️ Automatic production update is not configured.\n\nNext steps:\n${instructions}\n\nDo you want to copy the generated content to your clipboard now?`);
-            if (wantCopy && responseData.content) {
-              try {
-                await navigator.clipboard.writeText(responseData.content);
-                alert('✅ Content copied. Paste it into src/data/apiData.js and push to main.');
-              } catch (_) {
-                console.log('Generated content:', responseData.content);
-                alert('⚠️ Copy failed. The content has been printed to the console for manual copy.');
-              }
-            }
+            // Show manual update modal instead of confirm dialog
+            setManualUpdateDialog({
+              open: true,
+              content: responseData.content || '',
+              instructions: responseData.instructions || []
+            });
             // Do not auto navigate back on manual flow; allow user to complete steps
             return { success: false, mode: 'production-manual' };
           }
@@ -1220,6 +1220,74 @@ const AdminPanel = () => {
             startIcon={saving ? null : <SaveIcon />}
           >
             {saving ? 'Saving...' : (editingEndpoint ? 'Update' : 'Create')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Manual Update Dialog */}
+      <Dialog 
+        open={manualUpdateDialog.open} 
+        onClose={() => setManualUpdateDialog({ open: false, content: '', instructions: [] })}
+        maxWidth="lg" 
+        fullWidth
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Alert severity="warning" sx={{ p: 0, '& .MuiAlert-message': { p: 0 } }}>
+            ⚠️ Automatic production update is not configured
+          </Alert>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h6" gutterBottom>Next steps:</Typography>
+            <Box component="ol" sx={{ pl: 3, mb: 2 }}>
+              {manualUpdateDialog.instructions.map((instruction, index) => (
+                <Typography key={index} component="li" sx={{ mb: 1 }}>
+                  {instruction}
+                </Typography>
+              ))}
+            </Box>
+          </Box>
+          
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h6" gutterBottom>Generated Content:</Typography>
+            <TextField
+              multiline
+              rows={15}
+              fullWidth
+              value={manualUpdateDialog.content}
+              InputProps={{
+                readOnly: true,
+                style: { fontFamily: 'monospace', fontSize: '0.8rem' }
+              }}
+              sx={{ 
+                '& .MuiInputBase-root': { 
+                  backgroundColor: '#f5f5f5',
+                  border: '1px solid #ddd'
+                }
+              }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setManualUpdateDialog({ open: false, content: '', instructions: [] })}
+          >
+            Close
+          </Button>
+          <Button 
+            variant="contained" 
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(manualUpdateDialog.content);
+                alert('✅ Content copied to clipboard!\n\nNow paste it into src/data/apiData.js and follow the git commands above.');
+              } catch (error) {
+                console.error('Copy failed:', error);
+                alert('⚠️ Could not copy to clipboard automatically.\n\nPlease manually select and copy the content above.');
+              }
+            }}
+            startIcon={<SaveIcon />}
+          >
+            Copy to Clipboard
           </Button>
         </DialogActions>
       </Dialog>
