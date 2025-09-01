@@ -262,20 +262,32 @@ const AdminPanel = () => {
             return { success: true, mode: 'local' };
           }
         } else {
-          // In production, show success message
-          if (responseData.reloaded) {
-            alert('✅ Changes saved successfully!\n\n🔄 Your changes have been applied to production and the application will reload automatically.');
-            // Refresh the data to show the changes immediately
-            setTimeout(() => {
-              fetchEndpoints();
-            }, 1000);
-          } else {
-            alert('✅ Changes saved successfully!\n\nYour updates have been applied to the production environment.');
-            // Refresh the data to show the changes immediately
-            setTimeout(() => {
-              fetchEndpoints();
-            }, 1000);
+          // In production, handle both auto commit and manual fallback
+          if (responseData.success && responseData.autoCommitted) {
+            alert('✅ Changes saved successfully!\n\n🔄 Your changes have been committed and a deployment has been triggered.');
+            setTimeout(() => { fetchEndpoints(); }, 1000);
+            return { success: true, mode: 'production' };
           }
+
+          if (responseData.manual) {
+            const instructions = (responseData.instructions || []).join('\n');
+            const wantCopy = confirm(`⚠️ Automatic production update is not configured.\n\nNext steps:\n${instructions}\n\nDo you want to copy the generated content to your clipboard now?`);
+            if (wantCopy && responseData.content) {
+              try {
+                await navigator.clipboard.writeText(responseData.content);
+                alert('✅ Content copied. Paste it into src/data/apiData.js and push to main.');
+              } catch (_) {
+                console.log('Generated content:', responseData.content);
+                alert('⚠️ Copy failed. The content has been printed to the console for manual copy.');
+              }
+            }
+            // Do not auto navigate back on manual flow; allow user to complete steps
+            return { success: false, mode: 'production-manual' };
+          }
+
+          // Generic success
+          alert('✅ Changes saved successfully!\n\nYour updates have been applied to the production environment.');
+          setTimeout(() => { fetchEndpoints(); }, 1000);
           return { success: true, mode: 'production' };
         }
       } else {
@@ -374,10 +386,12 @@ const AdminPanel = () => {
         handleCloseDialog();
         fetchEndpoints(); // Refresh the list
         
-        // Automatically navigate back to the previous page
-        setTimeout(() => {
-          window.history.back();
-        }, 1000); // Small delay to show the success message
+        // Automatically navigate back to the previous page only on full success (not manual)
+        if (result.mode !== 'production-manual') {
+          setTimeout(() => {
+            window.history.back();
+          }, 1000);
+        }
       } else {
         alert('❌ Failed to generate updated content. Please try again.');
       }

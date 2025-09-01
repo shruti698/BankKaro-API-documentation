@@ -51,26 +51,106 @@ export default async function handler(req, res) {
         });
       }
     } else if (mode === 'production') {
-      // Production mode - write to file and trigger rebuild
+      // Production mode - prefer committing directly to GitHub if env is configured
       try {
-        const apiDataPath = path.join(process.cwd(), 'src', 'data', 'apiData.js');
-        fs.writeFileSync(apiDataPath, content);
-        
-        // In production (Vercel), the file change will trigger a rebuild
+        const githubToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.GITHUB_PAT;
+        const repoOwner = process.env.GITHUB_REPO_OWNER || process.env.GITHUB_OWNER;
+        const repoName = process.env.GITHUB_REPO_NAME || process.env.GITHUB_REPO;
+        const branch = process.env.GITHUB_BRANCH || 'main';
+        const filePath = process.env.GITHUB_FILE_PATH || 'src/data/apiData.js';
+        const deployHookUrl = process.env.VERCEL_DEPLOY_HOOK_URL || process.env.DEPLOY_HOOK_URL;
+
+        if (githubToken && repoOwner && repoName) {
+          // Get the current file SHA (required for updates)
+          const getUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${encodeURIComponent(filePath)}?ref=${encodeURIComponent(branch)}`;
+          const getResp = await fetch(getUrl, {
+            headers: {
+              'Authorization': `Bearer ${githubToken}`,
+              'Accept': 'application/vnd.github+json'
+            }
+          });
+
+          let sha = undefined;
+          if (getResp.ok) {
+            const getJson = await getResp.json();
+            sha = getJson.sha;
+          }
+
+          const putUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${encodeURIComponent(filePath)}`;
+          const putBody = {
+            message: 'chore: update API data from Admin Panel',
+            content: Buffer.from(content, 'utf8').toString('base64'),
+            branch,
+            sha
+          };
+
+          const putResp = await fetch(putUrl, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${githubToken}`,
+              'Accept': 'application/vnd.github+json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(putBody)
+          });
+
+          if (!putResp.ok) {
+            const txt = await putResp.text();
+            throw new Error(`GitHub commit failed: ${putResp.status} ${txt}`);
+          }
+
+          // Optionally trigger a deploy hook to speed up Vercel redeploy
+          if (deployHookUrl) {
+            try {
+              await fetch(deployHookUrl, { method: 'POST' });
+            } catch (_) {
+              // Non-fatal
+            }
+          }
+
+          return res.status(200).json({
+            success: true,
+            message: 'Changes committed to GitHub and deploy triggered',
+            mode: 'production',
+            autoCommitted: true,
+            deployed: true,
+            reloaded: true
+          });
+        }
+
+        // If GitHub env not configured, fall back to manual path
         return res.status(200).json({
-          success: true,
-          message: 'Changes saved to production and will be deployed automatically',
+          success: false,
+          message: 'GitHub credentials not configured. Manual update required.',
           mode: 'production',
-          deployed: true,
-          reloaded: true
+          manual: true,
+          content,
+          instructions: [
+            '1. Copy the generated content below',
+            '2. Replace the contents of src/data/apiData.js with it',
+            '3. Commit and push to your main branch:',
+            '   git add src/data/apiData.js',
+            '   git commit -m "Update API data from admin panel"',
+            '   git push origin main'
+          ]
         });
       } catch (writeError) {
-        console.error('Production write failed:', writeError.message);
-        return res.status(500).json({
+        console.error('Production commit failed:', writeError.message);
+        return res.status(200).json({
           success: false,
-          message: 'Failed to save to production',
+          message: 'Automatic production update failed. Manual update required.',
+          mode: 'production',
+          manual: true,
           error: writeError.message,
-          mode: 'production'
+          content,
+          instructions: [
+            '1. Copy the generated content below',
+            '2. Replace the contents of src/data/apiData.js with it',
+            '3. Commit and push to your main branch:',
+            '   git add src/data/apiData.js',
+            '   git commit -m "Update API data from admin panel"',
+            '   git push origin main'
+          ]
         });
       }
     } else {
