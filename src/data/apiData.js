@@ -3797,13 +3797,234 @@ export const apiData = {
     }
   ]
 }
-};
+},
 
 export const cardGeniusApiData = {
   // Card Genius specific data
-};
+},
 
 export const projects = {
   // Project data
-};
+},
 
+'loan-tags': {
+  "name": "Loan Tags",
+  "endpoint": "/loan/tags",
+  "methods": ["GET"],
+  "status": "live",
+  "description": "Get available loan tags and categories",
+  "category": "Loan Genius",
+  "purpose": "Retrieve all available loan tags, categories, and metadata for loan classification",
+  "requestSchema": {
+    "type": "object",
+    "properties": {
+      "category": {
+        "type": "string",
+        "description": "Filter by loan category",
+        "required": false,
+        "validation": "Optional category filter"
+      }
+    }
+  },
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "status": {"type": "string", "description": "Response status (success/error)"},
+      "message": {"type": "string", "description": "Response message"},
+      "data": {
+        "type": "object",
+        "properties": {
+          "tags": {
+            "type": "array",
+            "description": "List of available loan tags",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {"type": "string", "description": "Tag ID"},
+                "name": {"type": "string", "description": "Tag name"},
+                "category": {"type": "string", "description": "Tag category"},
+                "description": {"type": "string", "description": "Tag description"}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "sampleRequest": {"category": "personal"},
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/loan/tags' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json'",
+  "validationNotes": ["Authorization header with partner token is required", "Category parameter is optional for filtering"],
+  "fieldTable": [{"field": "category", "type": "string", "required": "No", "description": "Filter by loan category (optional)"}],
+  "products": ["Loan Genius"],
+  "sampleResponses": [],
+  "errorResponse": {"status": "error", "message": "Failed to fetch loan tags", "data": null, "error_code": "LOAN_TAGS_001"},
+  "errorResponses": []
+},
+'loan-offer-details': {
+  "name": "Loan Offer Details",
+  "endpoint": "/loan/offer-details",
+  "methods": ["GET", "POST"],
+  "status": "live",
+  "description": "Get detailed information about loan offers",
+  "category": "Loan Genius",
+  "purpose": "Retrieve comprehensive details about available loan offers including terms, rates, and eligibility criteria",
+  "requestSchema": {
+    "type": "object",
+    "properties": {
+      "offer_id": {"type": "string", "description": "Specific offer ID to retrieve", "required": false, "validation": "Valid offer ID"},
+      "loan_amount": {"type": "number", "description": "Requested loan amount", "required": false, "validation": "Positive number"},
+      "loan_type": {"type": "string", "description": "Type of loan", "required": false, "validation": "Valid loan type"}
+    }
+  },
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "status": {"type": "string", "description": "Response status (success/error)"},
+      "message": {"type": "string", "description": "Response message"},
+      "data": {
+        "type": "object",
+        "properties": {
+          "offers": {
+            "type": "array",
+            "description": "List of loan offers",
+            "items": {
+              "type": "object",
+              "properties": {
+                "offer_id": {"type": "string", "description": "Unique offer ID"},
+                "loan_amount": {"type": "number", "description": "Loan amount"},
+                "interest_rate": {"type": "number", "description": "Interest rate"},
+                "tenure": {"type": "number", "description": "Loan tenure in months"},
+                "emi": {"type": "number", "description": "Monthly EMI amount"},
+                "eligibility_criteria": {"type": "object", "description": "Eligibility requirements"}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "sampleRequest": {"loan_amount": 500000, "loan_type": "personal"},
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/loan/offer-details' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\"loan_amount\": 500000, \"loan_type\": \"personal\"}'",
+  "validationNotes": ["Authorization header with partner token is required", "All parameters are optional for filtering", "Loan amount must be positive number"],
+  "fieldTable": [
+    {"field": "offer_id", "type": "string", "required": "No", "description": "Specific offer ID to retrieve"},
+    {"field": "loan_amount", "type": "number", "required": "No", "description": "Requested loan amount"},
+    {"field": "loan_type", "type": "string", "required": "No", "description": "Type of loan"}
+  ],
+  "products": ["Loan Genius"],
+  "sampleResponses": [],
+  "errorResponse": {"status": "error", "message": "Failed to fetch loan offer details", "data": null, "error_code": "LOAN_OFFER_001"},
+  "errorResponses": []
+},
+'loans-lead-details': {
+  "name": "Loans Lead Details",
+  "endpoint": "/loan/lead-details",
+  "methods": ["GET", "POST"],
+  "status": "live",
+  "description": "Manage and retrieve loan lead information",
+  "category": "Loan Genius",
+  "purpose": "Create, update, and retrieve detailed information about loan leads including customer data and application status",
+  "requestSchema": {
+    "type": "object",
+    "properties": {
+      "lead_id": {"type": "string", "description": "Lead ID to retrieve specific lead", "required": false, "validation": "Valid lead ID"},
+      "customer_mobile": {"type": "string", "description": "Customer mobile number", "required": false, "validation": "10-digit mobile number"},
+      "status": {"type": "string", "description": "Lead status filter", "required": false, "validation": "Valid status value"}
+    }
+  },
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "status": {"type": "string", "description": "Response status (success/error)"},
+      "message": {"type": "string", "description": "Response message"},
+      "data": {
+        "type": "object",
+        "properties": {
+          "leads": {
+            "type": "array",
+            "description": "List of loan leads",
+            "items": {
+              "type": "object",
+              "properties": {
+                "lead_id": {"type": "string", "description": "Unique lead ID"},
+                "customer_name": {"type": "string", "description": "Customer name"},
+                "customer_mobile": {"type": "string", "description": "Customer mobile"},
+                "loan_amount": {"type": "number", "description": "Requested loan amount"},
+                "status": {"type": "string", "description": "Lead status"},
+                "created_at": {"type": "string", "description": "Lead creation date"},
+                "updated_at": {"type": "string", "description": "Last update date"}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "sampleRequest": {"customer_mobile": "9876543210", "status": "active"},
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/loan/lead-details' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\"customer_mobile\": \"9876543210\", \"status\": \"active\"}'",
+  "validationNotes": ["Authorization header with partner token is required", "All parameters are optional for filtering", "Mobile number must be 10 digits"],
+  "fieldTable": [
+    {"field": "lead_id", "type": "string", "required": "No", "description": "Lead ID to retrieve specific lead"},
+    {"field": "customer_mobile", "type": "string", "required": "No", "description": "Customer mobile number (10 digits)"},
+    {"field": "status", "type": "string", "required": "No", "description": "Lead status filter"}
+  ],
+  "products": ["Loan Genius"],
+  "sampleResponses": [],
+  "errorResponse": {"status": "error", "message": "Failed to fetch loan lead details", "data": null, "error_code": "LOAN_LEAD_001"},
+  "errorResponses": []
+},
+'partner-auto-auth-mobile': {
+  "name": "Partner Auto Authentication (using mobile)",
+  "endpoint": "/partner/auto-auth-mobile",
+  "methods": ["POST"],
+  "status": "live",
+  "description": "Automatic partner authentication using mobile number",
+  "category": "Partner APIs",
+  "purpose": "Authenticate partner automatically using mobile number without OTP verification for trusted devices",
+  "requestSchema": {
+    "type": "object",
+    "properties": {
+      "mobile": {"type": "string", "description": "Mobile number for authentication", "required": true, "validation": "Must be a valid 10-digit mobile number"},
+      "device_id": {"type": "string", "description": "Unique device identifier", "required": true, "validation": "Valid device ID"},
+      "trusted_device": {"type": "boolean", "description": "Whether device is trusted", "required": false, "validation": "Boolean value"}
+    }
+  },
+  "responseSchema": {
+    "type": "object",
+    "properties": {
+      "status": {"type": "string", "description": "Response status (success/error)"},
+      "message": {"type": "string", "description": "Response message"},
+      "data": {
+        "type": "object",
+        "properties": {
+          "auth_token": {"type": "string", "description": "JWT authentication token"},
+          "user_data": {
+            "type": "object",
+            "properties": {
+              "mobile": {"type": "string", "description": "User mobile number"},
+              "name": {"type": "string", "description": "User name"},
+              "partner_id": {"type": "string", "description": "Partner ID"}
+            }
+          },
+          "device_trusted": {"type": "boolean", "description": "Whether device is marked as trusted"}
+        }
+      }
+    }
+  },
+  "sampleRequest": {"mobile": "9876543210", "device_id": "device_12345", "trusted_device": true},
+  "curlExample": "curl --location 'https://uat-partner.bankkaro.com/partner/auto-auth-mobile' \\\n--header 'Authorization: Bearer {{JWT_TOKEN}}' \\\n--header 'Content-Type: application/json' \\\n--data '{\"mobile\": \"9876543210\", \"device_id\": \"device_12345\", \"trusted_device\": true}'",
+  "validationNotes": ["Mobile must be a valid 10-digit number", "Device ID is required for security", "Trusted device flag is optional", "Authorization header with partner token is required"],
+  "fieldTable": [
+    {"field": "mobile", "type": "string", "required": "Yes", "description": "Mobile number for authentication (10 digits)"},
+    {"field": "device_id", "type": "string", "required": "Yes", "description": "Unique device identifier"},
+    {"field": "trusted_device", "type": "boolean", "required": "No", "description": "Whether device is trusted"}
+  ],
+  "products": ["Loan Genius"],
+  "sampleResponses": [],
+  "errorResponse": {"status": "error", "message": "Auto authentication failed", "data": null, "error_code": "AUTO_AUTH_001"},
+  "errorResponses": [
+    {"title": "Invalid Mobile Number", "statusCode": 400, "response": {"status": "error", "message": "Invalid mobile number format", "data": null, "error_code": "AUTO_AUTH_002"}},
+    {"title": "Device Not Trusted", "statusCode": 403, "response": {"status": "error", "message": "Device is not trusted for auto authentication", "data": null, "error_code": "AUTO_AUTH_003"}}
+  ]
+}
+};
