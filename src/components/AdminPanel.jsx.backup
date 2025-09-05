@@ -81,13 +81,6 @@ const AdminPanel = () => {
     fieldTable: []
   });
 
-  // Function to generate endpoint key from endpoint path
-  const generateEndpointKey = (endpointPath) => {
-    if (!endpointPath) return '';
-    // Convert /partner/auth to partner-auth
-    return endpointPath.replace(/^\//, '').replace(/\//g, '-');
-  };
-
   useEffect(() => {
     fetchEndpoints();
   }, []);
@@ -335,21 +328,6 @@ const AdminPanel = () => {
       const updatedEndpoints = { ...apiData };
 
       if (editingEndpoint) {
-
-      // Validate required fields
-      if (!formData.name || !formData.endpoint) {
-        alert("❌ Please fill in the Name and Endpoint URL fields.");
-        setSaving(false);
-        return;
-      }
-
-      // Generate endpoint key and validate
-      const endpointKey = generateEndpointKey(formData.endpoint);
-      if (!endpointKey) {
-        alert("❌ Please provide a valid endpoint URL.");
-        setSaving(false);
-        return;
-      }
         // Update existing endpoint
         const oldKey = editingEndpoint.endpoint;
         const newKey = formData.endpoint;
